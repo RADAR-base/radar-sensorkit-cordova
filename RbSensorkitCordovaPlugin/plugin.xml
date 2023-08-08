@@ -41,7 +41,6 @@
         <source-file src="src/ios/SensorKitDataExtractor/PhoneUsageReportDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/RotationRateDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/SensorKitDataExtractor.swift" />
-        <source-file src="src/ios/SensorKitDataExtractor/SiriSpeechDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/SiriSpeechMetricsDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/TelephonySpeechMetricsDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/VisitsDataExtractor.swift" />
