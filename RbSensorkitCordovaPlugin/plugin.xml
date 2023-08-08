@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-radarbase-sensorkit" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>RbSensorkitCordovaPlugin</name>
+    <description>Cordova plugin for Sensorkit integration in RADAR-base</description>
+    <license>MIT-0</license>
+    <keywords>cordova, radarbase, ios, sensorkit</keywords>
+
+    <js-module name="RbSensorkitCordovaPlugin" src="www/RbSensorkitCordovaPlugin.js">
+        <clobbers target="RbSensorkitCordovaPlugin" />
+    </js-module>
+
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="RbSensorkitCordovaPlugin">
+                <param name="ios-package" value="RbSensorkitCordovaPlugin" />
+            </feature>
+        </config-file>
+
+<!--        <config-file target="*-Info.plist" parent="UIFileSharingEnabled">-->
+<!--            <true/>-->
+<!--        </config-file>-->
+
+<!--        <config-file target="*-Info.plist" parent="LSSupportsOpeningDocumentsInPlace">-->
+<!--            <true/>-->
+<!--        </config-file>-->
+
+        <source-file src="src/ios/RbSensorkitCordovaPlugin.swift" />
+        <source-file src="src/ios/Constants.swift" />
+        <source-file src="src/ios/Utils.swift" />
+        <source-file src="src/ios/Extensions.swift" />
+        <source-file src="src/ios/CallbackHelper.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/AccelerometerDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/AmbientLightDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/AmbientPressureDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/DeviceUsageDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/KeyboardMetricsDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/MediaEventsDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/MessageUsageReportDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/OnWristStateDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/PedometerDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/PhoneUsageReportDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/RotationRateDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/SensorKitDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/SiriSpeechDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/SiriSpeechMetricsDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/TelephonySpeechMetricsDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/VisitsDataExtractor.swift" />
+        <source-file src="src/ios/SensorKitDataExtractor/SensorKitProtocol.swift" />
+
+        <!--        <source-file src="src/ios/SensorKitDataExtractor/" target="src/"/>-->
+
+        <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
+            <podspec>
+                <config>
+                    <!-- CocoaPods repositories -->
+<!--                    <source url="https://cdn.cocoapods.org/" />-->
+                    <source url="https://github.com/CocoaPods/Specs.git"/>
+                </config>
+                <pods use-frameworks="true">
+                    <!-- Or install using a Git repository -->
+                    <pod name="GzipSwift" options=":git => 'https://github.com/1024jp/GzipSwift.git', :tag => '5.2.0'" />
+                </pods>
+            </podspec>
+    </platform>
+</plugin>
