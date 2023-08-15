@@ -11,9 +11,7 @@ extension Array {
 extension String {
     func toDate(withFormat format: String = "yyyy-MM-dd'T'HH:mm:ss")-> Date?{
         let dateFormatter = DateFormatter()
-//        dateFormatter.timeZone = TimeZone(identifier: "Asia/Tehran")
-//        dateFormatter.locale = Locale(identifier: "fa-IR")
-//        dateFormatter.calendar = Calendar(identifier: .gregorian)
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = format
         let date = dateFormatter.date(from: self)
         return date
@@ -23,9 +21,7 @@ extension String {
 extension Date {
     func toString(withFormat format: String = "yyyy-MM-dd'T'HH:mm:ss") -> String {
         let dateFormatter = DateFormatter()
-//        dateFormatter.locale = Locale(identifier: "fa-IR")
-//        dateFormatter.timeZone = TimeZone(identifier: "Asia/Tehran")
-//        dateFormatter.calendar = Calendar(identifier: .persian)
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = format
         let str = dateFormatter.string(from: self)
         return str
