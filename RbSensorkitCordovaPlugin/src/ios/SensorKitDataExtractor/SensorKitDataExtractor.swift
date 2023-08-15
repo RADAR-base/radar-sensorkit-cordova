@@ -23,11 +23,21 @@ extension RbSensorkitCordovaPlugin {
         reader.fetch(fetchRequest)
     }
     
-    func processData(sensorDataArray: [[String : Any]]) {
-        getTopic(sensorDataArray: sensorDataArray)
+    func processData(sensorDataArray: [[String : Any]]) async {
+        if topicName == nil {
+            return
+        }
+        do {
+            self.topicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: topicName!) ?? 0
+            self.topicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: topicName!) ?? 0
+            self.logTopicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: "connect_data_log") ?? 0
+            self.logTopicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: "connect_data_log") ?? 0
+            await self.prepareForPost(sensorDataArray: sensorDataArray)
+        } catch {
+        }
     }
     
-    func prepareForPost(sensorDataArray: [[String : Any]]) {
+    func prepareForPost(sensorDataArray: [[String : Any]]) async {
         log("Processing Data started at: \(Date().timeIntervalSince1970)")
         log("Total number of records: \(sensorDataArray.count)")
         if sensorDataArray.isEmpty {
@@ -40,10 +50,10 @@ extension RbSensorkitCordovaPlugin {
         log("Number of chunks: \(totalIterations + 1) - ChunkSize: \(chunkSize) records")
         results = sensorDataArray.chunked(into: chunkSize)
         iterationCounter = -1
-        doNextPost()
+        await doNextPost()
     }
     
-    func postDataToKafka(payload: [[String : Any]]) {
+    func postDataToKafka(payload: [[String : Any]]) async {
         startTime = payload[0]["time"] as! Double
         endTime = payload[payload.count-1]["time"] as! Double
         let body = getBody(payload: payload)
@@ -53,7 +63,7 @@ extension RbSensorkitCordovaPlugin {
         let compressedData = getCompressedData(data: data)
 //        writeToFile(data: compressedData, fileName: "acc_1807_\(iterationCounter)")
         guard let request = getRequest(compressedData: compressedData) else {return}
-        send(request: request)
+        await send(request: request)
     }
     
     func getBody(payload: [[String: Any]]) -> [String: Any] {
@@ -67,7 +77,7 @@ extension RbSensorkitCordovaPlugin {
         }
         
         let body: [String: Any] = [
-            "key_schema_id": 1,
+            "key_schema_id": topicKeyId,
             "value_schema_id": topicValueId,
             "records": records
         ]
@@ -82,40 +92,27 @@ extension RbSensorkitCordovaPlugin {
         return compressedData
     }
     
-    func getTopic(sensorDataArray: [[String : Any]]) {
-        if (topicName == nil) {
-            return
-        }
-
-        guard let url = URL(string: Config.baseUrl + Config.schemaEndpoint + topicName! + "-value/versions/latest") else {
-            return
+    func getTopicId(property: TopicKeyValue, topicName: String) async throws -> Int? {
+        guard let url = URL(string: Config.baseUrl + Config.schemaEndpoint + topicName + "-" + property.rawValue + "/versions/latest") else {
+            return nil
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) { [self]
-            (data, response, error) in
-            _ = response as? HTTPURLResponse
-            
-            if let error = error {
-                log("An error occured. \(error)")
-                return
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw PostToKafkaError.runtimeError("Failed")
+        }
+        var id: Int? = nil
+        do {
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                id = json["id"] as? Int
             }
-            
-            if let data = data {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        topicValueId = json["id"] as! Int
-                        
-                        prepareForPost(sensorDataArray: sensorDataArray)
-                    }
-
-                } catch let error {
-                    log("We couldn't parse the data into JSON. \(error)")
-                }
-            }
-        }.resume()
+        } catch let error {
+            log("We couldn't parse the data into JSON. \(error)")
+        }
+        return id
     }
     
     func getRequest(compressedData: Data) -> URLRequest? {
@@ -129,12 +126,6 @@ extension RbSensorkitCordovaPlugin {
         request.httpMethod = "POST"
         
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        //        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        //        request.addValue(postLength, forHTTPHeaderField: "Content-Length")
-        //        request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
-        //        request.setValue("application/vnd.kafka.avro.v2+json", forHTTPHeaderField: "Content-Type")
-        //        request.setValue("application/vnd.radarbase.avro.v1+binary", forHTTPHeaderField: "Content-Type")
-
         request.setValue("application/vnd.kafka.v2+json, application/vnd.kafka+json; q=0.9, application/json; q=0.8", forHTTPHeaderField: "Accept")
         request.setValue( "Bearer \(Config.token)", forHTTPHeaderField: "Authorization")
         request.addValue(postLength, forHTTPHeaderField: "Content-Length")
@@ -144,34 +135,27 @@ extension RbSensorkitCordovaPlugin {
         return request
     }
     
-    func send(request: URLRequest) {
+    func send(request: URLRequest) async {
         let startTime = Date().timeIntervalSince1970
-        URLSession.shared.dataTask(with: request) { [self]
-            (data, response, error) in
-            let response = response as? HTTPURLResponse
-
-            if let error = error {
-                log("An error occured. \(error)")
-                return
-            }
-
-            if let data = data {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        let time = Date().timeIntervalSince1970 - startTime
-                        log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
-                        log("\(json)")
-                        handleError(response: response, data: json)
-                    }
-                } catch let error {
-                    log("We couldn't parse the data into JSON. \(error)")
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let time = Date().timeIntervalSince1970 - startTime
+                    log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
+                    log("\(json)")
+                    await handleError(response: response as? HTTPURLResponse, data: json)
                 }
-                self.doNextPost()
+            } catch let error {
+                log("We couldn't parse the data into JSON. \(error)")
             }
-        }.resume()
+            await self.doNextPost()
+        } catch {
+            
+        }
     }
     
-    func handleError(response: HTTPURLResponse?, data: [String: Any]){
+    func handleError(response: HTTPURLResponse?, data: [String: Any]) async{
         var recordCount = chunkSize
         if iterationCounter == totalIterations {
             recordCount = sensorDataArray.count - iterationCounter * chunkSize
@@ -180,6 +164,8 @@ extension RbSensorkitCordovaPlugin {
             let data = ["progress": iterationCounter + 1, "total": totalIterations + 1, "start": startTime, "end": endTime, "recordCount": recordCount] as [String : Any]
             let json = convertToJson(data: data)
             self.callbackHelper?.sendJson(self.fetchDataCommand!, json, true)
+            // send log
+            await self.postLogToKafka()
         } else {
             let data = ["statusCode": response?.statusCode ?? 0, "progress": iterationCounter + 1, "total": totalIterations + 1, "start": startTime, "end": endTime, "recordCount": recordCount, "error_description": data["error_description"] ?? "No description", "error_message": data["error"] ?? "No error message"]
             let json = convertToJson(data: data)
@@ -187,13 +173,47 @@ extension RbSensorkitCordovaPlugin {
         }
     }
     
-    func doNextPost() {
+    func doNextPost() async {
         if iterationCounter < totalIterations {
             iterationCounter += 1
-            postDataToKafka(payload: results[iterationCounter])
+            await postDataToKafka(payload: results[iterationCounter])
         } else {
             // SEND REPORT
             log("Finished at: \(Date().timeIntervalSince1970)")
         }
     }
+    
+    func postLogToKafka() async{
+        let data = [["time": Date().timeIntervalSince1970, "dataGroupingType": "PASSIVE_SENSOR_KIT"] as [String : Any]]
+        let key: [String : Any] = [
+            "projectId": ["string": Config.projectId],
+            "userId": Config.userId,
+            "sourceId": Config.sourceId
+        ] as [String : Any]
+        let records = data.map {
+            return ["key": key, "value": $0] as [String : Any]
+        }
+        
+        let body: [String: Any] = [
+            "key_schema_id": logTopicKeyId,
+            "value_schema_id": logTopicValueId,
+            "records": records
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: body) else {
+            return
+        }
+        guard let url = URL(string: Config.baseUrl + Config.kafkaEndpoint + "connect_data_log") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/vnd.kafka.v2+json, application/vnd.kafka+json; q=0.9, application/json; q=0.8", forHTTPHeaderField: "Accept")
+        request.setValue( "Bearer \(Config.token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = data
+        do {
+            let (_, _) = try await URLSession.shared.data(for: request)
+        } catch let error {
+            log("Error on sending connect log. \(error)")
+        }
+    }
 }
+

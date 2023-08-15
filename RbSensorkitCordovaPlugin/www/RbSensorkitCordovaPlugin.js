@@ -6,8 +6,8 @@ exports.selectSensor = function(arg0, success, error) {
     exec(success, error, PLUGIN_NAME, "selectSensor", arg0);
 };
 
-exports.authorize = function(success, error) {
-    exec(success, error, PLUGIN_NAME, "authorize", []);
+exports.authorize = function(arg0, success, error) {
+    exec(success, error, PLUGIN_NAME, "authorize", arg0);
 };
 
 exports.isSensorKitAvailable = function(success, error) {

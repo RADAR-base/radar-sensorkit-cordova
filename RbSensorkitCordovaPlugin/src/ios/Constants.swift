@@ -47,3 +47,13 @@ struct Config {
     static var userId = ""
     static var sourceId = ""
 }
+
+enum PostToKafkaError: Error {
+    case runtimeError(String)
+}
+
+enum TopicKeyValue: String {
+    case KEY = "key"
+    case VALUE = "value"
+}
+

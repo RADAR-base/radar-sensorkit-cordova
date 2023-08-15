@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJQUk9KRUNULlJFQUQiLCJST0xFLlJFQUQiLCJTT1VSQ0UuUkVBRCIsIlNPVVJDRURBVEEuUkVBRCIsIlNPVVJDRVRZUEUuUkVBRCIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIiwiVVNFUi5SRUFEIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE2OTEwODczMTMsImlhdCI6MTY5MTA0NDExMywiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.FyZlx5NRX1T6HmVYlL74fH-x4JJT8IT6v3NJmd05asSgPrBZmEVImh-NCkgjDS_2uxWJHZYluVT0Xm4BQi0IHw",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOltdLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwidXNlcl9uYW1lIjoiOTY5Yjk5MjktMTE1OS00MzIxLThjMzUtMWNkMzRmOTM0ZTg3Iiwicm9sZXMiOlsiU1RBR0lOR19QUk9KRUNUOlJPTEVfUEFSVElDSVBBTlQiXSwic2NvcGUiOlsiTUVBU1VSRU1FTlQuQ1JFQVRFIiwiUFJPSkVDVC5SRUFEIiwiUk9MRS5SRUFEIiwiU09VUkNFLlJFQUQiLCJTT1VSQ0VEQVRBLlJFQUQiLCJTT1VSQ0VUWVBFLlJFQUQiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSIsIlVTRVIuUkVBRCJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNjkyMDYwOTQ5LCJpYXQiOjE2OTIwMTc3NDksImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.GSoUBVYB5LHlwFBcq0AeZJMMbOMv9FydaxBfRWh-zwGp-yyLu9mj3hZHMWt1xw3OKsQG6ViBqUqhWBXTspUkBg",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
     projectId: "STAGING_PROJECT",
-    userId: "edf863e7-e38a-4161-b784-8f271afe01aa",
+    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -48,21 +48,37 @@ async function onDeviceReady() {
         console.log("[JS] Config is NOT set", e)
     }
 
-    await sleep(1000)
+    // await sleep(1000)
     /**********************************/
-    await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, '2023-08-01T10:00:00', '2023-08-5T10:00:00', 'iPhone')
+    const sensors = ["accelerometer", "ambientLightSensor", "ambientPressure", "deviceUsageReport", "keyboardMetrics", "mediaEvents", "messagesUsageReport", "onWristState", "pedometerData", "phoneUsageReport", "rotationRate", "siriSpeechMetrics", "telephonySpeechMetrics", "visits"]
+    try {
+        const res = await authorize(sensors)
+        console.log("[JS] Authorize", res);
+    } catch (e) {
+        console.log("[JS] Authorize Error", e);
+    }
+    /**********************************/
+    // await runSensor("onWristState", "sensorkit_on_wrist", 0, 10000, '2023-08-01T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 
-    await sleep(20000)
+    // await sleep(20000)
+
+    // await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, '2023-08-011T09:00:00', '2023-08-12T00:00:00', 'iPhone')
+
+    // await sleep(20000)
+
+    // await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, '2023-08-010T10:00:00', '2023-08-13T10:00:00', 'iPhone')
+
+    // await sleep(20000)
 
     await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, '2023-08-01T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 
     await sleep(20000)
 
-    await runSensor("visits", "sensorkit_visits", 0, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
+    // await runSensor("visits", "sensorkit_visits", 0, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 
-    await sleep(20000)
+    // await sleep(20000)
 
-    await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
+    // await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 }
 
 async function runSensor(name, topic, period, chunkSize, startDate, endDate, deviceName) {
@@ -89,17 +105,52 @@ async function runSensor(name, topic, period, chunkSize, startDate, endDate, dev
         document.getElementById('sensor').innerHTML = sensor.name;
         console.log("[JS] Sensor " + sensor.name + " is selected", res);
     } catch (e) {
-        document.getElementById('sensor').innerHTML = '-';
+        document.getElementById('sensor').innerHTML = "Sensor " + sensor.name + " is NOT selected (" + e + ")";
         console.log("[JS] Sensor " + sensor.name + " is NOT selected", e);
     }
-    await sleep(1000)
+    // await sleep(1000)
+    checkAuthorization()
+
+    // try {
+    //     const res = await checkAuthorization()
+    //     console.log("[JS] AuthorizationStatus", res);
+    //     // // if(res === 'NOT_DETERMINED') {
+    //     //     try {
+    //     //         const authRes = await authorize()
+    //     //         console.log("[JS] Authorize", authRes);
+    //     //     } catch (e) {
+    //     //         console.log("[JS] Authorize Error", e);
+    //     //     }
+    //     // // }
+    // } catch (e) {
+    //     console.log("[JS] AuthorizationStatus Error", e);
+    // }
+
+    // await sleep(1000)
     try {
-        const res = await checkAuthorization()
-        console.log("[JS] Authorization", res);
+        const res = await startRecording()
+        console.log("[JS] Start Recording", res);
     } catch (e) {
-        console.log("[JS] Authorization Error", e);
+        console.log("[JS] Start Recording Error", e);
     }
-    await sleep(1000)
+
+    // await sleep(1000)
+    try {
+        const res = await startRecording()
+        console.log("[JS] Start Recording2", res);
+    } catch (e) {
+        console.log("[JS] Start Recording2 Error", e);
+    }
+
+    // await sleep(1000)
+    try {
+        const res = await startRecording()
+        console.log("[JS] Start Recording3", res);
+    } catch (e) {
+        console.log("[JS] Start Recording3 Error", e);
+    }
+
+    // await sleep(1000)
     try {
         const res = await fetchDevices()
         console.log("[JS] Devices", JSON.stringify(res));
@@ -108,7 +159,7 @@ async function runSensor(name, topic, period, chunkSize, startDate, endDate, dev
         console.log("[JS] Devices Error", e);
         document.getElementById('device').innerHTML = JSON.stringify((e));
     }
-    await sleep(1000)
+    // await sleep(1000)
 
     const requestParams = {
         startDate: startDate,
@@ -159,14 +210,24 @@ function selectSensor(sensor) {
 }
 
 function checkAuthorization() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.checkAuthorization(resolve, reject)
-    })
+    RbSensorkitCordovaPlugin.checkAuthorization(function(res){
+            console.log("[JS] AuthorizationStatus", res);
+        },
+        function(e){
+            console.log("[JS] AuthorizationStatus Error", e);
+        }
+    )
 }
 
-function authorize() {
+// function checkAuthorization() {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.checkAuthorization(resolve, reject)
+//     })
+// }
+
+function authorize(sensors) {
     return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.authorize(resolve, reject)
+        RbSensorkitCordovaPlugin.authorize(sensors, resolve, reject)
     })
 }
 
@@ -206,5 +267,6 @@ function stopRecording() {
         RbSensorkitCordovaPlugin.stopRecording(resolve, reject)
     })
 }
+
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));

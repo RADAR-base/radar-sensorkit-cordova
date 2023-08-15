@@ -19,8 +19,10 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     var periodMili: Double = 0
     var chunkSize = 10000
 
-    //TODO topicKeyId
+    var topicKeyId = 1
     var topicValueId = 0
+    var logTopicKeyId = 0
+    var logTopicValueId = 0
     var lastRecordTS: Double = 0
     
     var totalIterations = 0
@@ -36,7 +38,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
         log("Initializing Cordova plugin \(Constants.APP_NAME)");
         super.pluginInitialize()
         callbackHelper = CallbackHelper(self.commandDelegate!)
-
     }
     
     // MARK: isSensorKitAvailable
@@ -62,14 +63,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     }
     
     func _isSensorAvailable(_ sensor: String) -> Bool {
-//        _selectSensor(sensor: sensor)
-//        do {
-//            self.selectedSensor?.checkAuthorization()
-//        }
-//        catch {
-//            // Couldn't create audio player object, log the error
-//            print("===*** Couldn't checkAuthorization")
-//        }
         switch (sensor) {
             case "accelerometer", "ambientLightSensor", "deviceUsageReport", "keyboardMetrics", "messagesUsageReport", "onWristState", "pedometerData", "phoneUsageReport", "rotationRate", "visits":
                 return true
@@ -144,11 +137,11 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             case "keyboardMetrics":
                 sensor = .keyboardMetrics
                 break
-//                case "mediaEvents":
-//                    if #available(iOS 16.4, *) {
-//                        sensor = .mediaEvents
-//                    }
-//                    break
+            // case "mediaEvents":
+            //    if #available(iOS 16.4, *) {
+            //        sensor = .mediaEvents
+            //    }
+            //    break
             case "messagesUsageReport":
                 sensor = .messagesUsageReport
                 break
@@ -161,29 +154,28 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             case "phoneUsageReport":
                 sensor = .phoneUsageReport
                 break
-//                case "rotationRate":
-//                    sensor = .rotationRate
-//                    break
-//                case "siriSpeechMetrics":
-//                    if #available(iOS 15.0, *) {
-//                        sensor = .siriSpeechMetrics
-//                    }
-//                    break
-//                case "telephonySpeechMetrics":
-//                    if #available(iOS 15.0, *) {
-//                        sensor = .telephonySpeechMetrics
-//                    }
-//                    break
+            // case "rotationRate":
+            //    sensor = .rotationRate
+            //    break
+            // case "siriSpeechMetrics":
+            //    if #available(iOS 15.0, *) {
+            //        sensor = .siriSpeechMetrics
+            //    }
+            //    break
+            // case "telephonySpeechMetrics":
+            //    if #available(iOS 15.0, *) {
+            //        sensor = .telephonySpeechMetrics
+            //    }
+            //    break
             case "visits":
                 sensor = .visits
                 break
             default:
-//                self.callbackHelper?.sendError(command, "INVALID_SENSOR")
                 break
         }
         return sensor
     }
-
+    
     // MARK: Select the Sensor
     @objc(selectSensor:) func selectSensor(command: CDVInvokedUrlCommand) {
         self.commandDelegate.run {
@@ -197,7 +189,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
                 return
             }
             
-            self.reader = SRSensorReader(sensor: sensor)
+            // self.reader = SRSensorReader(sensor: sensor)
             self.reader = .init(sensor: sensor)
             self.reader.delegate = self
 
@@ -214,8 +206,10 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             self.devices = []
             self.sensorDataArray = []
             
-            //TODO topicKeyId
+            self.topicKeyId = 0
             self.topicValueId = 0
+            self.logTopicKeyId = 0
+            self.logTopicValueId = 0
             self.lastRecordTS = 0
             
             self.totalIterations = 0
@@ -224,35 +218,40 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
 
             self.startTime = 0
             self.endTime = 0
-
-            self.callbackHelper?.sendEmpty(command)
+            let authorizationState = self._checkAuthorization()
+            if authorizationState == "AUTHORIZED" {
+                self.callbackHelper?.sendEmpty(command)
+                return
+            }
+            self.callbackHelper?.sendError(command, authorizationState)
         }
     }
 
     // MARK: Authorize
     @objc(authorize:) func authorize(command: CDVInvokedUrlCommand) {
-        switch self.reader.authorizationStatus {
-        case .authorized:
-            self.callbackHelper?.sendError(command, "ALREADY_AUTHORIZED")
-            break
-        case .denied:
-            self.callbackHelper?.sendError(command, "ALREADY_DENIED")
-            break
-        case .notDetermined:
+        guard let sensorsString: [String] = command.arguments as? [String] else {
+            self.callbackHelper?.sendError(command, "NO_SENSOR")
+            return
+        }
+        let sensors: Set<SRSensor> = Set(sensorsString.map { _getSRSensor(sensorString: $0) ?? nil}.compactMap { $0 })
+        if sensors.isEmpty {
+            self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
+            return
+        }
+        self.commandDelegate.run {
             SRSensorReader.requestAuthorization(
-                sensors: [self.reader.sensor], completion: { (error: Error?) in
+                sensors: sensors, completion: { (error: Error?) in
                     if let error = error {
                         self.callbackHelper?.sendError(command, error.localizedDescription)
                     } else {
-                        self.authorizationCommand = command
-                        log("RequestAuthorization Success for \(String(describing: self.reader.sensor.rawValue))")
+                        self.callbackHelper?.sendEmpty(command)
                     }
-            })
-            break
+                })
         }
     }
     
     func sensorReader(_ reader: SRSensorReader, didChange authorizationStatus: SRAuthorizationStatus) {
+        log("authorizationStatus didChange \(authorizationStatus) - \(reader.sensor)")
         var response = "NOT_DETERMIND"
         switch authorizationStatus {
         case .authorized:
@@ -265,11 +264,17 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             response = "NOT_DETERMINED"
             break
         }
-        self.callbackHelper?.sendString(self.authorizationCommand!, response)
+        self.callbackHelper?.sendString(self.authorizationCommand!, response, true)
     }
     
     // MARK: checkAuthorization
     @objc(checkAuthorization:) func checkAuthorization(command: CDVInvokedUrlCommand) {
+        let response = _checkAuthorization()
+        self.authorizationCommand = command
+        self.callbackHelper?.sendString(command, response, true)
+    }
+    
+    func _checkAuthorization() -> String {
         var response = "NOT_DETERMIND"
         switch self.reader.authorizationStatus {
         case .authorized:
@@ -282,11 +287,22 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             response = "NOT_DETERMINED"
             break
         }
-        self.callbackHelper?.sendString(command, response)
+        return response
+    }
+    
+    func _isAuthorized() -> Bool {
+        if self.reader.authorizationStatus.rawValue == 1 {
+            return true
+        }
+        return false
     }
 
     // MARK: startRecording
     @objc(startRecording:) func startRecording(command: CDVInvokedUrlCommand) {
+        if !_isAuthorized() {
+            callbackHelper?.sendError(command, "NOT_AUTHORIZED")
+            return
+        }
         self.startRecordingCommand = command
         reader.startRecording()
     }
@@ -294,28 +310,42 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     func sensorReaderWillStartRecording(_ reader: SRSensorReader) {
         callbackHelper?.sendEmpty(self.startRecordingCommand!)
     }
+    
     func sensorReader(_ reader: SRSensorReader, startRecordingFailedWithError error: Error) {
         callbackHelper?.sendError(self.startRecordingCommand!, error.localizedDescription)
     }
 
     // MARK: stopRecording
     @objc(stopRecording:) func stopRecording(command: CDVInvokedUrlCommand) {
-        self.stopRecordingCommand = command
-        reader.stopRecording()
+        self.commandDelegate.run {
+            if !self._isAuthorized() {
+                self.callbackHelper?.sendError(command, "NOT_AUTHORIZED")
+                return
+            }
+            self.stopRecordingCommand = command
+            self.reader.stopRecording()
+        }
     }
     
     func sensorReaderDidStopRecording(_ reader: SRSensorReader) {
         callbackHelper?.sendEmpty(self.stopRecordingCommand!)
     }
+    
     func sensorReader(_ reader: SRSensorReader, stopRecordingFailedWithError error: Error) {
         callbackHelper?.sendError(self.stopRecordingCommand!, error.localizedDescription)
     }
 
     // MARK: fetchDevices
     @objc(fetchDevices:) func fetchDevices(command: CDVInvokedUrlCommand) {
-        self.fetchDevicesCommand = command
         self.commandDelegate.run {
-            self.reader.fetchDevices()
+            if !self._isAuthorized() {
+                self.callbackHelper?.sendError(command, "NOT_AUTHORIZED")
+                return
+            }
+            self.fetchDevicesCommand = command
+            self.commandDelegate.run {
+                self.reader.fetchDevices()
+            }
         }
     }
     
@@ -332,29 +362,30 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
         }
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: ["devices": resultObject], options: JSONSerialization.WritingOptions.prettyPrinted)
-
-            // if let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
-            // print(JSONString)
-            // }
-
             let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
             self.callbackHelper!.sendJson(self.fetchDevicesCommand!, json)
-        } catch {
-            print("error.description")
+        } catch let error {
+            self.callbackHelper?.sendError(self.fetchDevicesCommand!, error.localizedDescription)
         }
     }
+    
     func sensorReader(_ reader: SRSensorReader, fetchDevicesDidFailWithError error: Error) {
         self.callbackHelper?.sendError(self.fetchDevicesCommand!, error.localizedDescription)
     }
 
     // MARK: fetchData
     @objc(fetchData:) func fetchData(command: CDVInvokedUrlCommand) {
+        if !_isAuthorized() {
+            callbackHelper?.sendError(command, "NOT_AUTHORIZED")
+            return
+        }
         if (Config.token.isEmpty || Config.baseUrl.isEmpty || Config.projectId.isEmpty || Config.userId.isEmpty ) {
             callbackHelper?.sendError(command, "INVALID_CONFIG")
             return
         }
 
         guard let fromDateString = command.arguments[0] as? String, let toDateString = command.arguments[1] as? String else {
+            callbackHelper?.sendError(command, "INVALID_DATES")
             return
         }
 
@@ -376,28 +407,9 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     }
     
     func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, failedWithError error: Error) {
-//        self.callbackHelper!.sendErrorJson(self.fetchDataCommand!, json, true)
-        // delegate?.fetchDataResponse(.error, error, nil)
-//        do {
-//            let jsonData = try JSONSerialization.data(withJSONObject: response!, options: JSONSerialization.WritingOptions.prettyPrinted)
-//
-//            // if let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
-//            // print(JSONString)
-//            // }
-//
-//            let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
-//            switch res {
-//                case .success:
-//                    self.callbackHelper!.sendJson((selectedSensor?.fetchDataCommand)!, json, true)
-//                    break
-//                case .error:
-//                    self.callbackHelper!.sendErrorJson((selectedSensor?.fetchDataCommand)!, json, true)
-//                    break
-//            }
-//        } catch {
-//            print("error.description")
-//        }
+        self.callbackHelper!.sendError(self.fetchDataCommand!, error.localizedDescription)
     }
+    
     func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, didFetchResult result: SRFetchResult<AnyObject>) -> Bool {
         switch reader.sensor.rawValue {
         case "com.apple.SensorKit.motion.accelerometer":
@@ -467,17 +479,18 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
         }
         return true
     }
-
+    
     func sensorReader(_ reader: SRSensorReader, didCompleteFetch fetchRequest: SRFetchRequest) {
         log("Fetch completed \(reader.sensor.rawValue) (\(sensorDataArray.count))")
         // showFirstNResult(n: 10, array: sensorDataArray)
-        processData(sensorDataArray: sensorDataArray)
+        Task {
+            await processData(sensorDataArray: sensorDataArray)
+        }
     }
 
 
     // MARK: echo
-    @objc(echo:)
-    func echo(command: CDVInvokedUrlCommand) {
+    @objc(echo:) func echo(command: CDVInvokedUrlCommand) {
         var pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR)
 
         let msg = command.arguments[0] as? String ?? ""
