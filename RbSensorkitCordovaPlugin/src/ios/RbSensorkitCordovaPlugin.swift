@@ -342,6 +342,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
                 self.callbackHelper?.sendError(command, "NOT_AUTHORIZED")
                 return
             }
+            self.devices = []
             self.fetchDevicesCommand = command
             self.commandDelegate.run {
                 self.reader.fetchDevices()
@@ -401,6 +402,12 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
         self.fetchDataCommand = command
         self.commandDelegate.run {
             self.sensorDataArray = []
+            self.totalIterations = 0
+            self.iterationCounter = -1
+            self.results = []
+
+            self.startTime = 0
+            self.endTime = 0
             let device: SRDevice? = self.devices.first(where: {$0.name == deviceName}) ?? SRDevice.current
             self.fetchSamples(fromDate: fromDate, toDate: toDate, device: device)
         }
