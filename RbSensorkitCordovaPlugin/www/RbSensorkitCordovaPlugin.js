@@ -49,3 +49,11 @@ exports.fetchDevices = function(success, error) {
 exports.echo = function(arg0, success, error) {
     exec(success, error, PLUGIN_NAME, "echo", [arg0]);
 };
+
+exports.selectMagneticFieldSensor = function(arg0, success, error) {
+    exec(success, error, PLUGIN_NAME, "selectMagneticFieldSensor", arg0);
+};
+
+exports.startMagneticFieldUpdate = function(arg0, success, error) {
+    exec(success, error, PLUGIN_NAME, "startMagneticFieldUpdate", arg0);
+};

@@ -15,6 +15,7 @@ struct Constants {
         "siriSpeechMetrics": "",
         "telephonySpeechMetrics": "",
         "visits": "sensorkit_visits",
+        "magneticField": "sensorkit_acceleration",
     ]
 
     static let DEFAULT_PERIOD: [String : Double] = [

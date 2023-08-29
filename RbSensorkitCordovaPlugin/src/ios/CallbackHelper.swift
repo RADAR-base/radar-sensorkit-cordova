@@ -27,12 +27,12 @@ class CallbackHelper {
   }
 
   // Returns an error result with a message
-  func sendError(_ command: CDVInvokedUrlCommand, _ message: String) {
+  func sendError(_ command: CDVInvokedUrlCommand, _ message: String, _ keepCallback: Bool = false) {
     let pluginResult = CDVPluginResult(
       status: CDVCommandStatus_ERROR,
       messageAs: message
     )
-    self.send(command, pluginResult!)
+    self.send(command, pluginResult!, keepCallback)
   }
 
   // Returns an OK response with no value
