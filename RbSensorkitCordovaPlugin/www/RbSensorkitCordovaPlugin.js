@@ -57,3 +57,7 @@ exports.selectMagneticFieldSensor = function(arg0, success, error) {
 exports.startMagneticFieldUpdate = function(arg0, success, error) {
     exec(success, error, PLUGIN_NAME, "startMagneticFieldUpdate", arg0);
 };
+
+exports.stopMagneticFieldUpdate = function(arg0, success, error) {
+    exec(success, error, PLUGIN_NAME, "stopMagneticFieldUpdate", arg0);
+};

@@ -113,6 +113,10 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
         Config.projectId = projectId
         Config.userId = userId
         Config.sourceId = sourceId
+        Task {
+            self.logTopicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: "connect_data_log") ?? 0
+            self.logTopicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: "connect_data_log") ?? 0
+        }
         
         callbackHelper?.sendEmpty(command)
         return
@@ -537,7 +541,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     }
     
     var deviceQueue = OperationQueue()
-//    var motionManager = CMMotionManager()
     
     var magneticFieldTopicName: String?
     var magneticFieldPeriodMili: Double = 0
@@ -546,7 +549,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     var magneticFieldTopicKeyId: Int?
     var magneticFieldTopicValueId: Int?
     
-    var fetchMFDataCommand: CDVInvokedUrlCommand?
+    var fetchMagneticFieldCommand: CDVInvokedUrlCommand?
     
     // MARK: Select Magnetic Field Sensor
     @objc(selectMagneticFieldSensor:) func selectMagneticFieldSensor(command: CDVInvokedUrlCommand) {
@@ -557,14 +560,10 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             
             self.magneticFieldTopicKeyId = nil
             self.magneticFieldTopicValueId = nil
-            print("***&&", self.magneticFieldTopicName, self.magneticFieldPeriodMili, self.magneticFieldChunkSize, self.magneticFieldTopicKeyId, self.magneticFieldTopicValueId)
             Task {
                 do {
                     self.magneticFieldTopicKeyId = try await self.getTopicId(property: TopicKeyValue.KEY, topicName: self.magneticFieldTopicName!) ?? 0
                     self.magneticFieldTopicValueId = try await self.getTopicId(property: TopicKeyValue.VALUE, topicName: self.magneticFieldTopicName!) ?? 0
-                    self.logTopicKeyId = try await self.getTopicId(property: TopicKeyValue.KEY, topicName: "connect_data_log") ?? 0
-                    self.logTopicValueId = try await self.getTopicId(property: TopicKeyValue.VALUE, topicName: "connect_data_log") ?? 0
-                    print("***", self.magneticFieldTopicName, self.magneticFieldPeriodMili, self.magneticFieldChunkSize, self.magneticFieldTopicKeyId, self.magneticFieldTopicValueId)
                     if self.magneticFieldTopicKeyId == nil || self.magneticFieldTopicValueId == nil {
                         self.callbackHelper?.sendError(command, "INVALID_TOPIC")
                         return
@@ -581,6 +580,11 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
     
     var motionManager: CMMotionManager!
 
+    // MARK: MagneticFiled Sensor
+    @objc(stopMagneticFieldUpdate:) func stopMagneticFieldUpdate(command: CDVInvokedUrlCommand) {
+        motionManager.stopMagnetometerUpdates()
+        self.callbackHelper?.sendEmpty(command)
+    }
     
     // MARK: MagneticFiled Sensor
     @objc(startMagneticFieldUpdate:) func startMagneticFieldUpdate(command: CDVInvokedUrlCommand) {
@@ -589,7 +593,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             return
         }
 
-        self.fetchMFDataCommand = command
+        self.fetchMagneticFieldCommand = command
         motionManager = CMMotionManager()
         var mfSensorDataArray: [[String: Any]] = []
 
@@ -598,8 +602,8 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             motionManager.startMagnetometerUpdates(to: OperationQueue.main) { (data, error) in
                 let time = Date().timeIntervalSince1970
                 mfSensorDataArray.append([
-                    "time": time, //new Date().timeIntervalSince1970, // data!.timestamp + kCFAbsoluteTimeIntervalSince1970, //data!.timestamp as Double,
-                    "timeReceived": time, //new Date().timeIntervalSince1970data!.timestamp as Double,
+                    "time": time,
+                    "timeReceived": time,
                     "x": data!.magneticField.x as Double,
                     "y": data!.magneticField.y as Double,
                     "z": data!.magneticField.z as Double,
@@ -607,69 +611,20 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
                 if mfSensorDataArray.count > (self.magneticFieldChunkSize - 1) {
                     log("Processing Data started at: \(Date().timeIntervalSince1970)")
                     log("Total number of records: \(mfSensorDataArray.count)")
-                    let key: [String : Any] = [
-                        "projectId": ["string": Config.projectId],
-                        "userId": Config.userId,
-                        "sourceId": Config.sourceId
-                    ] as [String : Any]
-                    let records = mfSensorDataArray.map {
-                        return ["key": key, "value": $0]
-                    }
-                    
-                    let body: [String: Any] = [
-                        "key_schema_id": self.magneticFieldTopicKeyId!,
-                        "value_schema_id": self.magneticFieldTopicValueId!,
-                        "records": records
-                    ]
-//                    let body = self.getBody(payload: mfSensorDataArray)
+                    let body = self.getBody(payload: mfSensorDataArray, keySchemaId: self.magneticFieldTopicKeyId!, valueSchemaId: self.magneticFieldTopicValueId!)
+
                     mfSensorDataArray = []
                     guard let data = try? JSONSerialization.data(withJSONObject: body) else {
                         return
                     }
                     let compressedData = self.getCompressedData(data: data)
-                    guard let url = URL(string: Config.baseUrl + Config.kafkaEndpoint + self.magneticFieldTopicName!) else { return }
-                    var request = URLRequest(url: url)
-                    let postLength = String(format: "%lu", UInt(compressedData.count))
-
-                    request.httpMethod = "POST"
-                    
-                    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.setValue("application/vnd.kafka.v2+json, application/vnd.kafka+json; q=0.9, application/json; q=0.8", forHTTPHeaderField: "Accept")
-                    request.setValue( "Bearer \(Config.token)", forHTTPHeaderField: "Authorization")
-                    request.addValue(postLength, forHTTPHeaderField: "Content-Length")
-                    request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
-                    
-                    request.httpBody = compressedData
+                    guard let request = self.getRequest(compressedData: compressedData, topicName: self.magneticFieldTopicName!) else {return}
                     
                     Task {
-                        let startTime = Date().timeIntervalSince1970
-                        do {
-                            let (data, response) = try await URLSession.shared.data(for: request)
-                            do {
-                                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                                    let time = Date().timeIntervalSince1970 - startTime
-                                    log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
-                                    log("\(json)")
-                                    await self.handleMFError(response: response as? HTTPURLResponse, data: json)
-                                }
-                            } catch let error {
-                                log("We couldn't parse the data into JSON. \(error)")
-                            }
-                        } catch {
-                            
-                        }
+                        await self.sendMagneticFieldData(request: request)
                     }
                 }
             }
-        }
-    }
-    
-    func handleMFError(response: HTTPURLResponse?, data: [String: Any]) async{
-        if response?.statusCode == 200 {
-            self.callbackHelper?.sendEmpty(self.fetchMFDataCommand!, true)
-//            await self.postLogToKafka()
-        } else {
-            self.callbackHelper?.sendError(self.fetchMFDataCommand!, "Error", true)
         }
     }
 }

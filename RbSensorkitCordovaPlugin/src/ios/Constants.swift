@@ -15,7 +15,7 @@ struct Constants {
         "siriSpeechMetrics": "",
         "telephonySpeechMetrics": "",
         "visits": "sensorkit_visits",
-        "magneticField": "sensorkit_acceleration",
+        "magneticField": "apple_ios_magnetic_field",
     ]
 
     static let DEFAULT_PERIOD: [String : Double] = [
@@ -33,6 +33,7 @@ struct Constants {
         "mediaEvents": 0,
         "siriSpeechMetrics": 0,
         "telephonySpeechMetrics": 0,
+        "magneticField": 100,
     ]
     static let DEFAULT_CHUNK_SIZE = 10000
     static let APP_NAME = "RADAR-base Sesnsorkit Plugin"

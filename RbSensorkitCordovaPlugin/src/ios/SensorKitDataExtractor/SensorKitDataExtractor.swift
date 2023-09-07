@@ -30,8 +30,6 @@ extension RbSensorkitCordovaPlugin {
         do {
             self.topicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: topicName!) ?? 0
             self.topicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: topicName!) ?? 0
-            self.logTopicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: "connect_data_log") ?? 0
-            self.logTopicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: "connect_data_log") ?? 0
             await self.prepareForPost(sensorDataArray: sensorDataArray)
         } catch {
         }
@@ -56,17 +54,17 @@ extension RbSensorkitCordovaPlugin {
     func postDataToKafka(payload: [[String : Any]]) async {
         startTime = payload[0]["time"] as! Double
         endTime = payload[payload.count-1]["time"] as! Double
-        let body = getBody(payload: payload)
+        let body = getBody(payload: payload, keySchemaId: self.topicKeyId, valueSchemaId: self.topicValueId)
         guard let data = try? JSONSerialization.data(withJSONObject: body) else {
             return
         }
         let compressedData = getCompressedData(data: data)
 //        writeToFile(data: compressedData, fileName: "acc_1807_\(iterationCounter)")
-        guard let request = getRequest(compressedData: compressedData) else {return}
+        guard let request = getRequest(compressedData: compressedData, topicName: self.topicName!) else {return}
         await send(request: request)
     }
     
-    func getBody(payload: [[String: Any]]) -> [String: Any] {
+    func getBody(payload: [[String: Any]], keySchemaId: Int, valueSchemaId: Int) -> [String: Any] {
         let key: [String : Any] = [
             "projectId": ["string": Config.projectId],
             "userId": Config.userId,
@@ -77,8 +75,8 @@ extension RbSensorkitCordovaPlugin {
         }
         
         let body: [String: Any] = [
-            "key_schema_id": topicKeyId,
-            "value_schema_id": topicValueId,
+            "key_schema_id": keySchemaId,
+            "value_schema_id": valueSchemaId,
             "records": records
         ]
         return body
@@ -115,11 +113,8 @@ extension RbSensorkitCordovaPlugin {
         return id
     }
     
-    func getRequest(compressedData: Data) -> URLRequest? {
-        if (topicName == nil) {
-            return nil
-        }
-        guard let url = URL(string: Config.baseUrl + Config.kafkaEndpoint + topicName!) else { return nil }
+    func getRequest(compressedData: Data, topicName: String) -> URLRequest? {
+        guard let url = URL(string: Config.baseUrl + Config.kafkaEndpoint + topicName) else { return nil }
         var request = URLRequest(url: url)
         let postLength = String(format: "%lu", UInt(compressedData.count))
 
@@ -144,7 +139,7 @@ extension RbSensorkitCordovaPlugin {
                     let time = Date().timeIntervalSince1970 - startTime
                     log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
                     log("\(json)")
-                    await handleError(response: response as? HTTPURLResponse, data: json)
+                    await handleSuccessError(response: response as? HTTPURLResponse, data: json)
                 }
             } catch let error {
                 log("We couldn't parse the data into JSON. \(error)")
@@ -155,7 +150,27 @@ extension RbSensorkitCordovaPlugin {
         }
     }
     
-    func handleError(response: HTTPURLResponse?, data: [String: Any]) async{
+    func sendMagneticFieldData(request: URLRequest) async {
+        let startTime = Date().timeIntervalSince1970
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let time = Date().timeIntervalSince1970 - startTime
+                    log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
+                    log("\(json)")
+                    await handleMagneticFieldSuccessError(response: response as? HTTPURLResponse, data: json)
+                }
+            } catch let error {
+                log("We couldn't parse the data into JSON. \(error)")
+            }
+            await self.doNextPost()
+        } catch {
+            
+        }
+    }
+    
+    func handleSuccessError(response: HTTPURLResponse?, data: [String: Any]) async{
         var recordCount = chunkSize
         if iterationCounter == totalIterations {
             recordCount = sensorDataArray.count - iterationCounter * chunkSize
@@ -167,9 +182,19 @@ extension RbSensorkitCordovaPlugin {
             // send log
             await self.postLogToKafka()
         } else {
-            let data = ["statusCode": response?.statusCode ?? 0, "progress": iterationCounter + 1, "total": totalIterations + 1, "start": startTime, "end": endTime, "recordCount": recordCount, "error_description": data["error_description"] ?? "No description", "error_message": data["error"] ?? "No error message"]
+            let data = ["statusCode": response?.statusCode ?? 0, "progress": iterationCounter + 1, "total": totalIterations + 1, "start": startTime, "end": endTime, "recordCount": recordCount, "error_description": data["error_description"] ?? "No error description", "error_message": data["error"] ?? "No error message"]
             let json = convertToJson(data: data)
             self.callbackHelper!.sendErrorJson(self.fetchDataCommand!, json, true)
+        }
+    }
+    
+    func handleMagneticFieldSuccessError(response: HTTPURLResponse?, data: [String: Any]) async{
+        if response?.statusCode == 200 {
+            self.callbackHelper?.sendEmpty(self.fetchMagneticFieldCommand!, true)
+            // send log
+            await self.postLogToKafka()
+        } else {
+            self.callbackHelper!.sendError(self.fetchMagneticFieldCommand!, data["error_description"] as? String ?? "UNKNOWN_ERROR", true)
         }
     }
     
