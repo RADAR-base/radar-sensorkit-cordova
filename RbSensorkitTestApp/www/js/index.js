@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImFkNTM3ZjMyLTMyZDMtNGNjNy05MTE1LWRkOTI5NGI3MDJlMyIsInNvdXJjZXMiOlsiYjFkZDYyMGEtN2EwOS00ODRkLWFkMzUtMmQ2MzZhMWUyNzliIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJhZDUzN2YzMi0zMmQzLTRjYzctOTExNS1kZDkyOTRiNzAyZTMiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJQUk9KRUNULlJFQUQiLCJST0xFLlJFQUQiLCJTT1VSQ0UuUkVBRCIsIlNPVVJDRURBVEEuUkVBRCIsIlNPVVJDRVRZUEUuUkVBRCIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIiwiVVNFUi5SRUFEIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE2OTMzNTk3NjcsImlhdCI6MTY5MzMxNjU2NywiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.6p2T7WQZLSLaQ3FpHM39ykengdE13sj6ilhefcfz48yNfwe-hHQBGhw7WVtN_MRB1IMQTl84W6vO8QYQo02hgQ",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJQUk9KRUNULlJFQUQiLCJST0xFLlJFQUQiLCJTT1VSQ0UuUkVBRCIsIlNPVVJDRURBVEEuUkVBRCIsIlNPVVJDRVRZUEUuUkVBRCIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIiwiVVNFUi5SRUFEIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE2OTQxMjUzNTUsImlhdCI6MTY5NDA4MjE1NSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.qaKZzgxBwplzIv4qPZoKAE_pJOhacPO7w_B3X5ftgUs1anzUzb1bVzEoWsF-zI9M7wlqehCTOlzOXeVIZFhLuQ",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
     projectId: "STAGING_PROJECT",
-    userId: "ad537f32-32d3-4cc7-9115-dd9294b702e3",
+    userId: "edf863e7-e38a-4161-b784-8f271afe01aa",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -45,7 +45,7 @@ async function onDeviceReady() {
     }
 
     try {
-        const res = await selectMagneticFieldSensor({topic: "sensorkit_acceleration", period: 100, chunkSize: 100})
+        const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
         document.getElementById('sensor').innerHTML = "Magnetic Field";
         console.log("[JS] Sensor Magnetic Field is selected", res);
     } catch (e) {
@@ -56,6 +56,12 @@ async function onDeviceReady() {
     await sleep(1000)
 
     fetchMagneticFieldData();
+
+    await sleep(60000);
+
+    await stopUpdateMagneticField();
+
+
 
     return;
 
@@ -316,6 +322,20 @@ function stopRecording() {
         RbSensorkitCordovaPlugin.stopRecording(resolve, reject)
     })
 }
+
+function stopUpdateMagneticField() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.stopMagneticFieldUpdate([],
+            function(){
+                console.log("[JS] Stop magnetic field");
+            },
+            function(e){
+                console.log("[JS] Error on Stop magnetic field");
+            }
+        )
+    })
+}
+
 
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
