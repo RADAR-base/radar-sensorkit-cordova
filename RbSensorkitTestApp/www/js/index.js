@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJQUk9KRUNULlJFQUQiLCJST0xFLlJFQUQiLCJTT1VSQ0UuUkVBRCIsIlNPVVJDRURBVEEuUkVBRCIsIlNPVVJDRVRZUEUuUkVBRCIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIiwiVVNFUi5SRUFEIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE2OTQxMjUzNTUsImlhdCI6MTY5NDA4MjE1NSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.qaKZzgxBwplzIv4qPZoKAE_pJOhacPO7w_B3X5ftgUs1anzUzb1bVzEoWsF-zI9M7wlqehCTOlzOXeVIZFhLuQ",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJQUk9KRUNULlJFQUQiLCJST0xFLlJFQUQiLCJTT1VSQ0UuUkVBRCIsIlNPVVJDRURBVEEuUkVBRCIsIlNPVVJDRVRZUEUuUkVBRCIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIiwiVVNFUi5SRUFEIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE2OTQyMDY3MDUsImlhdCI6MTY5NDE2MzUwNSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.gHz5x6Y0AEPn9YxasDGqQDtWEiCWZe3y-uQ6qjY_QZrKtEtuLL_dzD8DKcZ6vKXyvcGfymwQxL4i0T6kLBTR1A",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
     projectId: "STAGING_PROJECT",
-    userId: "edf863e7-e38a-4161-b784-8f271afe01aa",
+    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -57,13 +57,13 @@ async function onDeviceReady() {
 
     fetchMagneticFieldData();
 
-    await sleep(60000);
+    // await sleep(60000);
 
-    await stopUpdateMagneticField();
+    // await stopUpdateMagneticField();
 
 
 
-    return;
+    //return;
 
     isSensorkitAvailable();
     isSensorAvailable("accelerometer");
@@ -90,21 +90,21 @@ async function onDeviceReady() {
 
     // await sleep(20000)
 
-    // await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, '2023-08-11T09:00:00', '2023-08-12T00:00:00', 'iPhone')
+    await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, '2023-08-11T09:00:00', '2023-08-12T00:00:00', 'iPhone')
 
-    // await sleep(20000)
+    await sleep(20000)
 
-    // await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, '2023-08-010T10:00:00', '2023-08-13T10:00:00', 'iPhone')
+    await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, '2023-08-010T10:00:00', '2023-08-13T10:00:00', 'iPhone')
 
-    // await sleep(20000)
+    await sleep(20000)
 
-    // await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, '2023-08-01T10:00:00', '2023-08-05T10:00:00', 'iPhone')
+    await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, '2023-08-01T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 
-    // await sleep(20000)
+    await sleep(20000)
 
-    // await runSensor("visits", "sensorkit_visits", 0, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
+    await runSensor("visits", "sensorkit_visits", 0, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 
-    // await sleep(20000)
+    await sleep(20000)
 
     await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-08-23T10:00:00', '2023-08-24T10:00:00', 'iPhone')
 

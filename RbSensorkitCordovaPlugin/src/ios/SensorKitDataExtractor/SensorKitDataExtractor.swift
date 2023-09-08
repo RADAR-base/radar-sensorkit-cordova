@@ -157,14 +157,14 @@ extension RbSensorkitCordovaPlugin {
             do {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     let time = Date().timeIntervalSince1970 - startTime
-                    log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
+                    //log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
                     log("\(json)")
                     await handleMagneticFieldSuccessError(response: response as? HTTPURLResponse, data: json)
                 }
             } catch let error {
                 log("We couldn't parse the data into JSON. \(error)")
             }
-            await self.doNextPost()
+            //await self.doNextPost()
         } catch {
             
         }
