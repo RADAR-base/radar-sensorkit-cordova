@@ -436,6 +436,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             }
             break
         case "com.apple.SensorKit.ambientPressure":
+            convertAmbientPressureSensorData(result: result)
             break
         case "com.apple.SensorKit.deviceUsageReport":
             let currentRecordTS: Double = result.timestamp.rawValue * 1000
