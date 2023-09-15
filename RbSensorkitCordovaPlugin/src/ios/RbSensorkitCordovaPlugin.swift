@@ -413,6 +413,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
 
             self.startTime = 0
             self.endTime = 0
+            self.lastRecordTS = 0
             let device: SRDevice? = self.devices.first(where: {$0.name == deviceName}) ?? SRDevice.current
             self.fetchSamples(fromDate: fromDate, toDate: toDate, device: device)
         }

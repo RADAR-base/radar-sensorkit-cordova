@@ -23,7 +23,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJQUk9KRUNULlJFQUQiLCJST0xFLlJFQUQiLCJTT1VSQ0UuUkVBRCIsIlNPVVJDRURBVEEuUkVBRCIsIlNPVVJDRVRZUEUuUkVBRCIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIiwiVVNFUi5SRUFEIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE2OTQyMDY3MDUsImlhdCI6MTY5NDE2MzUwNSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.gHz5x6Y0AEPn9YxasDGqQDtWEiCWZe3y-uQ6qjY_QZrKtEtuLL_dzD8DKcZ6vKXyvcGfymwQxL4i0T6kLBTR1A",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNjk0NzM3NTYyLCJpYXQiOjE2OTQ2OTQzNjIsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.CV52Ag6DlWdLs0aE0R-iszqVcLgIuhRIM7TbGQbxM3_XZPTgr2wZkMNMgBKpOlYULjhoruHEDjqI8hKgkHsIyQ",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
@@ -44,18 +44,18 @@ async function onDeviceReady() {
         console.log("[JS] Config is NOT set", e)
     }
 
-    try {
-        const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
-        document.getElementById('sensor').innerHTML = "Magnetic Field";
-        console.log("[JS] Sensor Magnetic Field is selected", res);
-    } catch (e) {
-        document.getElementById('sensor').innerHTML = "Sensor Magnetic Field is NOT selected (" + e + ")";
-        console.log("[JS] Sensor Magnetic Field is NOT selected", e);
-    }
-
-    await sleep(1000)
-
-    fetchMagneticFieldData();
+    // try {
+    //     const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
+    //     document.getElementById('sensor').innerHTML = "Magnetic Field";
+    //     console.log("[JS] Sensor Magnetic Field is selected", res);
+    // } catch (e) {
+    //     document.getElementById('sensor').innerHTML = "Sensor Magnetic Field is NOT selected (" + e + ")";
+    //     console.log("[JS] Sensor Magnetic Field is NOT selected", e);
+    // }
+    //
+    // await sleep(1000)
+    //
+    // fetchMagneticFieldData();
 
     // await sleep(60000);
 
@@ -86,35 +86,56 @@ async function onDeviceReady() {
         console.log("[JS] Authorize Error", e);
     }
     /**********************************/
-    // await runSensor("onWristState", "sensorkit_on_wrist", 0, 10000, '2023-08-01T10:00:00', '2023-08-05T10:00:00', 'iPhone')
+    const startDate = "2023-09-01T10:00:00";
+    const endDate = "2023-09-13T20:00:00";
+
+    // await runSensor("onWristState", "sensorkit_on_wrist", 0, 10000, startDate, endDate, 0); //'iPhone')
+    //
+    // await sleep(20000);
+    //
+    // await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, startDate, endDate, 0);//'iPhone')
+    //
+    // await sleep(20000)
+    //
+    // await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, startDate, endDate, 1);//'iPhone')
+    //
+    // await sleep(20000)
+    //
+    // await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, startDate, endDate, 0); //'iPhone')
+    //
+    // await sleep(20000)
+    await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, startDate, endDate, 0); //'iPhone')
+
+    await sleep(20000)
+
+    await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, startDate, endDate, 1); //'Apple Watch')
+
+    await sleep(20000)
+    //
+    await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, startDate, endDate, 0); //'iPhone')
+
+    await sleep(20000)
+
+
+
+
+    // await runSensor("onWristState", "sensorkit_on_wrist", 0, 10000, '2023-09-01T10:00:00', '2023-09-11T10:00:00', 'iPhone')
 
     // await sleep(20000)
 
-    await runSensor("ambientLightSensor", "sensorkit_ambient_light", 60000, 10000, '2023-08-11T09:00:00', '2023-08-12T00:00:00', 'iPhone')
-
-    await sleep(20000)
-
-    await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, '2023-08-010T10:00:00', '2023-08-13T10:00:00', 'iPhone')
-
-    await sleep(20000)
-
-    await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, '2023-08-01T10:00:00', '2023-08-05T10:00:00', 'iPhone')
-
-    await sleep(20000)
-
-    await runSensor("visits", "sensorkit_visits", 0, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
-
-    await sleep(20000)
-
-    await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-08-23T10:00:00', '2023-08-24T10:00:00', 'iPhone')
+    // await runSensor("visits", "sensorkit_visits", 0, 10000, '2023-07-28T10:00:00', '2023-08-05T10:00:00', 'iPhone')
 
     // await sleep(20000)
 
-    await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-08-24T10:00:00', '2023-08-25T10:00:00', 'iPhone')
+    // await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-08-23T10:00:00', '2023-08-24T10:00:00', 'iPhone')
+
+    // await sleep(20000)
+
+    // await runSensor("accelerometer", "sensorkit_acceleration", 1000, 10000, '2023-08-24T10:00:00', '2023-08-25T10:00:00', 'iPhone')
 
 }
 
-async function runSensor(name, topic, period, chunkSize, startDate, endDate, deviceName) {
+async function runSensor(name, topic, period, chunkSize, startDate, endDate, deviceNumber) { //deviceName) {
     document.getElementById('result').innerHTML = "";
 
     // const sensor = {name: "accelerometer", topic: "sensorkit_acceleration", period: 20, chunkSize: 10000};
@@ -184,20 +205,23 @@ async function runSensor(name, topic, period, chunkSize, startDate, endDate, dev
     }
 
     // await sleep(1000)
+    let devices = [];
     try {
         const res = await fetchDevices()
         console.log("[JS] Devices", JSON.stringify(res));
         document.getElementById('device').innerHTML = JSON.stringify(res);
+        devices = res['devices'];
     } catch (e) {
         console.log("[JS] Devices Error", e);
         document.getElementById('device').innerHTML = JSON.stringify((e));
+        devices = [];
     }
     // await sleep(1000)
-
+    console.log("[JS*****] Device:", devices[deviceNumber].name)
     const requestParams = {
         startDate: startDate,
         endDate: endDate,
-        deviceName: deviceName
+        deviceName: devices[deviceNumber].name //deviceName
     }
     fetchData(requestParams)
 }
