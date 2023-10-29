@@ -20,8 +20,8 @@ extension RbSensorkitCordovaPlugin {
                 sensorDataArray.append([
                     "time": currentRecordTS,
                     "timeReceived": currentRecordTS,
-                    "pressure": a.pressure,
-                    "temperature": a.temperature,
+                    "pressure": a.pressure.value,
+                    "temperature": a.temperature.value,
                 ])
             }
         }
