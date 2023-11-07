@@ -8,54 +8,40 @@
 import Foundation
 import SensorKit
 
-//class TelephonySpeechMetricsDataExtractor : SensorKitDataExtractor {
-//    override var topicName: String {
-//        return "android_phone_telephony_speech_metrics"
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, didCompleteFetch fetchRequest: SRFetchRequest) {
-//        print("sensorReader didCompleteFetch \(reader.sensor.rawValue) (\(counter))")
-//        counter = 0
-//        processData(sensorDataArray: sensorDataArray)
-//        sensorDataArray = []
-//    }
-//    /*
-//     No Schema
-//     */
-//    /*
-//     Getting session information
-//     var sessionIdentifier: String
-//        An identifier for the audio session.
-//     var sessionFlags: SRSpeechMetrics.SessionFlags
-//        Details about the audio processing.
-//     
-//     struct SRSpeechMetrics.SessionFlags
-//        Possible details about processing an audio stream.
-//     
-//     var timestamp: Date
-//        The date and time when the speech occurs.
-//     
-//     Getting speech metrics and analytics
-//     var audioLevel: SRAudioLevel?
-//        The audio level of the speech.
-//     
-//     class SRAudioLevel
-//        An object that represents the audio level for a range of speech.
-//     
-//     var speechRecognition: SFSpeechRecognitionResult?
-//        The partial or final results of the speech recognition request.
-//     var soundClassification: SNClassificationResult?
-//        The highest-ranking classifications in the time range.
-//     var speechExpression: SRSpeechExpression?
-//        The metrics and voice analytics for the range of speech.
-//     */
-//    
-//    // main
-//    override func convertSensorData(result: SRFetchResult<AnyObject>){
-//        let sample = result.sample as! SRSpeechMetrics
-//            sensorDataArray.append([
-//                "time": result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970,
-//                "timeReceived": Date().timeIntervalSince1970,
-//            ])
-//    }
-//}
+extension RbSensorkitCordovaPlugin {
+    func convertTelephonySpeechMetricsData(result: SRFetchResult<AnyObject>) {
+        if #available(iOS 17.0, *) {
+            let sample = result.sample as! SRSpeechMetrics
+
+            var classifications: [SNClassification]? = sample.soundClassification?.classifications
+            
+            var classificationsString = classifications?.compactMap { word in
+                word.identifier + ": " + word.confidence.description
+            }.joined(separator: ", ")
+
+            sensorDataArray.append([
+                "time": sample.timestamp.timeIntervalSince1970,
+                "timeReceived": sample.timestamp.timeIntervalSince1970,
+                "audioLevelLoudness": sample.audioLevel?.loudness as Any,
+                "audioLevelStart": sample.audioLevel?.timeRange.start.seconds as Any,
+                "audioLevelDuration": sample.audioLevel?.timeRange.duration.seconds as Any,
+                
+                "speechExpressionStart": sample.speechExpression?.timeRange.start.seconds as Any,
+                "speechExpressionDuration": sample.speechExpression?.timeRange.duration.seconds as Any,
+                "speechExpressionVersion": sample.speechExpression?.version as Any,
+                "speechExpressionConfidence": sample.speechExpression?.confidence as Any,
+                "speechExpressionMood": sample.speechExpression?.mood as Any,
+                "speechExpressionValence": sample.speechExpression?.valence as Any,
+                "speechExpressionActivation": sample.speechExpression?.activation as Any,
+                "speechExpressionDominance": sample.speechExpression?.dominance as Any,
+                
+                "soundClassificationStart": sample.soundClassification?.timeRange.start.seconds as Any,
+                "soundClassificationDuration": sample.soundClassification?.timeRange.duration.seconds as Any,
+                "soundClassification": (classificationsString ?? nil) as Any
+            ])
+        } else {
+            // Fallback on earlier versions
+        }
+         
+    }
+}

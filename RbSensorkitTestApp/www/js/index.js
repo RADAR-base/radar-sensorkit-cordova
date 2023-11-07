@@ -86,8 +86,8 @@ async function onDeviceReady() {
         console.log("[JS] Authorize Error", e);
     }
     /**********************************/
-    const startDate = "2023-10-20T10:00:00";
-    const endDate = "2023-10-27T20:00:00";
+    const startDate = "2023-11-02T10:00:00";
+    const endDate = "2023-11-07T20:00:00";
 
     // await runSensor("onWristState", "sensorkit_on_wrist", 0, 10000, startDate, endDate, 0); //'iPhone')
     //
@@ -104,9 +104,13 @@ async function onDeviceReady() {
     // await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, startDate, endDate, 0); //'iPhone')
     //
     // await sleep(20000)
-    await runSensor("ambientPressure", "sensorkit_ambient_pressure", 0, 10000, startDate, endDate, 0); //'iPhone')
+    await runSensor("telephonySpeechMetrics", "sensorkit_telephony_speech_metrics", 0, 10000, startDate, endDate, 0); //'iPhone')
 
     await sleep(20000)
+
+    // await runSensor("ambientPressure", "sensorkit_ambient_pressure", 0, 10000, startDate, endDate, 0); //'iPhone')
+    //
+    // await sleep(20000)
 
     // await runSensor("pedometerData", "sensorkit_pedometer", 0, 10000, startDate, endDate, 0); //'iPhone')
     //

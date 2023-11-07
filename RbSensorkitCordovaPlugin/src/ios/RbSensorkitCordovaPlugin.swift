@@ -167,11 +167,11 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             //        sensor = .siriSpeechMetrics
             //    }
             //    break
-            // case "telephonySpeechMetrics":
-            //    if #available(iOS 15.0, *) {
-            //        sensor = .telephonySpeechMetrics
-            //    }
-            //    break
+             case "telephonySpeechMetrics":
+                if #available(iOS 17.0, *) {
+                    sensor = .telephonySpeechMetrics
+                }
+                break
             case "visits":
                 sensor = .visits
                 break
@@ -478,6 +478,13 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SRSensorReaderDelegate {
             if currentRecordTS - lastRecordTS >= periodMili {
                 lastRecordTS = currentRecordTS
                 convertPhoneUsageSensorData(result: result)
+            }
+            break
+        case "com.apple.SensorKit.speechMetrics.telephony":
+            let currentRecordTS: Double = result.timestamp.rawValue * 1000
+            if currentRecordTS - lastRecordTS >= periodMili {
+                lastRecordTS = currentRecordTS
+                convertTelephonySpeechMetricsData(result: result)
             }
             break
         case "com.apple.SensorKit.visits":

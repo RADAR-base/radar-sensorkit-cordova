@@ -13,7 +13,7 @@ struct Constants {
         "phoneUsageReport": "sensorkit_phone_usage",
         "rotationRate": "sensorkit_rotation_rate",
         "siriSpeechMetrics": "",
-        "telephonySpeechMetrics": "",
+        "telephonySpeechMetrics": "sensorkit_telephony_speech_metrics",
         "visits": "sensorkit_visits",
         "magneticField": "apple_ios_magnetic_field",
     ]
