@@ -8,8 +8,14 @@
 import Foundation
 import SensorKit
 
-extension RbSensorkitCordovaPlugin {
-    func convertKeyboardMetricsSensorData(result: SRFetchResult<AnyObject>){
+class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
+//    override var defaultTopic: String { get { return DefaultTopics.KeyboardMetrics } }
+//    override var defaultPriod: Double { get { return DefaultPeriods.KeyboardMetrics } }
+    override var sensor: SRSensor? { get { return .keyboardMetrics } }
+//    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedDeviceUsage! } }
+
+    
+    override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! SRKeyboardMetrics
         var totalPauses = -1, totalTypingEpisodes = -1
         if #available(iOS 15.0, *) {
@@ -29,4 +35,31 @@ extension RbSensorkitCordovaPlugin {
             "totalTypingEpisodes": totalTypingEpisodes
         ])
     }
+    
+//    override func updateLastFetched(date: Date) {
+//        PersistentContainer.shared.lastFetchedKeyboardMetrics = date
+//    }
 }
+//extension SensorKitDataExtractor {
+//    func convertKeyboardMetricsSensorData(result: SRFetchResult<AnyObject>){
+//        let sample = result.sample as! SRKeyboardMetrics
+//        var totalPauses = -1, totalTypingEpisodes = -1
+//        if #available(iOS 15.0, *) {
+//            totalPauses = sample.totalPauses
+//            totalTypingEpisodes = sample.totalTypingEpisodes
+//        }
+//        let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
+//        sensorDataArray.append([
+//            "time": time,
+//            "timeReceived": time,
+//            "totalWords": sample.totalWords,
+//            "totalAlteredWords": sample.totalAlteredWords,
+//            "totalTaps": sample.totalTaps,
+//            "totalEmojis": sample.totalEmojis,
+//            "totalTypingDuration": sample.totalTypingDuration,
+//            "totalPauses": totalPauses,
+//            "totalTypingEpisodes": totalTypingEpisodes
+//        ])
+//    }
+//}
+

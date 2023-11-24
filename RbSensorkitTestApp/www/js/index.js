@@ -23,7 +23,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNjk5NTczNTQyLCJpYXQiOjE2OTk1MzAzNDIsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.PdMiX6Q3uOMFImnnusW11ORGPUVEOBiHx2WiJQ4UdhnMsBlSRNJUJCF2j733N43zYDdZ6ovCGs72NcRzu5AlYw",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAwNTUxNTAyLCJpYXQiOjE3MDA1MDgzMDIsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.rLvNo6f9WMks1lEPnre50XvTBnxFsdBju8uynvMtZNea8MdGsK5Etf5FomrhxOfj7c5ctUMLx_fsyMWiLL6X0Q",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
@@ -65,27 +65,118 @@ async function onDeviceReady() {
 
     //return;
 
-    isSensorkitAvailable();
-    isSensorAvailable("accelerometer");
-    isSensorAvailable("invalid_sensor");
-
+    await isSensorkitAvailable();
+    // isSensorAvailable("accelerometer");
+    // isSensorAvailable("invalid_sensor");
+    // await sleep(5000)
     try {
-        const res = await setConfig(config)
-        console.log("[JS] Config is set", res);
+        const res = await getAvailableSensors()
+        console.log("[JS] Sensors", JSON.stringify(res));
+        // document.getElementById('device').innerHTML = JSON.stringify(res);
+        // devices = res['devices'];
     } catch (e) {
-        console.log("[JS] Config is NOT set", e)
+        console.log("[JS] Sensors Error", e);
+        // document.getElementById('device').innerHTML = JSON.stringify((e));
+        // devices = [];
     }
+    // await sleep(5000)
+    try {
+        const res = await getCacheStatus()
+        console.log("[JS] Cache Status", res);
+        // document.getElementById('device').innerHTML = JSON.stringify(res);
+        // devices = res['devices'];
+    } catch (e) {
+        console.log("[JS] Cache Status Error", e);
+        // document.getElementById('device').innerHTML = JSON.stringify((e));
+        // devices = [];
+    }
+    // await sleep(5000)
+    // try {
+    //     const res = await setConfig(config)
+    //     console.log("[JS] Config is set", res);
+    // } catch (e) {
+    //     console.log("[JS] Config is NOT set", e)
+    // }
 
     // await sleep(1000)
     /**********************************/
-    const sensors = ["accelerometer", "ambientLightSensor", "ambientPressure", "deviceUsageReport", "keyboardMetrics", "mediaEvents", "messagesUsageReport", "onWristState", "pedometerData", "phoneUsageReport", "rotationRate", "siriSpeechMetrics", "telephonySpeechMetrics", "visits"]
+    // const sensors = ["accelerometer", "ambientLightSensor", "ambientPressure", "deviceUsageReport", "keyboardMetrics", "mediaEvents", "messagesUsageReport", "onWristState", "pedometerData", "phoneUsageReport", "rotationRate", "siriSpeechMetrics", "telephonySpeechMetrics", "visits"]
+    // try {
+    //     const res = await authorize(sensors)
+    //     console.log("[JS] Authorize", res);
+    // } catch (e) {
+    //     console.log("[JS] Authorize Error", e);
+    // }
+
+    // try {
+    //     const sensorConfigs = [
+    //         {sensor: "ambientLightSensor", topic: "", period: 6000},
+    //         {sensor: "accelerometer", topic: "", period: 6000},
+    //         {sensor: "deviceUsageReport", topic: "", period: 6000},
+    //         {sensor: "keyboardMetrics", topic: "", period: 6000},
+    //         {sensor: "messagesUsageReport", topic: "", period: 6000},
+    //         {sensor: "onWristState", topic: "", period: 6000},
+    //         {sensor: "pedometerData", topic: "", period: 6000},
+    //         {sensor: "phoneUsageReport", topic: "", period: 6000},
+    //         {sensor: "visits", topic: "", period: 6000},
+    //         {sensor: "ambientPressure", topic: "", period: 6000}
+    //     ];
+    //     console.log("***&&&", sensorConfigs);
+    //     const res = await configureSensors(sensorConfigs);
+    //     console.log("[JS] configureSensors", res);
+    //
+    //     // document.getElementById('device').innerHTML = JSON.stringify(res);
+    //     // devices = res['devices'];
+    // } catch (e) {
+    //     console.log("[JS] configureSensors", e);
+    //     // document.getElementById('device').innerHTML = JSON.stringify((e));
+    //     // devices = [];
+    // }
+
+
     try {
-        const res = await authorize(sensors)
-        console.log("[JS] Authorize", res);
+        // const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const sensorArray = [
+            {sensor: "ambientLightSensor", period: 6000},
+            {sensor: "accelerometer", period: 1000},
+            {sensor: "deviceUsageReport"},
+            {sensor: "keyboardMetrics"},
+            {sensor: "messagesUsageReport"},
+            {sensor: "onWristState"},
+            {sensor: "pedometerData"},
+            {sensor: "phoneUsageReport"},
+            {sensor: "visits"},
+            {sensor: "ambientPressure"},
+            {sensor: "telephonySpeechMetrics"}
+        ]
+        const res = await selectSensors(sensorArray)
+        console.log("[JS] selectSensors", res);
+
+        // document.getElementById('device').innerHTML = JSON.stringify(res);
+        // devices = res['devices'];
     } catch (e) {
-        console.log("[JS] Authorize Error", e);
+        console.log("[JS] selectSensors", e);
+        // document.getElementById('device').innerHTML = JSON.stringify((e));
+        // devices = [];
     }
+
+    await sleep(5000)
+
+    try {
+        const res = await startFetchingAll()
+        console.log("[JS] startFetchingAll", res);
+        // document.getElementById('device').innerHTML = JSON.stringify(res);
+        // devices = res['devices'];
+    } catch (e) {
+        console.log("[JS] startFetchingAll", e);
+        // document.getElementById('device').innerHTML = JSON.stringify((e));
+        // devices = [];
+    }
+
+    // await sleep(5000)
     /**********************************/
+
+
     const startDate = "2023-11-02T10:00:00";
     const endDate = "2023-11-07T20:00:00";
 
@@ -104,9 +195,9 @@ async function onDeviceReady() {
     // await runSensor("phoneUsageReport", "sensorkit_phone_usage", 0, 10000, startDate, endDate, 0); //'iPhone')
     //
     // await sleep(20000)
-    await runSensor("telephonySpeechMetrics", "sensorkit_telephony_speech_metrics", 0, 10000, startDate, endDate, 0); //'iPhone')
+    // await runSensor("telephonySpeechMetrics", "sensorkit_telephony_speech_metrics", 0, 10000, startDate, endDate, 0); //'iPhone')
 
-    await sleep(20000)
+    // await sleep(20000)
 
     // await runSensor("ambientPressure", "sensorkit_ambient_pressure", 0, 10000, startDate, endDate, 0); //'iPhone')
     //
@@ -143,114 +234,25 @@ async function onDeviceReady() {
 
 }
 
-async function runSensor(name, topic, period, chunkSize, startDate, endDate, deviceNumber) { //deviceName) {
-    document.getElementById('result').innerHTML = "";
-
-    // const sensor = {name: "accelerometer", topic: "sensorkit_acceleration", period: 20, chunkSize: 10000};
-    // const sensor = {name: "ambientLightSensor", topic: "sensorkit_ambient_light", period: 1000, chunkSize: 10000};
-    // const sensor = {name: "ambientPressure", topic: "sensorkit_ambient_pressure", period: 0, chunkSize: 10000};
-    // const sensor = {name: "deviceUsageReport", topic: "sensorkit_device_usage", period: 0, chunkSize: 10000};
-    // const sensor = {name: "keyboardMetrics", topic: "sensorkit_keyboard_metrics", period: 0, chunkSize: 10000};
-    // const sensor = {name: "mediaEvents", topic: "sensorkit_media_events", period: 0, chunkSize: 10000};
-    // const sensor = {name: "messagesUsageReport", topic: "sensorkit_message_usage", period: 0, chunkSize: 10000};
-    // const sensor = {name: "onWristState", topic: "sensorkit_on_wrist", period: 0, chunkSize: 10000};
-    // const sensor = {name: "pedometerData", topic: "sensorkit_pedometer", period: 0, chunkSize: 10000};
-    // const sensor = {name: "phoneUsageReport", topic: "sensorkit_phone_usage", period: 0, chunkSize: 10000};
-    // const sensor = {name: "rotationRate", topic: "sensorkit_rotation_rate", period: 20, chunkSize: 10000};
-    // const sensor = {name: "siriSpeechMetrics", topic: "", period: 0, chunkSize: 10000};
-    // const sensor = {name: "telephonySpeechMetrics", topic: "", period: 0, chunkSize: 10000};
-    // const sensor = {name: "visits", topic: "sensorkit_visits", period: 0, chunkSize: 10000};
-    const sensor = {name: name, topic: topic, period: period, chunkSize: chunkSize};
-
-    try {
-        const res = await selectSensor(sensor)
-        document.getElementById('sensor').innerHTML = sensor.name;
-        console.log("[JS] Sensor " + sensor.name + " is selected", res);
-    } catch (e) {
-        document.getElementById('sensor').innerHTML = "Sensor " + sensor.name + " is NOT selected (" + e + ")";
-        console.log("[JS] Sensor " + sensor.name + " is NOT selected", e);
-    }
-    // await sleep(1000)
-    checkAuthorization()
-
-    // try {
-    //     const res = await checkAuthorization()
-    //     console.log("[JS] AuthorizationStatus", res);
-    //     // // if(res === 'NOT_DETERMINED') {
-    //     //     try {
-    //     //         const authRes = await authorize()
-    //     //         console.log("[JS] Authorize", authRes);
-    //     //     } catch (e) {
-    //     //         console.log("[JS] Authorize Error", e);
-    //     //     }
-    //     // // }
-    // } catch (e) {
-    //     console.log("[JS] AuthorizationStatus Error", e);
-    // }
-
-    // await sleep(1000)
-    try {
-        const res = await startRecording()
-        console.log("[JS] Start Recording", res);
-    } catch (e) {
-        console.log("[JS] Start Recording Error", e);
-    }
-
-    // await sleep(1000)
-    try {
-        const res = await startRecording()
-        console.log("[JS] Start Recording2", res);
-    } catch (e) {
-        console.log("[JS] Start Recording2 Error", e);
-    }
-
-    // await sleep(1000)
-    try {
-        const res = await startRecording()
-        console.log("[JS] Start Recording3", res);
-    } catch (e) {
-        console.log("[JS] Start Recording3 Error", e);
-    }
-
-    // await sleep(1000)
-    let devices = [];
-    try {
-        const res = await fetchDevices()
-        console.log("[JS] Devices", JSON.stringify(res));
-        document.getElementById('device').innerHTML = JSON.stringify(res);
-        devices = res['devices'];
-    } catch (e) {
-        console.log("[JS] Devices Error", e);
-        document.getElementById('device').innerHTML = JSON.stringify((e));
-        devices = [];
-    }
-    // await sleep(1000)
-    console.log("[JS*****] Device:", devices[deviceNumber].name)
-    const requestParams = {
-        startDate: startDate,
-        endDate: endDate,
-        deviceName: devices[deviceNumber].name //deviceName
-    }
-    fetchData(requestParams)
-}
-
-function echo(text){
-    function success(msg) {
-        console.log("[JS] Echo success", msg);
-        document.getElementById('deviceready').querySelector('.received').innerHTML = msg;
-    }
-    function error(error) {
-        console.log("[JS] Echo failed", error);
-        document.getElementById('deviceready').innerHTML = '<p class="event received">' + error + '</p>';
-    }
-    RbSensorkitCordovaPlugin.echo(text, success, error);
-}
-
+// function getAvailableSensors() {
+//     RbSensorkitCordovaPlugin.getAvailableSensors(
+//         function(res) {
+//             console.log("[JS] getAvailableSensors", JSON.stringify(res['sensors']));
+//         },
+//         function(err) { console.log("[JS] getAvailableSensors", err); }
+//     );
+// }
 function isSensorkitAvailable() {
     RbSensorkitCordovaPlugin.isSensorKitAvailable(
         function(msg) { console.log("[JS] SensorKit Available", msg); },
         function(err) { console.log("[JS] SensorKit Error", err); }
     );
+}
+
+function getAvailableSensors() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.getAvailableSensors(resolve, reject)
+    })
 }
 
 function isSensorAvailable(sensor) {
@@ -267,20 +269,25 @@ function setConfig(config) {
     })
 }
 
-function selectSensor(sensor) {
-    const sensorArray = [sensor.name, sensor.topic, sensor.period, sensor.chunkSize];
+function selectSensors(sensorArray) {
     return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.selectSensor(sensorArray, resolve, reject)
+        RbSensorkitCordovaPlugin.selectSensors(sensorArray, resolve, reject)
     })
 }
 
-function selectMagneticFieldSensor(sensor) {
-    const sensorArray = [sensor.topic, sensor.period, sensor.chunkSize];
+
+// function configureSensors(configs) {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.configureSensors(configs, resolve, reject)
+//     })
+// }
+
+
+function authorize(sensors) {
     return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.selectMagneticFieldSensor(sensorArray, resolve, reject)
+        RbSensorkitCordovaPlugin.authorize(sensors, resolve, reject)
     })
 }
-
 
 function checkAuthorization() {
     RbSensorkitCordovaPlugin.checkAuthorization(function(res){
@@ -292,42 +299,197 @@ function checkAuthorization() {
     )
 }
 
+function stopRecording() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.stopRecording(resolve, reject)
+    })
+}
+
+
+function startFetchingAll() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.startFetchingAll(resolve, reject)
+    })
+}
+
+
+
+
+
+function getCacheStatus() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.getCacheStatus(resolve, reject)
+    })
+}
+
+function clearCache() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.clearCache(resolve, reject)
+    })
+}
+
+function uploadCache() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
+    })
+}
+
+
+
+
+// async function runSensor(name, topic, period, chunkSize, startDate, endDate, deviceNumber) { //deviceName) {
+//     document.getElementById('result').innerHTML = "";
+//
+//     // const sensor = {name: "accelerometer", topic: "sensorkit_acceleration", period: 20, chunkSize: 10000};
+//     // const sensor = {name: "ambientLightSensor", topic: "sensorkit_ambient_light", period: 1000, chunkSize: 10000};
+//     // const sensor = {name: "ambientPressure", topic: "sensorkit_ambient_pressure", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "deviceUsageReport", topic: "sensorkit_device_usage", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "keyboardMetrics", topic: "sensorkit_keyboard_metrics", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "mediaEvents", topic: "sensorkit_media_events", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "messagesUsageReport", topic: "sensorkit_message_usage", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "onWristState", topic: "sensorkit_on_wrist", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "pedometerData", topic: "sensorkit_pedometer", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "phoneUsageReport", topic: "sensorkit_phone_usage", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "rotationRate", topic: "sensorkit_rotation_rate", period: 20, chunkSize: 10000};
+//     // const sensor = {name: "siriSpeechMetrics", topic: "", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "telephonySpeechMetrics", topic: "", period: 0, chunkSize: 10000};
+//     // const sensor = {name: "visits", topic: "sensorkit_visits", period: 0, chunkSize: 10000};
+//     const sensor = {name: name, topic: topic, period: period, chunkSize: chunkSize};
+//
+//     try {
+//         const res = await selectSensor(sensor)
+//         document.getElementById('sensor').innerHTML = sensor.name;
+//         console.log("[JS] Sensor " + sensor.name + " is selected", res);
+//     } catch (e) {
+//         document.getElementById('sensor').innerHTML = "Sensor " + sensor.name + " is NOT selected (" + e + ")";
+//         console.log("[JS] Sensor " + sensor.name + " is NOT selected", e);
+//     }
+//     // await sleep(1000)
+//     checkAuthorization()
+//
+//     // try {
+//     //     const res = await checkAuthorization()
+//     //     console.log("[JS] AuthorizationStatus", res);
+//     //     // // if(res === 'NOT_DETERMINED') {
+//     //     //     try {
+//     //     //         const authRes = await authorize()
+//     //     //         console.log("[JS] Authorize", authRes);
+//     //     //     } catch (e) {
+//     //     //         console.log("[JS] Authorize Error", e);
+//     //     //     }
+//     //     // // }
+//     // } catch (e) {
+//     //     console.log("[JS] AuthorizationStatus Error", e);
+//     // }
+//
+//     // await sleep(1000)
+//     try {
+//         const res = await startRecording()
+//         console.log("[JS] Start Recording", res);
+//     } catch (e) {
+//         console.log("[JS] Start Recording Error", e);
+//     }
+//
+//     // await sleep(1000)
+//     try {
+//         const res = await startRecording()
+//         console.log("[JS] Start Recording2", res);
+//     } catch (e) {
+//         console.log("[JS] Start Recording2 Error", e);
+//     }
+//
+//     // await sleep(1000)
+//     try {
+//         const res = await startRecording()
+//         console.log("[JS] Start Recording3", res);
+//     } catch (e) {
+//         console.log("[JS] Start Recording3 Error", e);
+//     }
+//
+//     // await sleep(1000)
+//     let devices = [];
+//     try {
+//         const res = await fetchDevices()
+//         console.log("[JS] Devices", JSON.stringify(res));
+//         document.getElementById('device').innerHTML = JSON.stringify(res);
+//         devices = res['devices'];
+//     } catch (e) {
+//         console.log("[JS] Devices Error", e);
+//         document.getElementById('device').innerHTML = JSON.stringify((e));
+//         devices = [];
+//     }
+//     // await sleep(1000)
+//     console.log("[JS*****] Device:", devices[deviceNumber].name)
+//     const requestParams = {
+//         startDate: startDate,
+//         endDate: endDate,
+//         deviceName: devices[deviceNumber].name //deviceName
+//     }
+//     fetchData(requestParams)
+// }
+
+function echo(text){
+    function success(msg) {
+        console.log("[JS] Echo success", msg);
+        document.getElementById('deviceready').querySelector('.received').innerHTML = msg;
+    }
+    function error(error) {
+        console.log("[JS] Echo failed", error);
+        document.getElementById('deviceready').innerHTML = '<p class="event received">' + error + '</p>';
+    }
+    RbSensorkitCordovaPlugin.echo(text, success, error);
+}
+
+
+
+
+// function selectSensor(sensor) {
+//     const sensorArray = [sensor.name, sensor.topic, sensor.period, sensor.chunkSize];
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.selectSensor(sensorArray, resolve, reject)
+//     })
+// }
+
+function selectMagneticFieldSensor(sensor) {
+    const sensorArray = [sensor.topic, sensor.period, sensor.chunkSize];
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.selectMagneticFieldSensor(sensorArray, resolve, reject)
+    })
+}
+
+
+
 // function checkAuthorization() {
 //     return new Promise((resolve, reject) => {
 //         RbSensorkitCordovaPlugin.checkAuthorization(resolve, reject)
 //     })
 // }
 
-function authorize(sensors) {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.authorize(sensors, resolve, reject)
-    })
-}
 
-function initialiseSensor() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.initialiseSensor(resolve, reject)
-    })
-}
-function fetchDevices() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.fetchDevices(resolve, reject)
-    })
-}
+// function initialiseSensor() {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.initialiseSensor(resolve, reject)
+//     })
+// }
+// function fetchDevices() {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.fetchDevices(resolve, reject)
+//     })
+// }
 
-function fetchData(requestParams) {
-    const requestParamsArray = [requestParams.startDate, requestParams.endDate, requestParams.deviceName];
-    RbSensorkitCordovaPlugin.fetchData(requestParamsArray,
-        function(res){
-            console.log("[JS] Data sent", JSON.stringify(res));
-            document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(res) + '<br>';
-        },
-        function(e){
-            console.log("[JS] Sending failed", JSON.stringify(e));
-            document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(e) + '<br>';
-        }
-    )
-}
+// function fetchData(requestParams) {
+//     const requestParamsArray = [requestParams.startDate, requestParams.endDate, requestParams.deviceName];
+//     RbSensorkitCordovaPlugin.fetchData(requestParamsArray,
+//         function(res){
+//             console.log("[JS] Data sent", JSON.stringify(res));
+//             document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(res) + '<br>';
+//         },
+//         function(e){
+//             console.log("[JS] Sending failed", JSON.stringify(e));
+//             document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(e) + '<br>';
+//         }
+//     )
+// }
 
 function fetchMagneticFieldData(requestParams) {
     RbSensorkitCordovaPlugin.startMagneticFieldUpdate([],
@@ -343,17 +505,12 @@ function fetchMagneticFieldData(requestParams) {
 }
 
 
-function startRecording() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.startRecording(resolve, reject)
-    })
-}
+// function startRecording() {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.startRecording(resolve, reject)
+//     })
+// }
 
-function stopRecording() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.stopRecording(resolve, reject)
-    })
-}
 
 function stopUpdateMagneticField() {
     return new Promise((resolve, reject) => {

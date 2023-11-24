@@ -45,6 +45,9 @@
         <source-file src="src/ios/SensorKitDataExtractor/TelephonySpeechMetricsDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/VisitsDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/SensorKitProtocol.swift" />
+        <source-file src="src/ios/BackgroundSession.swift" />
+        <source-file src="src/ios/Model/PersistentContainer.swift" />
+        <source-file src="src/ios/Model/ColorFeed.xcdatamodeld" />
 
         <!--        <source-file src="src/ios/SensorKitDataExtractor/" target="src/"/>-->
 
