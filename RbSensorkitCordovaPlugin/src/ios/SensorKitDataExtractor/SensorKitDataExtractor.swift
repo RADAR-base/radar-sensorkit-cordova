@@ -58,14 +58,14 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 
         super.init()
 //        beginDate = -4 * DAY + 6 * 60 * 60 // - 3d and 18h
-        print("beginDate = \(String(describing: beginDate)) \(beginDate.timeIntervalSince1970) \(fetchIntervalInHours) \(endDate.timeIntervalSince1970)")
+//        print("beginDate = \(String(describing: beginDate)) \(beginDate.timeIntervalSince1970) \(fetchIntervalInHours) \(endDate.timeIntervalSince1970)")
 //        print("beginDate = \(beginDate) \(DAY)")
 //        numberOfFetches = Int(ceil((-DAY - beginDate)/DAY))
 //        numberOfFetches = Int(ceil((-DAY - beginDate.timeIntervalSince1970)/DAY))
         let fetchIntrevalInSeconds: Double = Double(fetchIntervalInHours * 60 * 60)
         numberOfFetches = Int(ceil((endDate.timeIntervalSince1970 - beginDate.timeIntervalSince1970)/fetchIntrevalInSeconds))
 
-        print("\(Date().timeIntervalSince1970) numberOfFetches = \(numberOfFetches)")
+//        print("\(Date().timeIntervalSince1970) numberOfFetches = \(numberOfFetches)")
 
         self.topicName = topicName // defaultTopic ?? "" // topicName
         self.periodMili = periodMili // defaultPriod //period
@@ -87,7 +87,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     
     
     func sensorReader(_ reader: SRSensorReader, didCompleteFetch fetchRequest: SRFetchRequest) {
-        print("\(Date().timeIntervalSince1970) Fetch completed \(reader.sensor.rawValue) (\(sensorDataArray.count))")
+//        print("\(Date().timeIntervalSince1970) Fetch completed \(reader.sensor.rawValue) (\(sensorDataArray.count))")
 
 //        print("\(Date().timeIntervalSince1970) sensorReader didCompleteFetch \(reader.sensor.rawValue) (\(counter))")
 //        print("\(sensorDataArray[0])")
@@ -102,13 +102,9 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     }
     
     func processData(sensorDataArray: [[String : Any]]) async {
-//        if topicName == nil {
-//            return
-//        }
         do {
             if sensorDataArray.isEmpty {
                 processNextFetch()
-//                delegate?.writeToFileFinished("")
                 return
             }
             if self.topicKeyId == 0 {
@@ -118,7 +114,9 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
                 self.topicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: topicName) ?? 0
             }
             await self.prepareForPost(sensorDataArray: sensorDataArray)
-        } catch {
+        } catch let error {
+            delegate?.__failedFetchTopic(topicName: topicName, error: error)
+            processNextFetch()
         }
     }
     
@@ -134,7 +132,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 //                deviceCounter = deviceCounter + 1
 //                doNextFetch(device: selectedDevice)
             } else {
-                delegate?.__fetchCompletedForOneSensor(date: endDate)
+                delegate?.__fetchCompletedForOneSensor(sensor: sensor!, date: endDate)
 ////                deviceCounter = 0
 //                if sensorCounter < sensors.count - 1 {
 //                    changeSensor()
@@ -193,7 +191,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     
     func fetchSamples(fromDate: NSDate , toDate: NSDate, device: SRDevice?) { //CFAbsoluteTime
         guard let device = device else {
-            print("\(Date().timeIntervalSince1970) No device found for this sensor")
+//            print("\(Date().timeIntervalSince1970) No device found for this sensor")
             return
         }
         let fetchRequest = SRFetchRequest()
@@ -207,29 +205,29 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 //extension SensorKitDataExtractor : SRSensorReaderDelegate {
     // MARK: StartRecording
     func startRecording() {
-        print("\(Date().timeIntervalSince1970) -startRecording")
+//        print("\(Date().timeIntervalSince1970) -startRecording")
         self.reader!.startRecording()
     }
     func sensorReader(_ reader: SRSensorReader, startRecordingFailedWithError error: Error) {
 //        delegate?.startRecodingResponse(0)
-        print("\(Date().timeIntervalSince1970) -sensorReader startRecordingFailedWithError \(error)")
+//        print("\(Date().timeIntervalSince1970) -sensorReader startRecordingFailedWithError \(error)")
     }
     func sensorReaderWillStartRecording(_ reader: SRSensorReader) {
-        print("\(Date().timeIntervalSince1970) -sensorReaderWillStartRecording")
+//        print("\(Date().timeIntervalSince1970) -sensorReaderWillStartRecording")
     }
     
     // MARK: StopRecording
     func stopRecording() {
-        print("\(Date().timeIntervalSince1970) -stopRecording")
+//        print("\(Date().timeIntervalSince1970) -stopRecording")
         self.reader!.stopRecording()
     }
     func sensorReaderDidStopRecording(_ reader: SRSensorReader) {
-        print("\(Date().timeIntervalSince1970) -sensorReaderDidStopRecording \(reader)")
+//        print("\(Date().timeIntervalSince1970) -sensorReaderDidStopRecording \(reader)")
         // delegate
         delegate?.__didStopRecording(sensor: reader.sensor)
     }
     func sensorReader(_ reader: SRSensorReader, stopRecordingFailedWithError error: Error) {
-        print("\(Date().timeIntervalSince1970) -sensorReader stopRecordingFailedWithError \(error)")
+//        print("\(Date().timeIntervalSince1970) -sensorReader stopRecordingFailedWithError \(error)")
         // delegate
         delegate?.__failedStopRecording(sensor: reader.sensor, error: error)
     }
@@ -245,26 +243,26 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         //self.devices = devices
         // call parent and send back the devices
         self.devices = devices
-        print("\(Date().timeIntervalSince1970) number of devices = \(devices.count)")
+//        print("\(Date().timeIntervalSince1970) number of devices = \(devices.count)")
         changeDevice()
         
 //        self.delegate?.devicesFetched(devices)
-        var resultObject: [[String: Any]] = []
-        devices.forEach { device in
-            resultObject.append([
-                "name": device.name, // e.g. "My iPhone"
-                "model": device.model, // e.g. @"iPhone"
-                "systemName": device.systemName, // e.g. @"iOS"
-                "systemVersion": device.systemVersion
-            ])
-//            resultObject.append(DeviceRecord(name: device.name, model: device.model, systemName: device.systemName, systemVersion: device.systemVersion))
-        }
+//        var resultObject: [[String: Any]] = []
+//        devices.forEach { device in
+//            resultObject.append([
+//                "name": device.name, // e.g. "My iPhone"
+//                "model": device.model, // e.g. @"iPhone"
+//                "systemName": device.systemName, // e.g. @"iOS"
+//                "systemVersion": device.systemVersion
+//            ])
+////            resultObject.append(DeviceRecord(name: device.name, model: device.model, systemName: device.systemName, systemVersion: device.systemVersion))
+//        }
 //        let result = convertToJson(object: resultObject)
 //        print("\(Date().timeIntervalSince1970) fetchDevices devices: \(String(describing: resultObject))")
     }
 
     func sensorReader(_ reader: SRSensorReader, fetchDevicesDidFailWithError error: Error) {
-        print("\(Date().timeIntervalSince1970) fetchDevices Error: \(error)")
+//        print("\(Date().timeIntervalSince1970) fetchDevices Error: \(error)")
     }
     
     func changeDevice() {
@@ -276,7 +274,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     
     func doNextFetch() {
         fetchCounter = fetchCounter + 1
-        print("\(Date().timeIntervalSince1970) doNextFetch \(fetchCounter)")
+//        print("\(Date().timeIntervalSince1970) doNextFetch \(fetchCounter)")
 //        print("fetchCounter \(fetchCounter)")
 //        let fromSeconds: Double = beginDate + DAY * Double(fetchCounter) // * -7 * 24 * 60 * 60
 //        print("fromSeconds \(fromSeconds)")
@@ -302,7 +300,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     }
     
     func fetch(from: NSDate, to: NSDate, device: SRDevice?) {
-        print("\(Date().timeIntervalSince1970) fetch")
+//        print("\(Date().timeIntervalSince1970) fetch")
 //        if (selectedSensor == nil) {
 //            print("\(Date().timeIntervalSince1970) fetch selectedSensor is nil")
 //            return
@@ -319,12 +317,12 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     
     // MARK: FetchData
     func fetchData(fromDate: NSDate , toDate: NSDate, device: SRDevice?) { // CFAbsoluteTime
-        print("\(Date().timeIntervalSince1970) FetchData started at: \(Date().timeIntervalSince1970)")
+//        print("\(Date().timeIntervalSince1970) FetchData started at: \(Date().timeIntervalSince1970)")
         fetchSamples(fromDate: fromDate, toDate: toDate, device: device ?? SRDevice.current)
     }
     
     func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, failedWithError error: Error) {
-        print("\(Date().timeIntervalSince1970) Reader fetch failed: \(error)")
+//        print("\(Date().timeIntervalSince1970) Reader fetch failed: \(error)")
     }
 
     func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, didFetchResult result: SRFetchResult<AnyObject>) -> Bool {
@@ -346,7 +344,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     }
     
     func sensorReader(_ reader: SRSensorReader, didChange authorizationStatus: SRAuthorizationStatus) {
-        print("\(Date().timeIntervalSince1970) -sensorReader didChange \(authorizationStatus)")
+//        print("\(Date().timeIntervalSince1970) -sensorReader didChange \(authorizationStatus)")
     }
     
 //    func initialiseSensor() {
@@ -373,8 +371,8 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
    
     
     func prepareForPost(sensorDataArray: [[String : Any]]) async {
-        print("\(Date().timeIntervalSince1970) Processing Data started at: \(Date().timeIntervalSince1970)")
-        print("\(Date().timeIntervalSince1970) Total number of records: \(sensorDataArray.count)")
+//        print("\(Date().timeIntervalSince1970) Processing Data started at: \(Date().timeIntervalSince1970)")
+//        print("\(Date().timeIntervalSince1970) Total number of records: \(sensorDataArray.count)")
 //        if sensorDataArray.isEmpty {
 ////            let data = ["progress": 0, "total": 0, "start": 0, "end": 0, "recordCount": 0]
 ////            let json = convertToJson(data: data)
@@ -383,14 +381,19 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 //            return
 //        }
         totalIterations = sensorDataArray.count / chunkSize
-        print("\(Date().timeIntervalSince1970) Number of chunks: \(totalIterations + 1) - ChunkSize: \(chunkSize) records")
+//        print("\(Date().timeIntervalSince1970) Number of chunks: \(totalIterations + 1) - ChunkSize: \(chunkSize) records")
         results = sensorDataArray.chunked(into: chunkSize)
         iterationCounter = -1
         await doNextPost()
     }
     
     func getTopicId(property: TopicKeyValue, topicName: String) async throws -> Int? {
-        guard let url = URL(string: RadarbaseConfig.baseUrl + RadarbaseConfig.schemaEndpoint + topicName + "-" + property.rawValue + "/versions/latest") else {
+        guard let baseUrl = RadarbaseConfig.baseUrl else {
+            // send error to JS and return
+            return nil
+        }
+        guard let url = URL(string: baseUrl + RadarbaseConfig.schemaEndpoint + topicName + "-" + property.rawValue + "/versions/latest") else {
+            // send error to JS and return
             return nil
         }
         
@@ -535,7 +538,12 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 //        if (topicName == nil) {
 //            return nil
 //        }
-        guard let url = URL(string: RadarbaseConfig.baseUrl + RadarbaseConfig.kafkaEndpoint + topicName) else { return nil }
+        guard let baseUrl = RadarbaseConfig.baseUrl else {
+          return nil
+        }
+        guard let url = URL(string: baseUrl + RadarbaseConfig.kafkaEndpoint + topicName) else {
+            return nil
+        }
         var request = URLRequest(url: url)
         let postLength = String(format: "%lu", UInt(compressedData.count))
 //        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -585,7 +593,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 //    }
     
     func handleError(response: HTTPURLResponse?, data: Data?){
-        print("\(Date().timeIntervalSince1970) Response: \(String(describing: response?.statusCode))")
+//        print("\(Date().timeIntervalSince1970) Response: \(String(describing: response?.statusCode))")
         switch(response?.statusCode){
         case 200:
             return
@@ -624,7 +632,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
             iterationCounter += 1
             await postDataToKafka(payload: results[iterationCounter])
         } else {
-            print("Finished at: \(Date().timeIntervalSince1970) # \(iterationCounter)")
+//            print("Finished at: \(Date().timeIntervalSince1970) # \(iterationCounter)")
             sensorDataArray = []
             processNextFetch()
 //            delegate?.writeToFileFinished(topicName)
@@ -749,8 +757,8 @@ extension SensorKitDataExtractor {
         let localURL = tempDir.appendingPathComponent(fileName + ".txt.gz")
         do {
             try data.write(to: localURL)
-            print("\(Date().timeIntervalSince1970) Write successful \(fileName)")
-            print("\(Date().timeIntervalSince1970) BeginDate \(String(describing: beginDate))")
+//            print("\(Date().timeIntervalSince1970) Write successful \(fileName)")
+//            print("\(Date().timeIntervalSince1970) BeginDate \(String(describing: beginDate))")
             
 
             await self.doNextPost()

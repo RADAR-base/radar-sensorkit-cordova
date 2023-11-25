@@ -23,7 +23,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAwNTUxNTAyLCJpYXQiOjE3MDA1MDgzMDIsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.rLvNo6f9WMks1lEPnre50XvTBnxFsdBju8uynvMtZNea8MdGsK5Etf5FomrhxOfj7c5ctUMLx_fsyMWiLL6X0Q",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAwOTY1MTc1LCJpYXQiOjE3MDA5MjE5NzUsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.QNOuCuGt7FlsK1R18lOxzQQWvyPjieDPv1hgifCFYDGvYyT-Dbk_pW21Wo9DztAFzGdQVYW4C9d91CLqAJ0nYg",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
@@ -71,25 +71,29 @@ async function onDeviceReady() {
     // await sleep(5000)
     try {
         const res = await getAvailableSensors()
-        console.log("[JS] Sensors", JSON.stringify(res));
+        console.log("[JS] Available Sensors", JSON.stringify(res));
         // document.getElementById('device').innerHTML = JSON.stringify(res);
         // devices = res['devices'];
     } catch (e) {
-        console.log("[JS] Sensors Error", e);
+        console.log("[JS] Available Sensors - Error", e);
         // document.getElementById('device').innerHTML = JSON.stringify((e));
         // devices = [];
     }
-    // await sleep(5000)
+
     try {
         const res = await getCacheStatus()
         console.log("[JS] Cache Status", res);
-        // document.getElementById('device').innerHTML = JSON.stringify(res);
-        // devices = res['devices'];
     } catch (e) {
         console.log("[JS] Cache Status Error", e);
-        // document.getElementById('device').innerHTML = JSON.stringify((e));
-        // devices = [];
     }
+
+    try {
+        const res = await clearCache()
+        console.log("[JS] Clear Cache", res);
+    } catch (e) {
+        console.log("[JS] Clear Cache - Error", e);
+    }
+
     // await sleep(5000)
     // try {
     //     const res = await setConfig(config)
@@ -133,11 +137,26 @@ async function onDeviceReady() {
     //     // devices = [];
     // }
 
+    try {
+        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const res = await checkAuthorization(sensorArray)
+        console.log("[JS] checkAuthorization", JSON.stringify(res));
+    } catch (e) {
+        console.log("[JS] checkAuthorization", e);
+    }
+
+    // try {
+    //     const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+    //     const res = await authorize(sensorArray)
+    //     console.log("[JS] Authorize", JSON.stringify(res));
+    // } catch (e) {
+    //     console.log("[JS] Authorize", e);
+    // }
 
     try {
         // const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
         const sensorArray = [
-            {sensor: "ambientLightSensor", period: 6000},
+            {sensor: "ambientLightSensor", topic: "sk_amb_light", period: 6000},
             {sensor: "accelerometer", period: 1000},
             {sensor: "deviceUsageReport"},
             {sensor: "keyboardMetrics"},
@@ -150,17 +169,16 @@ async function onDeviceReady() {
             {sensor: "telephonySpeechMetrics"}
         ]
         const res = await selectSensors(sensorArray)
-        console.log("[JS] selectSensors", res);
+        console.log("[JS] Select Sensor Success");
 
         // document.getElementById('device').innerHTML = JSON.stringify(res);
         // devices = res['devices'];
     } catch (e) {
-        console.log("[JS] selectSensors", e);
+        console.log("[JS] Select Sensors Error", e);
         // document.getElementById('device').innerHTML = JSON.stringify((e));
         // devices = [];
     }
-
-    await sleep(5000)
+    // await sleep(5000)
 
     try {
         const res = await startFetchingAll()
@@ -289,14 +307,17 @@ function authorize(sensors) {
     })
 }
 
-function checkAuthorization() {
-    RbSensorkitCordovaPlugin.checkAuthorization(function(res){
-            console.log("[JS] AuthorizationStatus", res);
-        },
-        function(e){
-            console.log("[JS] AuthorizationStatus Error", e);
-        }
-    )
+function checkAuthorization(sensorArray) {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.checkAuthorization(sensorArray, resolve, reject)
+    })
+    // RbSensorkitCordovaPlugin.checkAuthorization(function(res){
+    //         console.log("[JS] AuthorizationStatus", res);
+    //     },
+    //     function(e){
+    //         console.log("[JS] AuthorizationStatus Error", e);
+    //     }
+    // )
 }
 
 function stopRecording() {
@@ -305,12 +326,24 @@ function stopRecording() {
     })
 }
 
-
 function startFetchingAll() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.startFetchingAll(resolve, reject)
-    })
+    // const requestParamsArray = [requestParams.startDate, requestParams.endDate, requestParams.deviceName];
+    RbSensorkitCordovaPlugin.startFetchingAll(
+        function(res){
+            console.log("[JS] startFetchingAll", JSON.stringify(res));
+            // document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(res) + '<br>';
+        },
+        function(e){
+            console.log("[JS] startFetchingAll ERROR ", JSON.stringify(e));
+            // document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(e) + '<br>';
+        }
+    )
 }
+// function startFetchingAll() {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.startFetchingAll(resolve, reject)
+//     })
+// }
 
 
 

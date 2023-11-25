@@ -2,11 +2,8 @@ import Foundation
 import SensorKit
 
 class AmbientLightDataExtractor: SensorKitDataExtractor {
-//    override var defaultTopic: String { get { return DefaultTopics.AmbientLight } }
-//    override var defaultPriod: Double { get { return DefaultPeriods.AmbientLight } }
     override var sensor: SRSensor? { get { return .ambientLightSensor } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedAmbientLighth! } }
-
     
     override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! SRAmbientLightSample
@@ -23,16 +20,6 @@ class AmbientLightDataExtractor: SensorKitDataExtractor {
     
 //    override func updateLastFetched(date: Date) {
 //        PersistentContainer.shared.lastFetchedAmbientLighth = date
-//    }
-    
-//    func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, didFetchResult result: SRFetchResult<AnyObject>) -> Bool {
-//        let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//        if currentRecordTS - lastRecordTS >= periodMili {
-//            lastRecordTS = currentRecordTS
-////            convertSensorData(result: result)
-//            convertAmbientLightSensorData(result: result)
-//        }
-//        return true
 //    }
 }
 
@@ -64,4 +51,3 @@ extension SRAmbientLightSample.SensorPlacement {
         }
     }
 }
-

@@ -3,15 +3,11 @@ import CoreMotion
 
 @objc(RbSensorkitCordovaPlugin)
 @available(iOS 14.0, *)
-class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReaderDelegate {
+class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate {
 
     var sensorCounter: Int = -1
     var sensors: [SRSensor] = []
     var selectedSensor: SensorKitDataExtractor?
-    
-//    var reader: SRSensorReader = SRSensorReader(sensor: .ambientLightSensor)
-
-//    var startRecordingCommand: CDVInvokedUrlCommand?
     
     var stopRecordingsCommand: CDVInvokedUrlCommand?
     var stopRecordingsSensors: [SRSensor] = []
@@ -20,31 +16,13 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
     var checkAuthorizationCommand: CDVInvokedUrlCommand?
     var checkAuthorizationSensors: [SRSensor] = []
     var checkAuthorizationResponse: [[String: Any]] = []
-
-    //    var fetchDevicesCommand: CDVInvokedUrlCommand?
-//    var fetchDataCommand: CDVInvokedUrlCommand?
-//    var authorizationCommand: CDVInvokedUrlCommand?
     
-//    var devices: [SRDevice] = []
-//    var sensorDataArray: [[String: Any]] = []
+    var clearCacheCommand: CDVInvokedUrlCommand?
     
-//    var topicName: String?
-//    var periodMili: Double = 0
-//    var chunkSize = 10000
+    var startFetchingAllCommand: CDVInvokedUrlCommand?
+    
+    var uploadCacheCommand: CDVInvokedUrlCommand?
 
-//    var topicKeyId = 1
-//    var topicValueId = 0
-//    var logTopicKeyId = 0
-//    var logTopicValueId = 0
-//    var lastRecordTS: Double = 0
-//    
-//    var totalIterations = 0
-//    var iterationCounter = -1
-//    var results: [[[String : Any]]] = []
-//
-//    var startTime: Double = 0
-//    var endTime: Double = 0
-//    
     var callbackHelper: CallbackHelper?
     
     override func pluginInitialize() {
@@ -80,7 +58,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: ["sensors": resultObject], options: JSONSerialization.WritingOptions.prettyPrinted)
             let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
-            print("\(String(describing: json))")
             self.callbackHelper?.sendJson(command, json)
         } catch let error {
             self.callbackHelper?.sendError(command, error.localizedDescription)
@@ -136,49 +113,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
         return
     }
     
-//    @objc(configureSensors:) func configureSensors(command: CDVInvokedUrlCommand) {
-//        let configs = command.arguments
-//        print("--- *** \(String(describing: configs))")
-//        print("--- *** \(String(describing: configs?.count))")
-//        configs?.forEach { config in
-//            ConfigSensorPeriods.Accelerometer = (config as! [String: Any])["period"] as! Double
-////            print("--- *** \(config)")
-////            print("--- *** \(String(describing: (config as! [String: Any])["period"]))")
-//        }
-////        if command.arguments.endIndex < 7 {
-////            callbackHelper?.sendError(command, "INVALID_CONFIG")
-////            return
-////        }
-////        guard let token = command.arguments[0] as? String,
-////              let baseUrl = command.arguments[1] as? String,
-////              let projectId = command.arguments[2] as? String,
-////              let userId = command.arguments[3] as? String else {
-////            callbackHelper?.sendError(command, "INVALID_CONFIG")
-////            return
-////        }
-////
-////        let sourceId = command.arguments[4] as? String ?? ""
-////        let kafkaEndpoint = command.arguments[5] as? String ?? Constants.DefaultKafkaEndpoint
-////        let schemaEndpoint = command.arguments[6] as? String ?? Constants.DefaultSchemaEndpoint
-////
-////        RadarbaseConfig.baseUrl = baseUrl
-////        RadarbaseConfig.kafkaEndpoint = kafkaEndpoint
-////        RadarbaseConfig.schemaEndpoint = schemaEndpoint
-////        
-////        UserConfig.token = token
-////        UserConfig.userId = userId
-////        UserConfig.projectId = ["string": projectId]
-////        UserConfig.sourceId = sourceId
-////
-//////        Task {
-//////            self.logTopicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: "connect_data_log") ?? 0
-//////            self.logTopicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: "connect_data_log") ?? 0
-//////        }
-////        
-////        callbackHelper?.sendEmpty(command)
-////        return
-//    }
-    
     // MARK: Authorize
     @objc(authorize:) func authorize(command: CDVInvokedUrlCommand) {
         guard let sensorsString: [String] = command.arguments as? [String] else {
@@ -202,71 +136,52 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
         }
     }
 
-    
     // MARK: Select the Sensor
     @objc(selectSensors:) func selectSensors(command: CDVInvokedUrlCommand) {
-        print("--$$ selectSensors")
+//        print("--$$ selectSensors")
         guard let sensorsConfig: [[String: Any]] = command.arguments as? [[String: Any]] else {
-            print("--$$ selectSensors NO_SENSOR")
+//            print("--$$ selectSensors NO_SENSOR")
 
             self.callbackHelper?.sendError(command, "NO_SENSOR")
             return
         }
-        print("--$$ selectSensors \(sensorsConfig)")
+//        print("--$$ selectSensors \(sensorsConfig)")
         var sensors: Set<SRSensor> = Set()
         sensorsConfig.forEach { sensorConfig in
             guard let sensorString: String = sensorConfig["sensor"] as? String else {
-                print("--$$ selectSensors NO_SENSOR")
+//                print("--$$ selectSensors NO_SENSOR")
                 self.callbackHelper?.sendError(command, "NO_SENSOR")
                 return
             }
             guard let sensor: SRSensor = _getSRSensor(sensorString: sensorString) else {
-                print("--$$ selectSensors INVALID_SENSOR")
+//                print("--$$ selectSensors INVALID_SENSOR")
                 self.callbackHelper?.sendError(command, "INVALID_SENSOR")
                 return
             }
             sensors.insert(sensor)
             if let sensorPeriod = sensorConfig["period"] as? Double {
-                print("--$$ selectSensors sensorPeriod = \(sensorPeriod)")
+//                print("--$$ selectSensors sensorPeriod = \(sensorPeriod)")
                 ConfigSensor.periods[sensorString] = sensorPeriod
             }
             
             if let sensorTopic = sensorConfig["topic"] as? String {
-                print("--$$ selectSensors sensorTopic = \(sensorTopic)")
+//                print("--$$ selectSensors sensorTopic = \(sensorTopic)")
 
                 ConfigSensor.topics[sensorString] = sensorTopic
             }
-
         }
 
         if sensors.isEmpty {
-            print("--$$ selectSensors NO_VALID_SENSOR")
+//            print("--$$ selectSensors NO_VALID_SENSOR")
 
             self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
             return
         }
-        print("--$$ selectSensors \(sensors)")
+//        print("--$$ selectSensors \(sensors)")
 
-        
         self.sensors = Array(sensors)
         self.callbackHelper?.sendEmpty(command)
     }
-
-//    // MARK: Select the Sensor
-//    @objc(selectSensors:) func selectSensors(command: CDVInvokedUrlCommand) {
-//        guard let sensorsString: [String] = command.arguments as? [String] else {
-//            self.callbackHelper?.sendError(command, "NO_SENSOR")
-//            return
-//        }
-//        let sensors: Set<SRSensor> = Set(sensorsString.map { _getSRSensor(sensorString: $0) ?? nil}.compactMap { $0 })
-//        if sensors.isEmpty {
-//            self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
-//            return
-//        }
-//        
-//        self.sensors = Array(sensors)
-//        self.callbackHelper?.sendEmpty(command)
-//    }
     
     @objc(getCacheStatus:) func getCacheStatus(command: CDVInvokedUrlCommand) {
         var counter: Int = 0
@@ -279,24 +194,28 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
                     counter = counter + 1
                 }
             }
+            callbackHelper?.sendNumber(command, counter)
         } catch {
-            print("Could not clear temp folder: \(error)")
+            callbackHelper?.sendError(command, "Could not read temp folder: \(error)")
         }
-        callbackHelper?.sendNumber(command, counter)
     }
     
     @objc(clearCache:) func clearCache(command: CDVInvokedUrlCommand) {
+        clearCacheCommand = command
         _deleteAllFiles()
         callbackHelper?.sendEmpty(command)
     }
     
     @objc(uploadCache:) func uploadCache(command: CDVInvokedUrlCommand) {
+        uploadCacheCommand = command
         _uploadAllFiles()
-        callbackHelper?.sendEmpty(command)
+        callbackHelper?.sendEmpty(uploadCacheCommand!)
     }
     
     @objc(startFetchingAll:) func startFetchingAll(command: CDVInvokedUrlCommand) {
-        print("plugin startFetchingAll")
+        self.startFetchingAllCommand = command
+//        print("plugin startFetchingAll")
+        sensorCounter = -1
         _changeSensor()
     }
     
@@ -356,18 +275,14 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
             let response = _checkAuthorization(dataExtractor: dataExtractor!)
             checkAuthorizationResponse.append([sensor.rawValue: response])
         }
-        
+       
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: ["results": stopRecordingsResponse], options: JSONSerialization.WritingOptions.prettyPrinted)
+            let jsonData = try JSONSerialization.data(withJSONObject: ["results": checkAuthorizationResponse], options: JSONSerialization.WritingOptions.prettyPrinted)
             let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
-            self.callbackHelper?.sendJson(stopRecordingsCommand!, json)
+            self.callbackHelper?.sendJson(checkAuthorizationCommand!, json)
         } catch let error {
-            self.callbackHelper?.sendError(stopRecordingsCommand!, error.localizedDescription)
+            self.callbackHelper?.sendError(checkAuthorizationCommand!, error.localizedDescription)
         }
-        
-//        let response = _checkAuthorization()
-////        self.authorizationCommand = command
-//        self.callbackHelper?.sendString(command, response, true)
     }
     
     // MARK: echo
@@ -408,8 +323,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
           callbackId: command.callbackId
         )
     }
-    
-    
+       
     func _generateDataExtractor(sensor: SRSensor) -> SensorKitDataExtractor? {
         switch sensor {
         case .accelerometer:
@@ -462,12 +376,12 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
     }
 
     func _changeSensor() {
-        print("changeSensor")
-        print("\(sensors)")
-        print("\(self.sensorCounter)")
+//        print("changeSensor")
+//        print("\(sensors)")
+//        print("\(self.sensorCounter)")
 
         sensorCounter = sensorCounter + 1
-        print("\(self.sensorCounter)")
+//        print("\(self.sensorCounter)")
         let sensor = sensors[sensorCounter]
         selectedSensor = _generateDataExtractor(sensor: sensor)
         selectedSensor?.delegate = self
@@ -496,15 +410,31 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
         }
     }
     
-    func __fetchCompletedForOneSensor(date: Date) {
-        print("fetchCompletedForOneSensor \(sensors)")
-        print("\(Date().timeIntervalSince1970) writeToFileFinished from DELEGATE")
+    func __fetchCompletedForOneSensor(sensor: SRSensor, date: Date) {
+//        print("fetchCompletedForOneSensor \(sensors)")
+//        print("\(Date().timeIntervalSince1970) writeToFileFinished from DELEGATE")
         if sensorCounter < sensors.count - 1 {
             _changeSensor()
         } else {
             _updateLastFetch(date: date)
+            self.callbackHelper?.sendString(startFetchingAllCommand!, "Data fetched from sensor: \(sensor)", true)
+            uploadCacheCommand = startFetchingAllCommand
             _uploadAllFiles()
         }
+    }
+    
+    func __failedFetchTopic(topicName: String, error: Error) {
+        self.callbackHelper?.sendError(startFetchingAllCommand!, "Topic '\(topicName)' doesn't exist. [\(error)]", true)
+    }
+    
+    func __didUploadFileSuccess(){
+//        print("88888888")
+        self.callbackHelper?.sendString(uploadCacheCommand!, "Uploaded.", true)
+    }
+    
+    func __didUploadFileFailed(error: UploadError) {
+//        print("111111111")
+        self.callbackHelper?.sendError(uploadCacheCommand!, "Upload failed. \(error)", true)
     }
     
     func _updateLastFetch(date: Date) {
@@ -586,8 +516,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
                 break
             }
         }
-        
-        
         return sensorString
     }
     
@@ -702,7 +630,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
     
     // MARK: Cache / Temp Folder and files
     func _uploadAllFiles() {
-        print("UPLOAD ALL FILES")
+//        print("UPLOAD ALL FILES")
         do {
             let fileManager = FileManager.default
             let tempPath = fileManager.temporaryDirectory.path
@@ -710,13 +638,15 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
             for fileName in fileNames {
                 if (fileName.hasSuffix(".txt.gz")) {
                     //let filePathName = "\(tempPath)/\(fileName)"
-                    print("\(Date().timeIntervalSince1970) File: \(fileName)")
+//                    print("\(Date().timeIntervalSince1970) File: \(fileName)")
                     _uploadFile(fileName: fileName)
                 }
             }
+            
 
         } catch {
-            print("Could not clear temp folder: \(error)")
+            callbackHelper?.sendError(uploadCacheCommand!, "Could not upload all files: \(error)")
+//            print("Could not clear temp folder: \(error)")
         }
     }
     
@@ -724,32 +654,33 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
         do {
             // get topic name from the file
             let topicName = fileName.components(separatedBy: "___")[0]
-            guard let url = URL(string: RadarbaseConfig.baseUrl + RadarbaseConfig.kafkaEndpoint + topicName) else { return }
+            guard let baseUrl = RadarbaseConfig.baseUrl else {
+                // send error message to JS and return
+                return
+            }
+            guard let url = URL(string: baseUrl + RadarbaseConfig.kafkaEndpoint + topicName) else {
+                // send error message to JS and return
+                return
+            }
             var request = URLRequest(url: url)
-    //        let postLength = String(format: "%lu", UInt(compressedData.count))
-    //        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    //        request.addValue(postLength, forHTTPHeaderField: "Content-Length")
             request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
-           
             request.httpMethod = "POST"
-    //        request.setValue("application/vnd.radarbase.avro.v1+binary", forHTTPHeaderField: "Content-Type")
-            
-    //        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
             request.setValue("application/vnd.kafka.avro.v2+json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/vnd.kafka.v2+json, application/vnd.kafka+json; q=0.9, application/json; q=0.8", forHTTPHeaderField: "Accept")
-            request.setValue( "Bearer \(UserConfig.token)", forHTTPHeaderField: "Authorization")
-    //        request.addValue(postLength, forHTTPHeaderField: "Content-Length")
-    //        request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
-            
-    //        request.httpBody = compressedData
-//            let tempDir = FileManager.default.temporaryDirectory
-//            let fileURL = tempDir.appendingPathComponent(fileName)
+            guard let token = UserConfig.token else {
+                return
+            }
+//            print("OOO UserConfig.token \(token)")
+            request.setValue( "Bearer \(token)", forHTTPHeaderField: "Authorization")
+
             let identifierSuffix = "uniqueId"
 //        do {
 //            let request = URLRequest(url: URL(string: "your_upload_url_here")!)
 //            let fileURL = URL(fileURLWithPath: "/path/to/your/file.txt") // Provide the actual file path
 
             let backgroundSession = BackgroundSession.shared
+            backgroundSession.delegate = self
             _ = try backgroundSession.startUploadFile(for: request, fromFile: fileName, identifier: identifierSuffix)
             
             // You can optionally observe the progress or handle other aspects of the task here
@@ -757,7 +688,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
             // Save the completion handler for later use (if needed)
             backgroundSession.savedCompletionHandler = {
                 // Handle completion, if necessary
-                print("777 Success")
+//                print("777 Success")
 
             }
         } catch {
@@ -771,114 +702,16 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
             let fileManager = FileManager.default
             let tempPath = fileManager.temporaryDirectory.path
             let fileNames = try fileManager.contentsOfDirectory(atPath: "\(tempPath)")
-            print("ALL AVAILABLE FILES TO BE DELETED: \(fileNames.count)")
             for fileName in fileNames {
                 if (fileName.hasSuffix(".txt.gz")) {
                     let filePathName = "\(tempPath)/\(fileName)"
-                    print("File: \(fileName)")
                     try fileManager.removeItem(atPath: filePathName)
                 }
             }
         } catch {
-            print("Could not clear temp folder: \(error)")
+            callbackHelper?.sendError(clearCacheCommand!, "Could not clear temp folder: \(error)")
         }
     }
-    
-    func startSensors(sensor: [SRSensor]) {
-        
-    }
-    
-    
-    
-
-    
-//
-//    fetchFromSensors(){
-//
-//    }
-//
-//    fetchFromSingleSensor(){
-//
-//
-//    }
-//
-//    getDevicesOfSingleSensor(){}
-    
-//    @objc(selectSensor:) func selectSensor(command: CDVInvokedUrlCommand) {
-//        self.commandDelegate.run {
-//            guard let sensorString = command.arguments[0] as? String else {
-//                self.callbackHelper?.sendError(command, "NO_SENSOR")
-//                return
-//            }
-//
-//            guard let sensor = self._getSRSensor(sensorString: sensorString) else {
-//                self.callbackHelper?.sendError(command, "INVALID_SENSOR")
-//                return
-//            }
-//            
-//            // self.reader = SRSensorReader(sensor: sensor)
-//            self.reader = .init(sensor: sensor)
-//            self.reader.delegate = self
-//
-//            self.topicName = command.arguments[1] as? String ?? Constants.TOPIC_NAME[sensorString]
-//            self.periodMili = command.arguments[2] as? Double ?? Constants.DEFAULT_PERIOD[sensorString]!
-//            self.chunkSize = command.arguments[3] as? Int ?? Constants.DEFAULT_CHUNK_SIZE
-//            
-//            self.startRecordingCommand = nil
-//            self.stopRecordingCommand = nil
-//            self.fetchDevicesCommand = nil
-//            self.fetchDataCommand = nil
-//            self.authorizationCommand = nil
-//            
-//            self.devices = []
-//            self.sensorDataArray = []
-//            
-//            self.topicKeyId = 0
-//            self.topicValueId = 0
-//            self.logTopicKeyId = 0
-//            self.logTopicValueId = 0
-//            self.lastRecordTS = 0
-//            
-//            self.totalIterations = 0
-//            self.iterationCounter = -1
-//            self.results = []
-//
-//            self.startTime = 0
-//            self.endTime = 0
-//            let authorizationState = self._checkAuthorization()
-//            if authorizationState == "AUTHORIZED" {
-//                self.callbackHelper?.sendEmpty(command)
-//                return
-//            }
-//            self.callbackHelper?.sendError(command, authorizationState)
-//        }
-//    }
-
-    
-    
-//    func sensorReader(_ reader: SRSensorReader, didChange authorizationStatus: SRAuthorizationStatus) {
-//        log("authorizationStatus didChange \(authorizationStatus) - \(reader.sensor)")
-//        var response = "NOT_DETERMIND"
-//        switch authorizationStatus {
-//        case .authorized:
-//            response = "AUTHORIZED"
-//            break
-//        case .denied:
-//            response = "DENIED"
-//            break
-//        case .notDetermined:
-//            response = "NOT_DETERMINED"
-//            break
-//        }
-//        self.callbackHelper?.sendString(self.authorizationCommand!, response, true)
-//    }
-    
-    // MARK: checkAuthorization
-//    @objc(checkAuthorization:) func checkAuthorization(command: CDVInvokedUrlCommand) {
-//        let response = _checkAuthorization()
-//        self.authorizationCommand = command
-//        self.callbackHelper?.sendString(command, response, true)
-//    }
     
     func _checkAuthorization(dataExtractor: SensorKitDataExtractor) -> String {
         var response = "NOT_DETERMIND"
@@ -897,214 +730,6 @@ class RbSensorkitCordovaPlugin : CDVPlugin, SensorKitDelegate { //SRSensorReader
         }
         return response
     }
-    
-//
-//    func _isAuthorized() -> Bool {
-//        if self.reader.authorizationStatus.rawValue == 1 {
-//            return true
-//        }
-//        return false
-//    }
-
-    // MARK: startRecording
-//    @objc(startRecording:) func startRecording(command: CDVInvokedUrlCommand) {
-//        if !_isAuthorized() {
-//            callbackHelper?.sendError(command, "NOT_AUTHORIZED")
-//            return
-//        }
-//        self.startRecordingCommand = command
-//        reader.startRecording()
-//    }
-//    
-//    func sensorReaderWillStartRecording(_ reader: SRSensorReader) {
-//        callbackHelper?.sendEmpty(self.startRecordingCommand!)
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, startRecordingFailedWithError error: Error) {
-//        callbackHelper?.sendError(self.startRecordingCommand!, error.localizedDescription)
-//    }
-
- 
-//    
-//    func sensorReaderDidStopRecording(_ reader: SRSensorReader) {
-//        callbackHelper?.sendEmpty(self.stopRecordingCommand!)
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, stopRecordingFailedWithError error: Error) {
-//        callbackHelper?.sendError(self.stopRecordingCommand!, error.localizedDescription)
-//    }
-
-    // MARK: fetchDevices
-//    @objc(fetchDevices:) func fetchDevices(command: CDVInvokedUrlCommand) {
-//        self.commandDelegate.run {
-//            if !self._isAuthorized() {
-//                self.callbackHelper?.sendError(command, "NOT_AUTHORIZED")
-//                return
-//            }
-//            self.devices = []
-//            self.fetchDevicesCommand = command
-//            self.commandDelegate.run {
-//                self.reader.fetchDevices()
-//            }
-//        }
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, didFetch devices: [SRDevice]) {
-//        self.devices = devices
-//        var resultObject: [[String: Any]] = []
-//        devices.forEach { device in
-//            resultObject.append([
-//                "name": device.name, // e.g. "My iPhone"
-//                "model": device.model, // e.g. @"iPhone"
-//                "systemName": device.systemName, // e.g. @"iOS"
-//                "systemVersion": device.systemVersion
-//            ])
-//        }
-//        do {
-//            let jsonData = try JSONSerialization.data(withJSONObject: ["devices": resultObject], options: JSONSerialization.WritingOptions.prettyPrinted)
-//            let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
-//            self.callbackHelper!.sendJson(self.fetchDevicesCommand!, json)
-//        } catch let error {
-//            self.callbackHelper?.sendError(self.fetchDevicesCommand!, error.localizedDescription)
-//        }
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, fetchDevicesDidFailWithError error: Error) {
-//        self.callbackHelper?.sendError(self.fetchDevicesCommand!, error.localizedDescription)
-//    }
-
-    // MARK: fetchData
-//    @objc(fetchData:) func fetchData(command: CDVInvokedUrlCommand) {
-//        if !_isAuthorized() {
-//            callbackHelper?.sendError(command, "NOT_AUTHORIZED")
-//            return
-//        }
-//        if (Config.token.isEmpty || Config.baseUrl.isEmpty || Config.projectId.isEmpty || Config.userId.isEmpty ) {
-//            callbackHelper?.sendError(command, "INVALID_CONFIG")
-//            return
-//        }
-//
-//        guard let fromDateString = command.arguments[0] as? String, let toDateString = command.arguments[1] as? String else {
-//            callbackHelper?.sendError(command, "INVALID_DATES")
-//            return
-//        }
-//
-//        guard let fromDate = fromDateString.toDate() as? NSDate, let toDate = toDateString.toDate() as? NSDate else {
-//            callbackHelper?.sendError(command, "INVALID_DATES")
-//            return
-//        }
-//        var deviceName: String? = nil
-//        if command.arguments.endIndex > 2 {
-//            deviceName = command.arguments[2] as? String ?? nil
-//        }
-//        
-//        self.fetchDataCommand = command
-//        self.commandDelegate.run {
-//            self.sensorDataArray = []
-//            self.totalIterations = 0
-//            self.iterationCounter = -1
-//            self.results = []
-//
-//            self.startTime = 0
-//            self.endTime = 0
-//            self.lastRecordTS = 0
-//            let device: SRDevice? = self.devices.first(where: {$0.name == deviceName}) ?? SRDevice.current
-//            self.fetchSamples(fromDate: fromDate, toDate: toDate, device: device)
-//        }
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, failedWithError error: Error) {
-//        self.callbackHelper!.sendError(self.fetchDataCommand!, error.localizedDescription)
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, didFetchResult result: SRFetchResult<AnyObject>) -> Bool {
-//        switch reader.sensor.rawValue {
-//        case "com.apple.SensorKit.motion.accelerometer":
-//            convertAccelerometerSensorData(result: result)
-//            break
-//        case "com.apple.SensorKit.als":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertAmbientLightData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.ambientPressure":
-//            convertAmbientPressureSensorData(result: result)
-//            break
-//        case "com.apple.SensorKit.deviceUsageReport":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertDeviceUsageSensorData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.keyboardMetrics":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertKeyboardMetricsSensorData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.messagesUsageReport":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertMessageUsageSensorData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.onWristState":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertOnWristSensorData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.pedometer.data":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertPedometerSensorData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.phoneUsageReport":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertPhoneUsageSensorData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.speechMetrics.telephony":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertTelephonySpeechMetricsData(result: result)
-//            }
-//            break
-//        case "com.apple.SensorKit.visits":
-//            let currentRecordTS: Double = result.timestamp.rawValue * 1000
-//            if currentRecordTS - lastRecordTS >= periodMili {
-//                lastRecordTS = currentRecordTS
-//                convertVisitsSensorData(result: result)
-//            }
-//            break
-//        default:
-//            log("Unhandled sample type: \(result.sample)")
-//            return true
-//        }
-//        return true
-//    }
-//    
-//    func sensorReader(_ reader: SRSensorReader, didCompleteFetch fetchRequest: SRFetchRequest) {
-//        log("Fetch completed \(reader.sensor.rawValue) (\(sensorDataArray.count))")
-//        // showFirstNResult(n: 10, array: sensorDataArray)
-//        Task {
-//            await processData(sensorDataArray: sensorDataArray)
-//        }
-//    }
-
-
-    
     
 //    var deviceQueue = OperationQueue()
     

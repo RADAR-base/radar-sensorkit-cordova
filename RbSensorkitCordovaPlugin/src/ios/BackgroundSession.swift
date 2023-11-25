@@ -11,6 +11,8 @@ import Foundation
 private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: #file)
 
 class BackgroundSession: NSObject {
+    var delegate: SensorKitDelegate?
+    
     var savedCompletionHandler: (() -> Void)?
     
     static var shared = BackgroundSession()
@@ -94,6 +96,8 @@ extension BackgroundSession: URLSessionTaskDelegate {
 }
 
 extension BackgroundSession: URLSessionDataDelegate {
+    
+    
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome downloadTask: URLSessionDownloadTask) {
         os_log(#function, log: log, type: .debug)
     }
@@ -136,9 +140,9 @@ extension BackgroundSession: URLSessionDataDelegate {
 //    }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-      print("didReceive data")
+//      print("didReceive data \(data)")
         if let responseText = String(data: data, encoding: .utf8) {
-           print(responseText)
+//           print(responseText)
             
 //            if let data = data {
                 do {
@@ -147,9 +151,13 @@ extension BackgroundSession: URLSessionDataDelegate {
 //                        print("Data sent. \(self.iterationCounter)/\(self.totalIterations) in \(time)s")
 //                        print("\(json)")
                         if((json["error"]) != nil){
-                            print("ERR \(responseText)")
+//                            print("ERR \(responseText)")
+                            let error = UploadError(message: "Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
+//                            let error = Error()
+//                            errorTemp.description = "Upload failed \(responseText)"
+                            delegate?.__didUploadFileFailed(error: error)
                         } else {
-                            print("\(Date().timeIntervalSince1970) OK \(String(describing: fileNamesDictionary[dataTask.taskIdentifier]))")
+//                            print("\(Date().timeIntervalSince1970) OK \(String(describing: fileNamesDictionary[dataTask.taskIdentifier]))")
                             
 
                             let fileManager = FileManager.default
@@ -159,10 +167,14 @@ extension BackgroundSession: URLSessionDataDelegate {
                                 let filePathName = "\(tempPath)/\(fileName!)"
                                 try fileManager.removeItem(atPath: filePathName)
                             }
+                            delegate?.__didUploadFileSuccess()
                         }
+                        
                     }
                 } catch let error {
-                    print("\(Date().timeIntervalSince1970) We couldn't parse the data into JSON.", error)
+//                    print("\(Date().timeIntervalSince1970) We couldn't parse the data into JSON.", error)
+                    let _error = UploadError(message: "Upload failed \(error.localizedDescription)")
+                    delegate?.__didUploadFileFailed(error: _error)
                 }
                 //self.doNextPost()
 //            }
