@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAwOTY1MTc1LCJpYXQiOjE3MDA5MjE5NzUsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.QNOuCuGt7FlsK1R18lOxzQQWvyPjieDPv1hgifCFYDGvYyT-Dbk_pW21Wo9DztAFzGdQVYW4C9d91CLqAJ0nYg",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAxMDQwNzMyLCJpYXQiOjE3MDA5OTc1MzIsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.Lwy-vlj7V5IHUVA7xwbSahSPRwCqG_YluLPdNgiyQHBAeM-JUXjXbVIPHFpGJO8i94sTpmsBlyoD9TWxvpgJTA",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
     projectId: "STAGING_PROJECT",
-    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
+    userId: "edf863e7-e38a-4161-b784-8f271afe01aa",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -37,6 +37,29 @@ async function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 
+    await isSensorkitAvailable();
+
+    try {
+        const res = await getCacheStatus()
+        console.log("[JS] Cache Status - Number of files:", res);
+    } catch (e) {
+        console.log("[JS] Cache Status Error", e);
+    }
+
+    try {
+        const res = await clearCache()
+        console.log("[JS] Clear Cache", res);
+    } catch (e) {
+        console.log("[JS] Clear Cache Error", e);
+    }
+
+    try {
+        const res = await getAvailableSensors()
+        console.log("[JS] Available Sensors", JSON.stringify(res));
+    } catch (e) {
+        console.log("[JS] Available Sensors Error", e);
+    }
+
     try {
         const res = await setConfig(config)
         console.log("[JS] Config is set", res);
@@ -44,18 +67,18 @@ async function onDeviceReady() {
         console.log("[JS] Config is NOT set", e)
     }
 
-    // try {
-    //     const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
-    //     document.getElementById('sensor').innerHTML = "Magnetic Field";
-    //     console.log("[JS] Sensor Magnetic Field is selected", res);
-    // } catch (e) {
-    //     document.getElementById('sensor').innerHTML = "Sensor Magnetic Field is NOT selected (" + e + ")";
-    //     console.log("[JS] Sensor Magnetic Field is NOT selected", e);
-    // }
-    //
-    // await sleep(1000)
-    //
-    // fetchMagneticFieldData();
+    try {
+        const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
+        // document.getElementById('sensor').innerHTML = "Magnetic Field";
+        console.log("[JS] Sensor Magnetic Field is selected", res);
+    } catch (e) {
+        // document.getElementById('sensor').innerHTML = "Sensor Magnetic Field is NOT selected (" + e + ")";
+        console.log("[JS] Sensor Magnetic Field is NOT selected", e);
+    }
+
+    await sleep(1000)
+
+    fetchMagneticFieldData();
 
     // await sleep(60000);
 
@@ -65,34 +88,13 @@ async function onDeviceReady() {
 
     //return;
 
-    await isSensorkitAvailable();
+
     // isSensorAvailable("accelerometer");
     // isSensorAvailable("invalid_sensor");
     // await sleep(5000)
-    try {
-        const res = await getAvailableSensors()
-        console.log("[JS] Available Sensors", JSON.stringify(res));
-        // document.getElementById('device').innerHTML = JSON.stringify(res);
-        // devices = res['devices'];
-    } catch (e) {
-        console.log("[JS] Available Sensors - Error", e);
-        // document.getElementById('device').innerHTML = JSON.stringify((e));
-        // devices = [];
-    }
 
-    try {
-        const res = await getCacheStatus()
-        console.log("[JS] Cache Status", res);
-    } catch (e) {
-        console.log("[JS] Cache Status Error", e);
-    }
 
-    try {
-        const res = await clearCache()
-        console.log("[JS] Clear Cache", res);
-    } catch (e) {
-        console.log("[JS] Clear Cache - Error", e);
-    }
+
 
     // await sleep(5000)
     // try {
@@ -145,13 +147,13 @@ async function onDeviceReady() {
         console.log("[JS] checkAuthorization", e);
     }
 
-    // try {
-    //     const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
-    //     const res = await authorize(sensorArray)
-    //     console.log("[JS] Authorize", JSON.stringify(res));
-    // } catch (e) {
-    //     console.log("[JS] Authorize", e);
-    // }
+    try {
+        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const res = await authorize(sensorArray)
+        console.log("[JS] Authorize", JSON.stringify(res));
+    } catch (e) {
+        console.log("[JS] Authorize", e);
+    }
 
     try {
         // const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
@@ -280,10 +282,10 @@ function isSensorAvailable(sensor) {
     );
 }
 
-function setConfig(config) {
-    const configArray = [config.token, config.baseUrl, config.projectId, config.userId, config.sourceId, config.kafkaEndpoint, config.schemaEndpoint];
+function setConfig(configs) {
+    //const configArray = [config.token, config.baseUrl, config.projectId, config.userId, config.sourceId, config.kafkaEndpoint, config.schemaEndpoint];
     return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.setConfig(configArray, resolve, reject)
+        RbSensorkitCordovaPlugin.setConfig([configs], resolve, reject)
     })
 }
 
@@ -527,11 +529,11 @@ function selectMagneticFieldSensor(sensor) {
 function fetchMagneticFieldData(requestParams) {
     RbSensorkitCordovaPlugin.startMagneticFieldUpdate([],
         function(res){
-            console.log("[JS] Data sent", JSON.stringify(res));
+            console.log("[JS] MagneticField Data sent", JSON.stringify(res));
             document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(res) + '<br>';
         },
         function(e){
-            console.log("[JS] Sending failed", JSON.stringify(e));
+            console.log("[JS] MagneticField failed", JSON.stringify(e));
             document.getElementById('result').innerHTML = document.getElementById('result').innerHTML + JSON.stringify(e) + '<br>';
         }
     )

@@ -9,6 +9,7 @@ import Foundation
 import SensorKit
 import CoreMotion
 
+@available(iOS 14.0, *)
 class VisitsDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .visits } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedVisit! } }
@@ -19,6 +20,7 @@ class VisitsDataExtractor: SensorKitDataExtractor {
         sensorDataArray.append([
             "time": time,
             "timeReceived": time,
+            "device": selectedDevice?.model ?? "UNKNOWN",
             "identifier": sample.identifier.uuidString,
             "arrivalDateIntervalStart": sample.arrivalDateInterval.start.timeIntervalSince1970,
             "arrivalDateIntervalEnd": sample.arrivalDateInterval.end.timeIntervalSince1970,
@@ -36,6 +38,7 @@ class VisitsDataExtractor: SensorKitDataExtractor {
 //    }
 }
 
+@available(iOS 14.0, *)
 extension SRVisit.LocationCategory {
     var description: String {
         get {

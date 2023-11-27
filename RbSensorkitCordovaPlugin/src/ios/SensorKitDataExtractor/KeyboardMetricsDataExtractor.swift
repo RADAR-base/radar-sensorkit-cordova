@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 
+@available(iOS 14.0, *)
 class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .keyboardMetrics } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedDeviceUsage! } }
@@ -23,6 +24,7 @@ class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
         sensorDataArray.append([
             "time": time,
             "timeReceived": time,
+            "device": selectedDevice?.model ?? "UNKNOWN",
             "totalWords": sample.totalWords,
             "totalAlteredWords": sample.totalAlteredWords,
             "totalTaps": sample.totalTaps,

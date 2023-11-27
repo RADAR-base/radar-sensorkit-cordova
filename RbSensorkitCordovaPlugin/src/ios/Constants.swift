@@ -28,7 +28,8 @@ struct ConfigSensor {
         "siriSpeechMetrics": 0,
         "telephonySpeechMetrics": 0,
         "visits": 0,
-        "wristTemperature": 0
+        "wristTemperature": 0,
+        "magneticField": 0,
     ]
     static var topics: Dictionary<String, String> = [
         "accelerometer": "sensorkit_acceleration",
@@ -48,7 +49,8 @@ struct ConfigSensor {
         "siriSpeechMetrics": "sensorkit_siri_speech_metrics",
         "telephonySpeechMetrics": "sensorkit_telephony_speech_metrics",
         "visits": "sensorkit_visits",
-        "wristTemperature": "sensorkit_wrist_temperature"
+        "wristTemperature": "sensorkit_wrist_temperature",
+        "magneticField": ""
     ]
 }
 
@@ -56,6 +58,8 @@ struct RadarbaseConfig {
     static var baseUrl: String? = nil //"https://radar-dev.connectdigitalstudy.com/"
     static var kafkaEndpoint = "kafka/topics/"
     static var schemaEndpoint = "/schema/subjects/"
+    static var logTopicKeyId: Int? = nil
+    static var logTopicValueId: Int? = nil
 }
 
 struct UserConfig {

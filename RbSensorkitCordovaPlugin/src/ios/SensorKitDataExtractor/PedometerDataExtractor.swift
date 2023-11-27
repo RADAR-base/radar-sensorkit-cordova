@@ -9,6 +9,7 @@ import Foundation
 import SensorKit
 import CoreMotion
 
+@available(iOS 14.0, *)
 class PedometerDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .pedometerData } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedPedometer! } }
@@ -19,6 +20,7 @@ class PedometerDataExtractor: SensorKitDataExtractor {
         sensorDataArray.append([
             "time": time,
             "timeReceived": time,
+            "device": selectedDevice?.model ?? "UNKNOWN",
             "startDate": sample.startDate.timeIntervalSince1970,
             "endDate": sample.endDate.timeIntervalSince1970,
             "numberOfSteps": sample.numberOfSteps,

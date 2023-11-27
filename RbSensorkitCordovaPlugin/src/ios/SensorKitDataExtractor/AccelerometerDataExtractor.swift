@@ -9,6 +9,7 @@ import Foundation
 import SensorKit
 import CoreMotion
 
+@available(iOS 14.0, *)
 class AccelerometerDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .accelerometer } }
     override var fetchIntervalInHours: Int { get {return 1 * 24 }} // 1 days = 1 * 24 hours
@@ -23,6 +24,7 @@ class AccelerometerDataExtractor: SensorKitDataExtractor {
                 sensorDataArray.append([
                     "time": currentRecordTS,
                     "timeReceived": currentRecordTS,
+                    "device": selectedDevice?.model ?? "UNKNOWN",
                     "x": a.acceleration.x,
                     "y": a.acceleration.y,
                     "z": a.acceleration.z,

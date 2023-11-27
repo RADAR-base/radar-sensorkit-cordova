@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 
+@available(iOS 14.0, *)
 protocol SensorKitDelegate {
     func __fetchCompletedForOneSensor(sensor: SRSensor, date: Date)
     func __didStopRecording(sensor: SRSensor)

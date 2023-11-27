@@ -23,6 +23,7 @@ class AmbientPressureDataExtractor: SensorKitDataExtractor {
                 sensorDataArray.append([
                     "time": currentRecordTS,
                     "timeReceived": currentRecordTS,
+                    "device": selectedDevice?.model ?? "UNKNOWN",
                     "pressure": a.pressure.value,
                     "temperature": a.temperature.value,
                 ])

@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 
+@available(iOS 14.0, *)
 class DeviceUsageDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .deviceUsageReport } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedDeviceUsage! } }
@@ -22,6 +23,7 @@ class DeviceUsageDataExtractor: SensorKitDataExtractor {
         sensorDataArray.append([
             "time": time,
             "timeReceived": time,
+            "device": selectedDevice?.model ?? "UNKNOWN",
             "duration": sample.duration,
             "totalScreenWakes": sample.totalScreenWakes,
             "totalUnlocks": sample.totalUnlocks,

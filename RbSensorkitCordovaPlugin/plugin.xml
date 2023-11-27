@@ -26,9 +26,9 @@
 
         <source-file src="src/ios/RbSensorkitCordovaPlugin.swift" />
         <source-file src="src/ios/Constants.swift" />
-        <source-file src="src/ios/Utils.swift" />
-        <source-file src="src/ios/Extensions.swift" />
-        <source-file src="src/ios/CallbackHelper.swift" />
+        <source-file src="src/ios/Utils/Utils.swift" />
+        <source-file src="src/ios/Utils/Extensions.swift" />
+        <source-file src="src/ios/Utils/CallbackHelper.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/AccelerometerDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/AmbientLightDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/AmbientPressureDataExtractor.swift" />
@@ -45,7 +45,8 @@
         <source-file src="src/ios/SensorKitDataExtractor/TelephonySpeechMetricsDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/VisitsDataExtractor.swift" />
         <source-file src="src/ios/SensorKitDataExtractor/SensorKitProtocol.swift" />
-        <source-file src="src/ios/BackgroundSession.swift" />
+        <source-file src="src/ios/Utils/BackgroundSession.swift" />
+        <source-file src="src/ios/RbSensorkit/RbSensorkit.swift" />
         <source-file src="src/ios/Model/PersistentContainer.swift" />
         <source-file src="src/ios/Model/ColorFeed.xcdatamodeld" />
 

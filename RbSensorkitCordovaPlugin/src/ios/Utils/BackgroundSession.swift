@@ -10,6 +10,7 @@ import Foundation
 
 private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: #file)
 
+@available(iOS 14.0, *)
 class BackgroundSession: NSObject {
     var delegate: SensorKitDelegate?
     
@@ -32,6 +33,7 @@ class BackgroundSession: NSObject {
     }
 }
 
+@available(iOS 14.0, *)
 extension BackgroundSession {
 //    @discardableResult
 //    func startUpload(for request: URLRequest, from data: Data) throws -> URLSessionUploadTask {
@@ -68,6 +70,7 @@ extension BackgroundSession {
     }
 }
 
+@available(iOS 14.0, *)
 extension BackgroundSession: URLSessionDelegate {
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         os_log(#function, log: log, type: .debug)
@@ -79,6 +82,7 @@ extension BackgroundSession: URLSessionDelegate {
     }
 }
 
+@available(iOS 14.0, *)
 extension BackgroundSession: URLSessionTaskDelegate {
 //    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 //        if let error = error {
@@ -95,6 +99,7 @@ extension BackgroundSession: URLSessionTaskDelegate {
     }
 }
 
+@available(iOS 14.0, *)
 extension BackgroundSession: URLSessionDataDelegate {
     
     
@@ -141,7 +146,7 @@ extension BackgroundSession: URLSessionDataDelegate {
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
 //      print("didReceive data \(data)")
-        if let responseText = String(data: data, encoding: .utf8) {
+        if String(data: data, encoding: .utf8) != nil {
 //           print(responseText)
             
 //            if let data = data {
@@ -152,7 +157,7 @@ extension BackgroundSession: URLSessionDataDelegate {
 //                        print("\(json)")
                         if((json["error"]) != nil){
 //                            print("ERR \(responseText)")
-                            let error = UploadError(message: "Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
+                            let error = UploadError(message: json["error"] as! String) //"Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
 //                            let error = Error()
 //                            errorTemp.description = "Upload failed \(responseText)"
                             delegate?.__didUploadFileFailed(error: error)

@@ -1,6 +1,7 @@
 import Foundation
 import SensorKit
 
+@available(iOS 14.0, *)
 class AmbientLightDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .ambientLightSensor } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedAmbientLighth! } }
@@ -11,6 +12,7 @@ class AmbientLightDataExtractor: SensorKitDataExtractor {
          sensorDataArray.append([
              "time": time,
              "timeReceived": time,
+             "device": selectedDevice?.model ?? "UNKNOWN",
              "placement": sample.placement.description,
              "chromaticityX": sample.chromaticity.x,
              "chromaticityY": sample.chromaticity.y,
@@ -23,6 +25,7 @@ class AmbientLightDataExtractor: SensorKitDataExtractor {
 //    }
 }
 
+@available(iOS 14.0, *)
 extension SRAmbientLightSample.SensorPlacement {
     var description: String {
         get {

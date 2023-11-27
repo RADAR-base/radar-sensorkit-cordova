@@ -9,6 +9,7 @@ import Foundation
 import SensorKit
 import CoreMotion
 
+@available(iOS 14.0, *)
 class OnWristStateDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .onWristState } }
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedOnWrist! } }
@@ -25,6 +26,7 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
         sensorDataArray.append([
             "time": time,
             "timeReceived": time,
+            "device": selectedDevice?.model ?? "UNKNOWN",
             "crownOrientation": sample.crownOrientation.description,
             "onWrist": sample.onWrist,
             "wristLocation": sample.wristLocation.description,
@@ -38,6 +40,7 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
 //    }
 }
 
+@available(iOS 14.0, *)
 extension SRWristDetection.CrownOrientation {
     var description: String {
         get {
@@ -51,6 +54,7 @@ extension SRWristDetection.CrownOrientation {
     }
 }
 
+@available(iOS 14.0, *)
 extension SRWristDetection.WristLocation {
     var description: String {
         get {

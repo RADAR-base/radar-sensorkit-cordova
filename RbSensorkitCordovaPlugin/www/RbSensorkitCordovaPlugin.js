@@ -10,9 +10,9 @@ exports.getAvailableSensors = function(success, error) {
     exec(success, error, PLUGIN_NAME, "getAvailableSensors");
 };
 
-exports.isSensorAvailable = function(arg0, success, error) {
-    exec(success, error, PLUGIN_NAME, "isSensorAvailable", [arg0]);
-};
+// exports.isSensorAvailable = function(arg0, success, error) {
+//     exec(success, error, PLUGIN_NAME, "isSensorAvailable", [arg0]);
+// };
 
 exports.setConfig = function(arg0, success, error) {
     exec(success, error, PLUGIN_NAME, "setConfig", arg0);
@@ -85,9 +85,9 @@ exports.uploadCache = function(success, error) {
 
 
 
-exports.echo = function(arg0, success, error) {
-    exec(success, error, PLUGIN_NAME, "echo", [arg0]);
-};
+// exports.echo = function(arg0, success, error) {
+//     exec(success, error, PLUGIN_NAME, "echo", [arg0]);
+// };
 
 exports.selectMagneticFieldSensor = function(arg0, success, error) {
     exec(success, error, PLUGIN_NAME, "selectMagneticFieldSensor", arg0);

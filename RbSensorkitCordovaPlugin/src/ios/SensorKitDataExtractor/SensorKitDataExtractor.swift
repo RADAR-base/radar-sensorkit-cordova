@@ -9,6 +9,7 @@ import SensorKit
 import CoreMotion
 import Gzip
 
+@available(iOS 14.0, *)
 class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskDelegate {
     
 //    var defaultTopic: String? { get { return nil } }
@@ -234,7 +235,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     
     // MARK: FetchDevices
     func fetchDevices() {
-        print("\(Date().timeIntervalSince1970) fetchDevices \(reader!.sensor.rawValue)")
+//        print("\(Date().timeIntervalSince1970) fetchDevices \(reader!.sensor.rawValue)")
         self.reader!.fetchDevices()
     }
 
@@ -269,6 +270,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         fetchCounter = -1
         deviceCounter = deviceCounter + 1
         selectedDevice = devices[deviceCounter]
+//        print("selectedDevice \(selectedDevice?.name) - \(selectedDevice?.model) - \(selectedDevice?.systemName) - \(selectedDevice?.systemVersion) - \(selectedDevice?.description)")
         doNextFetch()
     }
     
@@ -459,7 +461,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     func getBody(payload: [[String: Any]], keySchemaId: Int, valueSchemaId: Int) -> [String: Any] {
         let key: [String : Any] = [
             "projectId": UserConfig.projectId, //["string": projectId],
-            "userId": UserConfig.userId,
+            "userId": UserConfig.userId!,
             "sourceId": UserConfig.sourceId ?? ""
         ] as [String : Any]
         let records = payload.map {
@@ -556,7 +558,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 //        request.setValue("application/vnd.kafka.avro.v2+json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/vnd.kafka.v2+json, application/vnd.kafka+json; q=0.9, application/json; q=0.8", forHTTPHeaderField: "Accept")
-        request.setValue( "Bearer \(UserConfig.token)", forHTTPHeaderField: "Authorization")
+        request.setValue( "Bearer \(UserConfig.token!)", forHTTPHeaderField: "Authorization")
         request.addValue(postLength, forHTTPHeaderField: "Content-Length")
         request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
         
@@ -638,6 +640,8 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 //            delegate?.writeToFileFinished(topicName)
         }
     }
+    
+    
     
     
     
@@ -750,6 +754,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 
 
 
+@available(iOS 14.0, *)
 extension SensorKitDataExtractor {
     // UTIL
     func writeToFile(data: Data, fileName: String) async {

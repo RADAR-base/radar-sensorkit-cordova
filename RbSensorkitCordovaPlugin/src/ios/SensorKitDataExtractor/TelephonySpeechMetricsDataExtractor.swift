@@ -26,6 +26,7 @@ class TelephonySpeechMetricsDataExtractor: SensorKitDataExtractor {
             sensorDataArray.append([
                 "time": sample.timestamp.timeIntervalSince1970,
                 "timeReceived": sample.timestamp.timeIntervalSince1970,
+                "device": selectedDevice?.model ?? "UNKNOWN",
                 "audioLevelLoudness": sample.audioLevel?.loudness as Any,
                 "audioLevelStart": sample.audioLevel?.timeRange.start.seconds as Any,
                 "audioLevelDuration": sample.audioLevel?.timeRange.duration.seconds as Any,
