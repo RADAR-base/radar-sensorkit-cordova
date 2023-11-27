@@ -48,6 +48,7 @@ extension RbSensorkitCordovaPlugin {
     }
 
     func _isAuthorized(_ dataExtractor: SensorKitDataExtractor?) -> Bool {
+//        print(" \(dataExtractor?.reader?.authorizationStatus)")
         if dataExtractor?.reader?.authorizationStatus.rawValue == 1 {
             return true
         }
@@ -268,14 +269,17 @@ extension RbSensorkitCordovaPlugin {
         do {
             // get topic name from the file
             let topicName = fileName.components(separatedBy: "___")[0]
+
             guard let baseUrl = RadarbaseConfig.baseUrl else {
                 // send error message to JS and return
                 return
             }
+
             guard let url = URL(string: baseUrl + RadarbaseConfig.kafkaEndpoint + topicName) else {
                 // send error message to JS and return
                 return
             }
+
             var request = URLRequest(url: url)
             request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
             request.httpMethod = "POST"
@@ -285,13 +289,10 @@ extension RbSensorkitCordovaPlugin {
             guard let token = UserConfig.token else {
                 return
             }
-//            print("OOO UserConfig.token \(token)")
+
             request.setValue( "Bearer \(token)", forHTTPHeaderField: "Authorization")
 
             let identifierSuffix = "uniqueId"
-//        do {
-//            let request = URLRequest(url: URL(string: "your_upload_url_here")!)
-//            let fileURL = URL(fileURLWithPath: "/path/to/your/file.txt") // Provide the actual file path
 
             let backgroundSession = BackgroundSession.shared
             backgroundSession.delegate = self
@@ -470,7 +471,7 @@ extension RbSensorkitCordovaPlugin {
                 let (data, response) = try await URLSession.shared.data(for: request)
                 do {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        let time = Date().timeIntervalSince1970 - startTime
+//                        let time = Date().timeIntervalSince1970 - startTime
                         //log("Data sent. \(self.iterationCounter + 1)/\(self.totalIterations + 1) in \(time)s")
                         log("\(json)")
                         await handleMagneticFieldSuccessError(response: response as? HTTPURLResponse, data: json)
@@ -511,13 +512,8 @@ extension RbSensorkitCordovaPlugin {
                 self.callbackHelper!.sendError(self.fetchMagneticFieldCommand!, data["error_description"] as? String ?? "UNKNOWN_ERROR", true)
             }
         }
-}
-
-
-@available(iOS 14.0, *)
-extension RbSensorkitCordovaPlugin: SensorKitDelegate {
-    func __didStopRecording(sensor: SRSensor) {
-        stopRecordingsResponse.append([sensor.rawValue: "STOPPED"])
+    
+    func _doNextStop() {
         if stopRecordingsSensors.count == stopRecordingsResponse.count {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: ["results": stopRecordingsResponse], options: JSONSerialization.WritingOptions.prettyPrinted)
@@ -526,14 +522,34 @@ extension RbSensorkitCordovaPlugin: SensorKitDelegate {
             } catch let error {
                 self.callbackHelper?.sendError(stopRecordingsCommand!, error.localizedDescription)
             }
+        } else {
+            let sensor = stopRecordingsSensors[stopRecordingCounter]
+            selectedStopRecordingSensor = _generateDataExtractor(sensor: sensor)
+            selectedStopRecordingSensor?.delegate = self
+            if !_isAuthorized(selectedStopRecordingSensor) {
+                // write in response object that it is not authorized
+                stopRecordingsResponse.append([sensor.rawValue: "NOT_AUTHORIZED"])
+                stopRecordingCounter = stopRecordingCounter + 1
+                _doNextStop()
+            } else {
+                selectedStopRecordingSensor?.stopRecording()
+                stopRecordingCounter = stopRecordingCounter + 1
+            }
         }
+    }
+}
+
+
+@available(iOS 14.0, *)
+extension RbSensorkitCordovaPlugin: SensorKitDelegate {
+    func __didStopRecording(sensor: SRSensor) {
+        stopRecordingsResponse.append([sensor.rawValue: "STOPPED"])
+        _doNextStop()
     }
     
     func __failedStopRecording(sensor: SRSensor, error: Error) {
         stopRecordingsResponse.append([sensor.rawValue: error])
-        if stopRecordingsSensors.count == stopRecordingsResponse.count {
-            self.callbackHelper?.sendError(stopRecordingsCommand!, error.localizedDescription)
-        }
+        _doNextStop()
     }
     
     func __fetchCompletedForOneSensor(sensor: SRSensor, date: Date) {
@@ -553,18 +569,18 @@ extension RbSensorkitCordovaPlugin: SensorKitDelegate {
         self.callbackHelper?.sendError(startFetchingAllCommand!, "Topic '\(topicName)' doesn't exist.", true)
     }
     
-    func __didUploadFileSuccess() {
+    func __didUploadFileSuccess(fileName: String?) {
         uploadedFileCounter = uploadedFileCounter + 1
         Task {
             await _postLogToKafka(dataGroupingType: "PASSIVE_SENSOR_KIT")
         }
-        let result: [String: AnyObject] = ["total": totalFilesToUpload, "UploadNumber": uploadedFileCounter] as [String : AnyObject]
+        let result: [String: AnyObject] = ["total": totalFilesToUpload, "UploadNumber": uploadedFileCounter, "topic": fileName ?? ""] as [String : AnyObject]
         self.callbackHelper?.sendJson(uploadCacheCommand!, result, true)
     }
     
-    func __didUploadFileFailed(error: UploadError) {
+    func __didUploadFileFailed(error: UploadError, fileName: String?) {
         uploadedFileCounter = uploadedFileCounter + 1
-        let result: [String: AnyObject] = ["total": totalFilesToUpload, "UploadNumber": uploadedFileCounter, "error": error.message] as [String : AnyObject]
+        let result: [String: AnyObject] = ["total": totalFilesToUpload, "UploadNumber": uploadedFileCounter, "error": error.message, "topic": fileName ?? ""] as [String : AnyObject]
         self.callbackHelper?.sendErrorJson(uploadCacheCommand!, result, true)
     }
 }

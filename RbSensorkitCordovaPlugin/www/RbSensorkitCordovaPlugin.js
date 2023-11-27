@@ -34,8 +34,8 @@ exports.checkAuthorization = function(arg0, success, error) {
     exec(success, error, PLUGIN_NAME, "checkAuthorization", arg0);
 };
 
-exports.stopRecording = function(success, error) {
-    exec(success, error, PLUGIN_NAME, "stopRecording", []);
+exports.stopRecording = function(arg0, success, error) {
+    exec(success, error, PLUGIN_NAME, "stopRecording", arg0);
 };
 
 

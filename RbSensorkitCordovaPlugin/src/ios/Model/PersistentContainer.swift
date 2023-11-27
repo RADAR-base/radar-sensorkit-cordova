@@ -36,7 +36,7 @@ class PersistentContainer: NSPersistentContainer {
     static let shared: PersistentContainer = {
 //        ValueTransformer.setValueTransformer(ColorTransformer(), forName: NSValueTransformerName(rawValue: String(describing: ColorTransformer.self)))
         
-        let container = PersistentContainer(name: "ColorFeed")
+        let container = PersistentContainer(name: "LastUpdate")
         container.loadPersistentStores { (desc, error) in
             if let error = error {
                 fatalError("Unresolved error \(error)")
@@ -262,7 +262,7 @@ extension PersistentContainer {
 //                    
 //                    _ = generateFakeEntries(from: start, to: end).map { FeedEntry(context: context, serverEntry: $0) }
 //                    try context.save()
-                let initDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: -48, to: Date(), options: [])!
+                let initDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: -168, to: Date(), options: [])!
 
                 self.lastFetched = initDate
 //                self.lastFetchedAccelerometer = daysAgo

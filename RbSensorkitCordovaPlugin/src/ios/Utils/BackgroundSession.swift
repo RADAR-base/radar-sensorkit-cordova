@@ -160,7 +160,7 @@ extension BackgroundSession: URLSessionDataDelegate {
                             let error = UploadError(message: json["error"] as! String) //"Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
 //                            let error = Error()
 //                            errorTemp.description = "Upload failed \(responseText)"
-                            delegate?.__didUploadFileFailed(error: error)
+                            delegate?.__didUploadFileFailed(error: error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
                         } else {
 //                            print("\(Date().timeIntervalSince1970) OK \(String(describing: fileNamesDictionary[dataTask.taskIdentifier]))")
                             
@@ -172,22 +172,14 @@ extension BackgroundSession: URLSessionDataDelegate {
                                 let filePathName = "\(tempPath)/\(fileName!)"
                                 try fileManager.removeItem(atPath: filePathName)
                             }
-                            delegate?.__didUploadFileSuccess()
+                            delegate?.__didUploadFileSuccess(fileName: fileName)
                         }
                         
                     }
                 } catch let error {
-//                    print("\(Date().timeIntervalSince1970) We couldn't parse the data into JSON.", error)
                     let _error = UploadError(message: "Upload failed \(error.localizedDescription)")
-                    delegate?.__didUploadFileFailed(error: _error)
+                    delegate?.__didUploadFileFailed(error: _error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
                 }
-                //self.doNextPost()
-//            }
-            // if error => nothing
-            // if not error => delete the file
-//            if ((data as Any)["error"]){
-//                print(data.base64EncodedData())
-//            }
         }
    }
     

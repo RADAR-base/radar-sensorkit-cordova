@@ -16,15 +16,20 @@ cordova plugin add ../RbSensorkitCordovaPlugin/'
 * Sensorkit works for iOS 14 and above. Some sensors work only on newer versions
 ## Usage
 ### Call methods in sequence
-- Check if sensor is available
+#### Important: In App Targets/Signing and Capabilities add Background Modes capability and enable Background processing
+
 - Set RADAR-base configuration
-- Select sensor (with sensor name, topic, period)
+- Check cache status
+- Upload all files in the cache
+- Get the list of available sensors
 - Check authorization status and request authorization
-- Initialise sensor
-- Start recording
+- Enable sensors to collect data (with sensor name, topic, period)
 - After 24 hours data will be available
-- Fetch devices
 - Fetch data
+- 
+- Stop recording for sensors if needed
+- Clear cache on logout
+
 ## Methods
 
 ### isSensorKitAvailable()
@@ -36,22 +41,29 @@ RbSensorkitCordovaPlugin.isSensorKitAvailable(successCallback, errorCallback)
 - successCallback: {type: function(res: boolean)}, true = available, false = not-available
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
-### isSensorAvailable(sensor: String)
-
+### getAvailableSensors()
 ```
-RbSensorkitCordovaPlugin.isSensorAvailable(sensor: string, successCallback, errorCallback)
+RbSensorkitCordovaPlugin.getAvailableSensors(successCallback, errorCallback)
 ```
-- sensor: {type :string}: valid sensor strings: accelerometer, ambientLightSensor, ambientPressure, deviceUsageReport, keyboardMetrics, mediaEvents, messagesUsageReport, onWristState, pedometerData, phoneUsageReport, rotationRate, siriSpeechMetrics, telephonySpeechMetrics, visits
-
-- successCallback: {type: function(res: boolean)}, true = available, false = not-available
+- successCallback: {type: function(res: string[])}, list of available sensors
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
-### setConfig(configArray: string[])
+### setConfig(configs: Config)
 
 ```
-RbSensorkitCordovaPlugin.setConfig(configArray, successCallback, errorCallback)
+RbSensorkitCordovaPlugin.setConfig([configs], successCallback, errorCallback)
 ```
-- configArray: {type: string[]}: [token: string, baseUrl: string, kafkaEndpoint: string, schemaEndpoint: string, projectId: string, userId: string, sourceId: string] 
+- configs: {type: Config}:
+  const configs = {
+  token: string,
+  baseUrl: string,
+  kafkaEndpoint?: string,
+  schemaEndpoint?: string,
+  projectId: string,
+  userId: string,
+  sourceId?: string
+  }
+
   - token: The access token from RADAR-base,
   - baseUrl: RADAR-base instance BaseUrl **[Note: add trailing slash]** (e.g. `https://your-domain-name.com/`),
   - projectId: Project ID from RADAR-base ManagementPortal,
@@ -66,80 +78,44 @@ RbSensorkitCordovaPlugin.setConfig(configArray, successCallback, errorCallback)
 - successCallback: {type: function()}, called in success
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
-### selectSensor(sensorParams: string[])
-- sensorParams: {type :string[]}: [name: name, topic: topic, period: period, chunkSize: chunkSize}]valid sensor strings: accelerometer, ambientLightSensor, ambientPressure, deviceUsageReport, keyboardMetrics, mediaEvents, messagesUsageReport, onWristState, pedometerData, phoneUsageReport, rotationRate, siriSpeechMetrics, telephonySpeechMetrics, visits
+### selectSensors(sensorsArray: SensorConfig[])
+- sensorsArray: {type :SensorConfig[]}: {sensor: string, topic?: string, period?: number}[]
 
 - successCallback: {type: function()}
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
 ```
-RbSensorkitCordovaPlugin.selectSensor(sensor, successCallback, errorCallback)
+RbSensorkitCordovaPlugin.selectSensor(sensorsArray, successCallback, errorCallback)
 ```
 
-- successCallback: {type: function()}, called in success
-- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
-
-### checkAuthorization()
+### checkAuthorization(sensorArray: string[])
 
 ```
-RbSensorkitCordovaPlugin.checkAuthorization(successCallback, errorCallback)
+RbSensorkitCordovaPlugin.checkAuthorization(sensorArray, successCallback, errorCallback)
 ```
+- sensorsArray: {type :string[]}
 
-- successCallback: {type: function(res: string)}, called in success
-  - res: 'NOT_DETERMINED', 'AUTHORIZED', 'DENIED'
+- successCallback: {type: function(res: {"results":{"sensorName":"AUTHORIZED|DENIED|NOT_DETERMINED"}[]}) called in success
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
 ### authorize()
 
 ```
-RbSensorkitCordovaPlugin.authorize(successCallback, errorCallback)
+RbSensorkitCordovaPlugin.authorize(sensorArray, successCallback, errorCallback)
 ```
-- successCallback: {type: function(res: string)}, called in success
-    - res: 'NOT_DETERMINED', 'AUTHORIZED', 'DENIED'
-- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
+- sensorsArray: {type :string[]}
 
-### initialiseSensor()
-
-```
-RbSensorkitCordovaPlugin.initialiseSensor(successCallback, errorCallback)
-```
-
-- successCallback: {type: function()}, called in success
-- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
-
-### startRecording()
-
-```
-RbSensorkitCordovaPlugin.startRecording(successCallback, errorCallback)
-```
-
-- successCallback: {type: function()}, called in success
+- successCallback: {type: function(res: {"results":{"sensorName":"AUTHORIZED|DENIED|NOT_DETERMINED"}[]}) called in success
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
 ### stopRecording()
 
 ```
-RbSensorkitCordovaPlugin.stopRecording(successCallback, errorCallback)
+RbSensorkitCordovaPlugin.stopRecording(sensorsArray, successCallback, errorCallback)
 ```
+- sensorsArray: {type :string[]}
 
 - successCallback: {type: function()}, called in success
-- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
-
-### fetchDevices()
-
-```
-RbSensorkitCordovaPlugin.fetchDevices(successCallback, errorCallback)
-```
-
-- successCallback: {type: function(res: {devices: Device[]})}, called in success
-```
-interface Device {
-    "name": string; // device name e.g. "My iPhone"
-    "model": string; // device model e.g. @"iPhone"
-    "systemName": string; // device system name e.g. @"iOS"
-    "systemVersion": string; // device system version
-}
-```
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
 ### fetchData(requestParamsArray: string[])
@@ -175,6 +151,32 @@ interface ChunkSentError {
     "error_message": string;
 }
 ```
+### getCacheStatus()
+
+```
+RbSensorkitCordovaPlugin.getCacheStatus(successCallback, errorCallback)
+```
+
+- successCallback: {type: function(res: number)}, number of files are in the cache
+- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
+
+### clearCache()
+
+```
+RbSensorkitCordovaPlugin.clearCache(successCallback, errorCallback)
+```
+
+- successCallback: {type: function()}, all files are successfully deleted.
+- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
+
+### uploadCache()
+
+```
+RbSensorkitCordovaPlugin.uploadCache(successCallback, errorCallback)
+```
+
+- successCallback: {type: function()}
+- errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
 ## External resources
 

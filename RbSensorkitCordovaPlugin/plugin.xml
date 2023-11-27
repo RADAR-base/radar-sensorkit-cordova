@@ -48,7 +48,7 @@
         <source-file src="src/ios/Utils/BackgroundSession.swift" />
         <source-file src="src/ios/RbSensorkit/RbSensorkit.swift" />
         <source-file src="src/ios/Model/PersistentContainer.swift" />
-        <source-file src="src/ios/Model/ColorFeed.xcdatamodeld" />
+        <source-file src="src/ios/Model/LastUpdate.xcdatamodeld" />
 
         <!--        <source-file src="src/ios/SensorKitDataExtractor/" target="src/"/>-->
 

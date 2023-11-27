@@ -11,10 +11,13 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     var sensorCounter: Int = -1
     var sensors: [SRSensor] = []
     var selectedSensor: SensorKitDataExtractor?
+    var selectedStopRecordingSensor: SensorKitDataExtractor?
+
     
     var stopRecordingsCommand: CDVInvokedUrlCommand?
     var stopRecordingsSensors: [SRSensor] = []
     var stopRecordingsResponse: [[String: Any]] = []
+    var stopRecordingCounter = 0
     
     var checkAuthorizationCommand: CDVInvokedUrlCommand?
     var checkAuthorizationSensors: [SRSensor] = []
@@ -126,46 +129,34 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
 
     // MARK: Select the Sensor
     @objc(selectSensors:) func selectSensors(command: CDVInvokedUrlCommand) {
-//        print("--$$ selectSensors")
         guard let sensorsConfig: [[String: Any]] = command.arguments as? [[String: Any]] else {
-//            print("--$$ selectSensors NO_SENSOR")
-
             self.callbackHelper?.sendError(command, "NO_SENSOR")
             return
         }
-//        print("--$$ selectSensors \(sensorsConfig)")
         var sensors: Set<SRSensor> = Set()
         sensorsConfig.forEach { sensorConfig in
             guard let sensorString: String = sensorConfig["sensor"] as? String else {
-//                print("--$$ selectSensors NO_SENSOR")
                 self.callbackHelper?.sendError(command, "NO_SENSOR")
                 return
             }
             guard let sensor: SRSensor = _getSRSensor(sensorString: sensorString) else {
-//                print("--$$ selectSensors INVALID_SENSOR")
                 self.callbackHelper?.sendError(command, "INVALID_SENSOR")
                 return
             }
             sensors.insert(sensor)
             if let sensorPeriod = sensorConfig["period"] as? Double {
-//                print("--$$ selectSensors sensorPeriod = \(sensorPeriod)")
                 ConfigSensor.periods[sensorString] = sensorPeriod
             }
             
             if let sensorTopic = sensorConfig["topic"] as? String {
-//                print("--$$ selectSensors sensorTopic = \(sensorTopic)")
-
                 ConfigSensor.topics[sensorString] = sensorTopic
             }
         }
 
         if sensors.isEmpty {
-//            print("--$$ selectSensors NO_VALID_SENSOR")
-
             self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
             return
         }
-//        print("--$$ selectSensors \(sensors)")
 
         self.sensors = Array(sensors)
         self.callbackHelper?.sendEmpty(command)
@@ -188,18 +179,17 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     @objc(uploadCache:) func uploadCache(command: CDVInvokedUrlCommand) {
         uploadCacheCommand = command
         _uploadAllFiles()
-        callbackHelper?.sendEmpty(uploadCacheCommand!)
     }
     
     @objc(startFetchingAll:) func startFetchingAll(command: CDVInvokedUrlCommand) {
         self.startFetchingAllCommand = command
-//        print("plugin startFetchingAll")
         sensorCounter = -1
         _changeSensor()
     }
     
     // MARK: stopRecording
     @objc(stopRecording:) func stopRecording(command: CDVInvokedUrlCommand) {
+        stopRecordingCounter = 0
         guard let sensorsString: [String] = command.arguments as? [String] else {
             self.callbackHelper?.sendError(command, "NO_SENSOR")
             return
@@ -213,25 +203,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
         stopRecordingsCommand = command
         stopRecordingsResponse = []
         stopRecordingsSensors = Array(sensors)
-        stopRecordingsSensors.forEach { sensor in
-            let dataExtractor = _generateDataExtractor(sensor: sensor)
-            if !_isAuthorized(dataExtractor) {
-                // write in response object that it is not authorized
-                stopRecordingsResponse.append([sensor.rawValue: "NOT_AUTHORIZED"])
-            } else {
-                dataExtractor?.stopRecording()
-            }
-        }
-        // listen to delegate and return back the response
-        
-//        self.commandDelegate.run {
-//            if !self._isAuthorized() {
-//                self.callbackHelper?.sendError(command, "NOT_AUTHORIZED")
-//                return
-//            }
-//            self.stopRecordingCommand = command
-//            self.reader.stopRecording()
-//        }
+        _doNextStop()
     }
     
     // MARK: checkAuthorization

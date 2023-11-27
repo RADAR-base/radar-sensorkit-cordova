@@ -14,6 +14,6 @@ protocol SensorKitDelegate {
     func __didStopRecording(sensor: SRSensor)
     func __failedStopRecording(sensor: SRSensor, error: Error)
     func __failedFetchTopic(topicName: String, error: Error)
-    func __didUploadFileFailed(error: UploadError)
-    func __didUploadFileSuccess()
+    func __didUploadFileFailed(error: UploadError, fileName: String?)
+    func __didUploadFileSuccess(fileName: String?)
 }

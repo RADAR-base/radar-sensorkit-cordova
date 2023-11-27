@@ -17,9 +17,9 @@ class TelephonySpeechMetricsDataExtractor: SensorKitDataExtractor {
         if #available(iOS 17.0, *) {
             let sample = result.sample as! SRSpeechMetrics
 
-            var classifications: [SNClassification]? = sample.soundClassification?.classifications
+            let classifications: [SNClassification]? = sample.soundClassification?.classifications
             
-            var classificationsString = classifications?.compactMap { word in
+            let classificationsString = classifications?.compactMap { word in
                 word.identifier + ": " + word.confidence.description
             }.joined(separator: ", ")
 
