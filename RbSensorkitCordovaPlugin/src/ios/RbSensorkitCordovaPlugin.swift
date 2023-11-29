@@ -34,9 +34,9 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     override func pluginInitialize() {
         log("Initializing Cordova plugin \(Constants.APP_NAME)");
         let lastFetched = PersistentContainer.shared.lastFetched
-//        if lastFetched == nil {
+        if lastFetched == nil {
             PersistentContainer.shared.loadInitialData()
-//        }
+        }
         super.pluginInitialize()
         sensorCounter = -1
         callbackHelper = CallbackHelper(self.commandDelegate!)
