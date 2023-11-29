@@ -18,7 +18,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     var topicName: String = "sensorkit_ambient_light"
     
     var periodMili: Double = 0
-    let chunkSize = 10000
+    var chunkSize = 10000
     
     var topicKeyId = 0
     var topicValueId = 0
@@ -48,7 +48,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     var endDate: Date = (Calendar.current as NSCalendar).date(byAdding: .day, value: -1, to: Date(), options: [])! //Date()
     var numberOfFetches: Int = 0
     
-    init(periodMili: Double, topicName: String) {
+    init(periodMili: Double, topicName: String, chunkSize: Int) {
           beginDate = PersistentContainer.shared.lastFetched!
 
         super.init()
@@ -57,6 +57,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 
         self.topicName = topicName
         self.periodMili = periodMili
+        self.chunkSize = chunkSize
         self.reader = SRSensorReader(sensor: sensor!)
         self.reader = .init(sensor: sensor!)
         self.reader!.delegate = self

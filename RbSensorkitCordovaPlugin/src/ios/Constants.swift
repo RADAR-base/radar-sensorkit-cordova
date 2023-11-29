@@ -52,6 +52,27 @@ struct ConfigSensor {
         "wristTemperature": "sensorkit_wrist_temperature",
         "magneticField": ""
     ]
+    static var chunkSize: Dictionary<String, Int> = [
+        "accelerometer": Constants.DEFAULT_CHUNK_SIZE,
+        "ambientLightSensor": Constants.DEFAULT_CHUNK_SIZE,
+        "ambientPressure": Constants.DEFAULT_CHUNK_SIZE,
+        "deviceUsageReport": Constants.DEFAULT_CHUNK_SIZE,
+        "faceMetrics": Constants.DEFAULT_CHUNK_SIZE,
+        "heartRate": Constants.DEFAULT_CHUNK_SIZE,
+        "keyboardMetrics": Constants.DEFAULT_CHUNK_SIZE,
+        "mediaEvents": Constants.DEFAULT_CHUNK_SIZE,
+        "messagesUsageReport": Constants.DEFAULT_CHUNK_SIZE,
+        "odometer": Constants.DEFAULT_CHUNK_SIZE,
+        "onWristState": Constants.DEFAULT_CHUNK_SIZE,
+        "pedometerData": Constants.DEFAULT_CHUNK_SIZE,
+        "phoneUsageReport": Constants.DEFAULT_CHUNK_SIZE,
+        "rotationRate": Constants.DEFAULT_CHUNK_SIZE,
+        "siriSpeechMetrics": Constants.DEFAULT_CHUNK_SIZE,
+        "telephonySpeechMetrics": Constants.DEFAULT_CHUNK_SIZE,
+        "visits": Constants.DEFAULT_CHUNK_SIZE,
+        "wristTemperature": Constants.DEFAULT_CHUNK_SIZE,
+        "magneticField": Constants.DEFAULT_CHUNK_SIZE,
+    ]
 }
 
 struct RadarbaseConfig {

@@ -73,35 +73,36 @@ async function onDeviceReady() {
     //     console.log("[JS] Upload Cache Error", e);
     // }
 
-    try {
-        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
-        const res = await checkAuthorization(sensorArray)
-        console.log("[JS] checkAuthorization", JSON.stringify(res));
-    } catch (e) {
-        console.log("[JS] checkAuthorization", e);
-    }
+    // try {
+    //     const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+    //     const res = await checkAuthorization(sensorArray)
+    //     console.log("[JS] checkAuthorization", JSON.stringify(res));
+    // } catch (e) {
+    //     console.log("[JS] checkAuthorization", e);
+    // }
+    //
+    // try {
+    //     const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+    //     const res = await authorize(sensorArray)
+    //     console.log("[JS] Authorize", JSON.stringify(res));
+    // } catch (e) {
+    //     console.log("[JS] Authorize", e);
+    // }
 
-    try {
-        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
-        const res = await authorize(sensorArray)
-        console.log("[JS] Authorize", JSON.stringify(res));
-    } catch (e) {
-        console.log("[JS] Authorize", e);
-    }
-
-    try {
-        const sensorArray = ["deviceUsageReport","keyboardMetrics"]
-        const res = await stopRecording(sensorArray)
-        console.log("[JS] stopRecording", JSON.stringify(res));
-    } catch (e) {
-        console.log("[JS] stopRecording", e);
-    }
+    // try {
+    //     const sensorArray = ["deviceUsageReport","keyboardMetrics"]
+    //     const res = await stopRecording(sensorArray)
+    //     console.log("[JS] stopRecording", JSON.stringify(res));
+    // } catch (e) {
+    //     console.log("[JS] stopRecording", e);
+    // }
 
     // return;
+
     try {
         const sensorArray = [
-            {sensor: "ambientLightSensor", topic: "sk_amb_light", period: 6000},
-            {sensor: "accelerometer", period: 200},
+            {sensor: "ambientLightSensor", period: 6000, chunkSize: 10000},
+            {sensor: "accelerometer", period: 50, chunkSize: 10000},
             // {sensor: "deviceUsageReport"},
             // {sensor: "keyboardMetrics"},
             {sensor: "messagesUsageReport"},
@@ -112,11 +113,33 @@ async function onDeviceReady() {
             {sensor: "ambientPressure"},
             {sensor: "telephonySpeechMetrics"}
         ]
-        const res = await selectSensors(sensorArray)
+        const res = await RbSensorkitCordovaPlugin.selectSensors(sensorArray)
         console.log("[JS] Select Sensor Success");
+
+        await sleep(1000)
     } catch (e) {
-        console.log("[JS] Select Sensors Error", e);
+        // add bugfender
+        console.log("[JS] Error selecting sensors", e);
     }
+    // try {
+    //     const sensorArray = [
+    //         {sensor: "ambientLightSensor", topic: "sk_amb_light", period: 6000},
+    //         {sensor: "accelerometer", period: 200},
+    //         // {sensor: "deviceUsageReport"},
+    //         // {sensor: "keyboardMetrics"},
+    //         {sensor: "messagesUsageReport"},
+    //         {sensor: "onWristState"},
+    //         {sensor: "pedometerData"},
+    //         {sensor: "phoneUsageReport"},
+    //         {sensor: "visits"},
+    //         {sensor: "ambientPressure"},
+    //         {sensor: "telephonySpeechMetrics"}
+    //     ]
+    //     const res = await selectSensors(sensorArray)
+    //     console.log("[JS] Select Sensor Success");
+    // } catch (e) {
+    //     console.log("[JS] Select Sensors Error", e);
+    // }
 
     // return;
 

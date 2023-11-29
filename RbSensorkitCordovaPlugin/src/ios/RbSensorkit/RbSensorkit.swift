@@ -6,23 +6,23 @@ extension RbSensorkitCordovaPlugin {
     func _generateDataExtractor(sensor: SRSensor) -> SensorKitDataExtractor? {
         switch sensor {
         case .accelerometer:
-            return AccelerometerDataExtractor(periodMili: ConfigSensor.periods["accelerometer"]!, topicName: ConfigSensor.topics["accelerometer"]!)
+            return AccelerometerDataExtractor(periodMili: ConfigSensor.periods["accelerometer"]!, topicName: ConfigSensor.topics["accelerometer"]!, chunkSize: ConfigSensor.chunkSize["accelerometer"]!)
         case .ambientLightSensor:
-            return AmbientLightDataExtractor(periodMili: ConfigSensor.periods["ambientLightSensor"]!, topicName: ConfigSensor.topics["ambientLightSensor"]!)
+            return AmbientLightDataExtractor(periodMili: ConfigSensor.periods["ambientLightSensor"]!, topicName: ConfigSensor.topics["ambientLightSensor"]!, chunkSize: ConfigSensor.chunkSize["ambientLightSensor"]!)
         case .deviceUsageReport:
-            return DeviceUsageDataExtractor(periodMili: ConfigSensor.periods["deviceUsageReport"]!, topicName: ConfigSensor.topics["deviceUsageReport"]!)
+            return DeviceUsageDataExtractor(periodMili: ConfigSensor.periods["deviceUsageReport"]!, topicName: ConfigSensor.topics["deviceUsageReport"]!, chunkSize: ConfigSensor.chunkSize["deviceUsageReport"]!)
         case .keyboardMetrics:
-            return KeyboardMetricsDataExtractor(periodMili: ConfigSensor.periods["keyboardMetrics"]!, topicName: ConfigSensor.topics["keyboardMetrics"]!)
+            return KeyboardMetricsDataExtractor(periodMili: ConfigSensor.periods["keyboardMetrics"]!, topicName: ConfigSensor.topics["keyboardMetrics"]!, chunkSize: ConfigSensor.chunkSize["keyboardMetrics"]!)
         case .messagesUsageReport:
-            return MessageUsageReportDataExtractor(periodMili: ConfigSensor.periods["messagesUsageReport"]!, topicName: ConfigSensor.topics["messagesUsageReport"]!)
+            return MessageUsageReportDataExtractor(periodMili: ConfigSensor.periods["messagesUsageReport"]!, topicName: ConfigSensor.topics["messagesUsageReport"]!, chunkSize: ConfigSensor.chunkSize["messagesUsageReport"]!)
         case .onWristState:
-            return OnWristStateDataExtractor(periodMili: ConfigSensor.periods["onWristState"]!, topicName: ConfigSensor.topics["onWristState"]!)
+            return OnWristStateDataExtractor(periodMili: ConfigSensor.periods["onWristState"]!, topicName: ConfigSensor.topics["onWristState"]!, chunkSize: ConfigSensor.chunkSize["onWristState"]!)
         case .pedometerData:
-            return PedometerDataExtractor(periodMili: ConfigSensor.periods["pedometerData"]!, topicName: ConfigSensor.topics["pedometerData"]!)
+            return PedometerDataExtractor(periodMili: ConfigSensor.periods["pedometerData"]!, topicName: ConfigSensor.topics["pedometerData"]!, chunkSize: ConfigSensor.chunkSize["pedometerData"]!)
         case .phoneUsageReport:
-            return PhoneUsageReportDataExtractor(periodMili: ConfigSensor.periods["phoneUsageReport"]!, topicName: ConfigSensor.topics["phoneUsageReport"]!)
+            return PhoneUsageReportDataExtractor(periodMili: ConfigSensor.periods["phoneUsageReport"]!, topicName: ConfigSensor.topics["phoneUsageReport"]!, chunkSize: ConfigSensor.chunkSize["phoneUsageReport"]!)
         case .visits:
-            return VisitsDataExtractor(periodMili: ConfigSensor.periods["visits"]!, topicName: ConfigSensor.topics["visits"]!)
+            return VisitsDataExtractor(periodMili: ConfigSensor.periods["visits"]!, topicName: ConfigSensor.topics["visits"]!, chunkSize: ConfigSensor.chunkSize["visits"]!)
         default:
             break
         }
@@ -30,7 +30,7 @@ extension RbSensorkitCordovaPlugin {
         if #available(iOS 15.4, *) {
             switch sensor {
             case .ambientPressure:
-                return AmbientPressureDataExtractor(periodMili: ConfigSensor.periods["ambientPressure"]!, topicName: ConfigSensor.topics["ambientPressure"]!)
+                return AmbientPressureDataExtractor(periodMili: ConfigSensor.periods["ambientPressure"]!, topicName: ConfigSensor.topics["ambientPressure"]!, chunkSize: ConfigSensor.chunkSize["ambientPressure"]!)
             default:
                 break
             }
@@ -39,7 +39,7 @@ extension RbSensorkitCordovaPlugin {
         if #available(iOS 15.0, *) {
             switch sensor {
             case .telephonySpeechMetrics:
-                return TelephonySpeechMetricsDataExtractor(periodMili: ConfigSensor.periods["telephonySpeechMetrics"]!, topicName: ConfigSensor.topics["telephonySpeechMetrics"]!)
+                return TelephonySpeechMetricsDataExtractor(periodMili: ConfigSensor.periods["telephonySpeechMetrics"]!, topicName: ConfigSensor.topics["telephonySpeechMetrics"]!, chunkSize: ConfigSensor.chunkSize["telephonySpeechMetrics"]!)
             default:
                 break
             }

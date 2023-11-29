@@ -79,7 +79,7 @@ RbSensorkitCordovaPlugin.setConfig([configs], successCallback, errorCallback)
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem
 
 ### selectSensors(sensorsArray: SensorConfig[])
-- sensorsArray: {type :SensorConfig[]}: {sensor: string, topic?: string, period?: number}[]
+- sensorsArray: {type :SensorConfig[]}: {sensor: string, topic?: string, period?: number, chunkSize?: number}[]
 
 - successCallback: {type: function()}
 - errorCallback: {type: function(err)}, called if something went wrong, err contains a textual description of the problem

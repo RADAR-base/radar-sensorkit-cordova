@@ -151,6 +151,11 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
             if let sensorTopic = sensorConfig["topic"] as? String {
                 ConfigSensor.topics[sensorString] = sensorTopic
             }
+            
+            if let sensorChunkSize = sensorConfig["chunkSize"] as? Int {
+                ConfigSensor.chunkSize[sensorString] = sensorChunkSize
+            }
+            
         }
 
         if sensors.isEmpty {
