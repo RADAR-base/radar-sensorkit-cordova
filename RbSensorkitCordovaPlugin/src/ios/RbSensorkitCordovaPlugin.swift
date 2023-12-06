@@ -40,7 +40,10 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
         super.pluginInitialize()
         sensorCounter = -1
         callbackHelper = CallbackHelper(self.commandDelegate!)
+        
+        //copyFilesFromTempToDocumentsFolderWith(fileExtension: ".txt.gz")
     }
+    
     
     // MARK: isSensorKitAvailable
     @objc(isSensorKitAvailable:) func isSensorKitAvailable(command: CDVInvokedUrlCommand) {
@@ -82,7 +85,7 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
             return
         }
         
-        let sourceId = configs["userId"] as? String ?? ""
+        let sourceId = configs["sourceId"] as? String ?? ""
         let kafkaEndpoint = configs["kafkaEndpoint"] as? String ?? Constants.DefaultKafkaEndpoint
         let schemaEndpoint = configs["schemaEndpoint"] as? String ?? Constants.DefaultSchemaEndpoint
 
@@ -168,22 +171,28 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     }
     
     @objc(getCacheStatus:) func getCacheStatus(command: CDVInvokedUrlCommand) {
-        do {
-            let total = try _getCacheStatus()
-            callbackHelper?.sendNumber(command, total)
-        } catch let error {
-            callbackHelper?.sendError(command, "Could not read temp folder: \(error.localizedDescription)")
+        self.commandDelegate.run {
+            do {
+                let total = try self._getCacheStatus()
+                self.callbackHelper?.sendNumber(command, total)
+            } catch let error {
+                self.callbackHelper?.sendError(command, "Could not read temp folder: \(error.localizedDescription)")
+            }
         }
     }
     
     @objc(clearCache:) func clearCache(command: CDVInvokedUrlCommand) {
-        _deleteAllFiles(command: command)
-        callbackHelper?.sendEmpty(command)
+        self.commandDelegate.run {
+            self._deleteAllFiles(command: command)
+            self.callbackHelper?.sendEmpty(command)
+        }
     }
     
     @objc(uploadCache:) func uploadCache(command: CDVInvokedUrlCommand) {
-        uploadCacheCommand = command
-        _uploadAllFiles()
+        self.commandDelegate.run {
+            self.uploadCacheCommand = command
+            self._uploadAllFiles()
+        }
     }
     
     @objc(startFetchingAll:) func startFetchingAll(command: CDVInvokedUrlCommand) {
@@ -194,52 +203,56 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     
     // MARK: stopRecording
     @objc(stopRecording:) func stopRecording(command: CDVInvokedUrlCommand) {
-        stopRecordingCounter = 0
-        guard let sensorsString: [String] = command.arguments as? [String] else {
-            self.callbackHelper?.sendError(command, "NO_SENSOR")
-            return
+        self.commandDelegate.run {
+            self.stopRecordingCounter = 0
+            guard let sensorsString: [String] = command.arguments as? [String] else {
+                self.callbackHelper?.sendError(command, "NO_SENSOR")
+                return
+            }
+            let sensors: Set<SRSensor> = Set(sensorsString.map { self._getSRSensor(sensorString: $0) ?? nil}.compactMap { $0 })
+            if sensors.isEmpty {
+                self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
+                return
+            }
+            
+            self.stopRecordingsCommand = command
+            self.stopRecordingsResponse = []
+            self.stopRecordingsSensors = Array(sensors)
+            self._doNextStop()
         }
-        let sensors: Set<SRSensor> = Set(sensorsString.map { _getSRSensor(sensorString: $0) ?? nil}.compactMap { $0 })
-        if sensors.isEmpty {
-            self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
-            return
-        }
-        
-        stopRecordingsCommand = command
-        stopRecordingsResponse = []
-        stopRecordingsSensors = Array(sensors)
-        _doNextStop()
     }
     
     // MARK: checkAuthorization
     @objc(checkAuthorization:) func checkAuthorization(command: CDVInvokedUrlCommand) {
-        guard let sensorsString: [String] = command.arguments as? [String] else {
-            self.callbackHelper?.sendError(command, "NO_SENSOR")
-            return
-        }
-        let sensors: Set<SRSensor> = Set(sensorsString.map { _getSRSensor(sensorString: $0) ?? nil}.compactMap { $0 })
-        if sensors.isEmpty {
-            self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
-            return
-        }
-        
-        checkAuthorizationCommand = command
-        checkAuthorizationResponse = []
-        checkAuthorizationSensors = Array(sensors)
-        checkAuthorizationSensors.forEach { sensor in
-            let dataExtractor = _generateDataExtractor(sensor: sensor)
-            let response = _checkAuthorization(dataExtractor: dataExtractor!)
-            if let sensorString = _getSensorString(sensor: sensor) {
-                checkAuthorizationResponse.append([sensorString: response])
+        self.commandDelegate.run {
+            guard let sensorsString: [String] = command.arguments as? [String] else {
+                self.callbackHelper?.sendError(command, "NO_SENSOR")
+                return
             }
-        }
-       
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: ["results": checkAuthorizationResponse], options: JSONSerialization.WritingOptions.prettyPrinted)
-            let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
-            self.callbackHelper?.sendJson(checkAuthorizationCommand!, json)
-        } catch let error {
-            self.callbackHelper?.sendError(checkAuthorizationCommand!, error.localizedDescription)
+            let sensors: Set<SRSensor> = Set(sensorsString.map { self._getSRSensor(sensorString: $0) ?? nil}.compactMap { $0 })
+            if sensors.isEmpty {
+                self.callbackHelper?.sendError(command, "NO_VALID_SENSOR")
+                return
+            }
+            
+            self.checkAuthorizationCommand = command
+            self.checkAuthorizationResponse = []
+            self.checkAuthorizationSensors = Array(sensors)
+            self.checkAuthorizationSensors.forEach { sensor in
+                let dataExtractor = self._generateDataExtractor(sensor: sensor)
+                let response = self._checkAuthorization(dataExtractor: dataExtractor!)
+                if let sensorString = self._getSensorString(sensor: sensor) {
+                    self.checkAuthorizationResponse.append([sensorString: response])
+                }
+            }
+            
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: ["results": self.checkAuthorizationResponse], options: JSONSerialization.WritingOptions.prettyPrinted)
+                let json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: AnyObject]
+                self.callbackHelper?.sendJson(self.checkAuthorizationCommand!, json)
+            } catch let error {
+                self.callbackHelper?.sendError(self.checkAuthorizationCommand!, error.localizedDescription)
+            }
         }
     }
     

@@ -101,7 +101,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         if fetchCounter < numberOfFetches - 1 {
             doNextFetch()
         } else {
-            if deviceCounter < self.devices.count - 1 {
+            if self.devices.count > 0 && deviceCounter < self.devices.count - 1 {
                 changeDevice()
             } else {
                 delegate?.__fetchCompletedForOneSensor(sensor: sensor!, date: endDate)
@@ -148,7 +148,11 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 
     func sensorReader(_ reader: SRSensorReader, didFetch devices: [SRDevice]) {
         self.devices = devices
-        changeDevice()
+        if self.devices.count > 0 && deviceCounter < self.devices.count - 1 {
+            changeDevice()
+        } else {
+            delegate?.__fetchCompletedForOneSensor(sensor: sensor!, date: endDate)
+        }
     }
 
     func sensorReader(_ reader: SRSensorReader, fetchDevicesDidFailWithError error: Error) {}

@@ -328,6 +328,29 @@ extension RbSensorkitCordovaPlugin {
         }
     }
     
+    func copyFilesFromTempToDocumentsFolderWith(fileExtension: String) {
+        if let resPath = Bundle.main.resourcePath {
+            do {
+                let fileManager = FileManager.default
+                let tempPath = fileManager.temporaryDirectory.path
+                let dirContents = try FileManager.default.contentsOfDirectory(atPath: tempPath)
+                let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+                let filteredFiles = dirContents.filter{ $0.contains(fileExtension)}
+                
+                for fileName in filteredFiles {
+                    if let documentsURL = documentsURL {
+                        let tempURL = fileManager.temporaryDirectory
+                        let sourceURL = tempURL.appendingPathComponent(fileName)
+                        let destURL = documentsURL.appendingPathComponent(fileName)
+                        do {
+                            try fileManager.copyItem(at: sourceURL, to: destURL)
+                        }
+                    }
+                }
+            } catch { }
+        }
+    }
+    
     func _checkAuthorization(dataExtractor: SensorKitDataExtractor) -> String {
         var response = "NOT_DETERMIND"
         switch dataExtractor.reader?.authorizationStatus {
