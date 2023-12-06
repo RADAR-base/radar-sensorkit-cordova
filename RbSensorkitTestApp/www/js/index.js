@@ -23,7 +23,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAxMTMxMzU2LCJpYXQiOjE3MDEwODgxNTYsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.Lxf_Q611nrcsgxxZmW3Ws1w_lP_LxQDz3Y1GEMU_zCT9g0sd2F6WewXGQEiS7cP4C47EmOi6ud-eSngGzVKYWA",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAxNzk5NjUwLCJpYXQiOjE3MDE3NTY0NTAsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.OUoFjkeRxH2rQnDq2GalSoWDFcSaY-kToMAH13oO0xVPhSINbpJgAsiUNGyQPjUd7uuuSfE1mM2sdZJ1R9XtVA",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
@@ -72,22 +72,24 @@ async function onDeviceReady() {
     // } catch (e) {
     //     console.log("[JS] Upload Cache Error", e);
     // }
-
-    // try {
-    //     const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
-    //     const res = await checkAuthorization(sensorArray)
-    //     console.log("[JS] checkAuthorization", JSON.stringify(res));
-    // } catch (e) {
-    //     console.log("[JS] checkAuthorization", e);
-    // }
     //
-    // try {
-    //     const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
-    //     const res = await authorize(sensorArray)
-    //     console.log("[JS] Authorize", JSON.stringify(res));
-    // } catch (e) {
-    //     console.log("[JS] Authorize", e);
-    // }
+    // return;
+
+    try {
+        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const res = await checkAuthorization(sensorArray)
+        console.log("[JS] checkAuthorization", JSON.stringify(res));
+    } catch (e) {
+        console.log("[JS] checkAuthorization", e);
+    }
+
+    try {
+        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const res = await authorize(sensorArray)
+        console.log("[JS] Authorize", JSON.stringify(res));
+    } catch (e) {
+        console.log("[JS] Authorize", e);
+    }
 
     // try {
     //     const sensorArray = ["deviceUsageReport","keyboardMetrics"]
@@ -101,10 +103,10 @@ async function onDeviceReady() {
 
     try {
         const sensorArray = [
-            {sensor: "ambientLightSensor", period: 6000, chunkSize: 10000},
-            {sensor: "accelerometer", period: 50, chunkSize: 10000},
-            // {sensor: "deviceUsageReport"},
-            // {sensor: "keyboardMetrics"},
+            {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
+            {sensor: "accelerometer", period: 1000, chunkSize: 10000},
+            {sensor: "deviceUsageReport"},
+            {sensor: "keyboardMetrics"},
             {sensor: "messagesUsageReport"},
             {sensor: "onWristState"},
             {sensor: "pedometerData"},
