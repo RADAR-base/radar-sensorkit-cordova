@@ -296,19 +296,20 @@ extension RbSensorkitCordovaPlugin {
 
             let backgroundSession = BackgroundSession.shared
             backgroundSession.delegate = self
-            _ = try backgroundSession.startUploadFile(for: request, fromFile: fileName, identifier: identifierSuffix)
-            
-            // You can optionally observe the progress or handle other aspects of the task here
-
-            // Save the completion handler for later use (if needed)
-            backgroundSession.savedCompletionHandler = {
-                // Handle completion, if necessary
-//                print("777 Success")
-
+            let fileManager = FileManager.default
+            let path = fileManager.temporaryDirectory.path + "/" + fileName
+            let fileExists = fileManager.fileExists(atPath: path)
+            if fileExists {
+                print("fileExists : \(fileExists)")
+                _ = try backgroundSession.startUploadFile(for: request, fromFile: fileName, identifier: identifierSuffix)
+                // Save the completion handler for later use (if needed)
+                backgroundSession.savedCompletionHandler = {
+                    // Handle completion, if necessary
+                }
             }
         } catch {
             // Handle the error thrown by startUploadFile
-            print("444 Error: \(error.localizedDescription)")
+            print("\(error.localizedDescription)")
         }
     }
     

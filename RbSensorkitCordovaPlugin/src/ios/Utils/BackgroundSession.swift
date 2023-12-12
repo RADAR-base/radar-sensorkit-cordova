@@ -61,7 +61,7 @@ extension BackgroundSession {
 //        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
 //            .appendingPathComponent(UUID().uuidString)
 //        try data.write(to: fileURL)
-        let task = session.uploadTask(with: request, fromFile: fileURL)
+            let task = session.uploadTask(with: request, fromFile: fileURL)
 //        print("TaskIdentifier: \(task.taskIdentifier)")
         fileNamesDictionary[task.taskIdentifier] = fileName
         task.resume()
