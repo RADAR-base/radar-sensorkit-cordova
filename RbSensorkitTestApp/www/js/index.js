@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImVkZjg2M2U3LWUzOGEtNDE2MS1iNzg0LThmMjcxYWZlMDFhYSIsInNvdXJjZXMiOlsiNmNhOTlhZTgtZTA2OS00N2I3LWFkMzUtMzQ3NTE2NmZiNDYyIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiJlZGY4NjNlNy1lMzhhLTQxNjEtYjc4NC04ZjI3MWFmZTAxYWEiLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAxNzk5NjUwLCJpYXQiOjE3MDE3NTY0NTAsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.OUoFjkeRxH2rQnDq2GalSoWDFcSaY-kToMAH13oO0xVPhSINbpJgAsiUNGyQPjUd7uuuSfE1mM2sdZJ1R9XtVA",
-    baseUrl: "https://radar-dev.connectdigitalstudy.com/",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImRjODI4Mzg2LTcwZDgtNDBiMy04ZGNjLTQyNmVmNDBkMGEyZCIsInNvdXJjZXMiOltdLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwidXNlcl9uYW1lIjoiZGM4MjgzODYtNzBkOC00MGIzLThkY2MtNDI2ZWY0MGQwYTJkIiwicm9sZXMiOlsidGVzdDpST0xFX1BBUlRJQ0lQQU5UIl0sInNjb3BlIjpbIk1FQVNVUkVNRU5ULkNSRUFURSIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE3MDI0MDgzMDcsImlhdCI6MTcwMjM2NTEwNywiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.rr9E1BGd7MHnsOodCu5W7TMdchB86d1KH5piE8OTCirSiEjPgRsHlTQfsOa9oHMt1iiQfLwJYdDFlgjovNZe-A",
+    baseUrl: "https://radar.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
-    projectId: "STAGING_PROJECT",
-    userId: "edf863e7-e38a-4161-b784-8f271afe01aa",
+    projectId: "test",
+    userId: "dc828386-70d8-40b3-8dcc-426ef40d0a2d",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -104,7 +104,7 @@ async function onDeviceReady() {
     try {
         const sensorArray = [
             {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
-            {sensor: "accelerometer", period: 1000, chunkSize: 10000},
+            {sensor: "accelerometer", period: 100, chunkSize: 10000},
             {sensor: "deviceUsageReport"},
             {sensor: "keyboardMetrics"},
             {sensor: "messagesUsageReport"},
