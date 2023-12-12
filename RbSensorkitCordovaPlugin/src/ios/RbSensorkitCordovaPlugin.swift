@@ -9,6 +9,8 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
 //    var logTopicValueId = 0
     
     var sensorCounter: Int = -1
+    var lockStartFetchingAll = false
+
     var sensors: [SRSensor] = []
     var selectedSensor: SensorKitDataExtractor?
     var selectedStopRecordingSensor: SensorKitDataExtractor?
@@ -196,9 +198,14 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     }
     
     @objc(startFetchingAll:) func startFetchingAll(command: CDVInvokedUrlCommand) {
-        self.startFetchingAllCommand = command
-        sensorCounter = -1
-        _changeSensor()
+        if lockStartFetchingAll == false {
+            lockStartFetchingAll = true
+            self.startFetchingAllCommand = command
+            sensorCounter = -1
+            _changeSensor()
+        } else {
+            self.callbackHelper?.sendError(startFetchingAllCommand!, "IN_PROGRESS", true)
+        }
     }
     
     // MARK: stopRecording

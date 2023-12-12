@@ -104,7 +104,7 @@ async function onDeviceReady() {
     try {
         const sensorArray = [
             {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
-            {sensor: "accelerometer", period: 100, chunkSize: 10000},
+            {sensor: "accelerometer", period: 200, chunkSize: 10000},
             {sensor: "deviceUsageReport"},
             {sensor: "keyboardMetrics"},
             {sensor: "messagesUsageReport"},
@@ -144,6 +144,26 @@ async function onDeviceReady() {
     // }
 
     // return;
+    startFetchingAll()
+    await sleep(30000);
+
+    startFetchingAll();
+    await sleep(30000);
+
+    startFetchingAll();
+    await sleep(30000);
+
+    startFetchingAll();
+    await sleep(30000);
+
+    startFetchingAll();
+    await sleep(30000);
+
+    startFetchingAll();
+    await sleep(30000);
+
+    startFetchingAll();
+    return;
 
     try {
         const res = await startFetchingAll()

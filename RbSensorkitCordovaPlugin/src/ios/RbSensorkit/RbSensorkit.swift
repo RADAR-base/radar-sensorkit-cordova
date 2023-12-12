@@ -300,7 +300,7 @@ extension RbSensorkitCordovaPlugin {
             let path = fileManager.temporaryDirectory.path + "/" + fileName
             let fileExists = fileManager.fileExists(atPath: path)
             if fileExists {
-                print("fileExists : \(fileExists)")
+//                print("fileExists : \(fileExists)")
                 _ = try backgroundSession.startUploadFile(for: request, fromFile: fileName, identifier: identifierSuffix)
                 // Save the completion handler for later use (if needed)
                 backgroundSession.savedCompletionHandler = {
@@ -584,6 +584,7 @@ extension RbSensorkitCordovaPlugin: SensorKitDelegate {
         } else {
             self.callbackHelper?.sendString(startFetchingAllCommand!, "Data fetched completed.", true)
             _updateLastFetch(date: date)
+            lockStartFetchingAll = false
             uploadCacheCommand = startFetchingAllCommand
             _uploadAllFiles()
         }
