@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6ImRjODI4Mzg2LTcwZDgtNDBiMy04ZGNjLTQyNmVmNDBkMGEyZCIsInNvdXJjZXMiOltdLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwidXNlcl9uYW1lIjoiZGM4MjgzODYtNzBkOC00MGIzLThkY2MtNDI2ZWY0MGQwYTJkIiwicm9sZXMiOlsidGVzdDpST0xFX1BBUlRJQ0lQQU5UIl0sInNjb3BlIjpbIk1FQVNVUkVNRU5ULkNSRUFURSIsIlNVQkpFQ1QuUkVBRCIsIlNVQkpFQ1QuVVBEQVRFIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJleHAiOjE3MDI0MDgzMDcsImlhdCI6MTcwMjM2NTEwNywiYXV0aG9yaXRpZXMiOlsiUk9MRV9QQVJUSUNJUEFOVCJdLCJjbGllbnRfaWQiOiJhUk1UIn0.rr9E1BGd7MHnsOodCu5W7TMdchB86d1KH5piE8OTCirSiEjPgRsHlTQfsOa9oHMt1iiQfLwJYdDFlgjovNZe-A",
-    baseUrl: "https://radar.connectdigitalstudy.com/",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAyOTQ4NzA1LCJpYXQiOjE3MDI5MDU1MDUsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.goF_RlhNjyhZphapKR6Er4FITsjcNMXU4Rg-4vJFfyuNuGqvloVrJanX1M5hJvlWNe54RSviTrL7TX6pr-RvsQ",
+    baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
-    projectId: "test",
-    userId: "dc828386-70d8-40b3-8dcc-426ef40d0a2d",
+    projectId: "STAGING_PROJECT",
+    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -76,7 +76,7 @@ async function onDeviceReady() {
     // return;
 
     try {
-        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport", "rotationRate", "visits","ambientPressure"]
         const res = await checkAuthorization(sensorArray)
         console.log("[JS] checkAuthorization", JSON.stringify(res));
     } catch (e) {
@@ -84,7 +84,7 @@ async function onDeviceReady() {
     }
 
     try {
-        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport","visits","ambientPressure"]
+        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport", "rotationRate", "visits","ambientPressure"]
         const res = await authorize(sensorArray)
         console.log("[JS] Authorize", JSON.stringify(res));
     } catch (e) {
@@ -104,16 +104,17 @@ async function onDeviceReady() {
     try {
         const sensorArray = [
             {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
-            {sensor: "accelerometer", period: 200, chunkSize: 10000},
-            {sensor: "deviceUsageReport"},
-            {sensor: "keyboardMetrics"},
-            {sensor: "messagesUsageReport"},
-            {sensor: "onWristState"},
-            {sensor: "pedometerData"},
-            {sensor: "phoneUsageReport"},
-            {sensor: "visits"},
-            {sensor: "ambientPressure"},
-            {sensor: "telephonySpeechMetrics"}
+            // {sensor: "accelerometer", period: 20, chunkSize: 10000},
+            {sensor: "rotationRate", period: 1000, chunkSize: 10000},
+            // {sensor: "deviceUsageReport"},
+            // {sensor: "keyboardMetrics"},
+            // {sensor: "messagesUsageReport"},
+            // {sensor: "onWristState"},
+            // {sensor: "pedometerData"},
+            // {sensor: "phoneUsageReport"},
+            // {sensor: "visits"},
+            // {sensor: "ambientPressure"},
+            // {sensor: "telephonySpeechMetrics"}
         ]
         const res = await RbSensorkitCordovaPlugin.selectSensors(sensorArray)
         console.log("[JS] Select Sensor Success");
@@ -145,24 +146,24 @@ async function onDeviceReady() {
 
     // return;
     startFetchingAll()
-    await sleep(30000);
-
-    startFetchingAll();
-    await sleep(30000);
-
-    startFetchingAll();
-    await sleep(30000);
-
-    startFetchingAll();
-    await sleep(30000);
-
-    startFetchingAll();
-    await sleep(30000);
-
-    startFetchingAll();
-    await sleep(30000);
-
-    startFetchingAll();
+    // await sleep(30000);
+    //
+    // startFetchingAll();
+    // await sleep(30000);
+    //
+    // startFetchingAll();
+    // await sleep(30000);
+    //
+    // startFetchingAll();
+    // await sleep(30000);
+    //
+    // startFetchingAll();
+    // await sleep(30000);
+    //
+    // startFetchingAll();
+    // await sleep(30000);
+    //
+    // startFetchingAll();
     return;
 
     try {

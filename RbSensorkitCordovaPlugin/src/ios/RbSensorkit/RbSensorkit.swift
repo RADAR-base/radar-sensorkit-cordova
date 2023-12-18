@@ -21,6 +21,8 @@ extension RbSensorkitCordovaPlugin {
             return PedometerDataExtractor(periodMili: ConfigSensor.periods["pedometerData"]!, topicName: ConfigSensor.topics["pedometerData"]!, chunkSize: ConfigSensor.chunkSize["pedometerData"]!)
         case .phoneUsageReport:
             return PhoneUsageReportDataExtractor(periodMili: ConfigSensor.periods["phoneUsageReport"]!, topicName: ConfigSensor.topics["phoneUsageReport"]!, chunkSize: ConfigSensor.chunkSize["phoneUsageReport"]!)
+        case .rotationRate:
+            return RotationDataExtractor(periodMili: ConfigSensor.periods["rotationRate"]!, topicName: ConfigSensor.topics["rotationRate"]!, chunkSize: ConfigSensor.chunkSize["rotationRate"]!)
         case .visits:
             return VisitsDataExtractor(periodMili: ConfigSensor.periods["visits"]!, topicName: ConfigSensor.topics["visits"]!, chunkSize: ConfigSensor.chunkSize["visits"]!)
         default:
@@ -200,9 +202,9 @@ extension RbSensorkitCordovaPlugin {
             case "phoneUsageReport":
                 sensor = .phoneUsageReport
                 break
-            // case "rotationRate":
-            //    sensor = .rotationRate
-            //    break
+             case "rotationRate":
+                sensor = .rotationRate
+                break
             // case "siriSpeechMetrics":
             //    if #available(iOS 15.0, *) {
             //        sensor = .siriSpeechMetrics

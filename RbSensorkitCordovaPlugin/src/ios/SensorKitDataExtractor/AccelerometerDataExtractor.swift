@@ -12,7 +12,7 @@ import CoreMotion
 @available(iOS 14.0, *)
 class AccelerometerDataExtractor: SensorKitDataExtractor {
     override var sensor: SRSensor? { get { return .accelerometer } }
-    override var fetchIntervalInHours: Int { get {return 1 * 24 }} // 1 days = 1 * 24 hours
+    override var fetchIntervalInHours: Int { get {return 1 * 6 }} // 1 days = 1 * 24 hours
 //    override var beginDate: Date? { get { return PersistentContainer.shared.lastFetchedAccelerometer! } }
     
     override func convertSensorData(result: SRFetchResult<AnyObject>){
