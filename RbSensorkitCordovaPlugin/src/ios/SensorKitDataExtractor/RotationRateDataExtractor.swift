@@ -38,7 +38,11 @@ class RotationDataExtractor: SensorKitDataExtractor {
         return true
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedAccelerometer = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedRotationRate
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedRotationRate = date
+    }
 }

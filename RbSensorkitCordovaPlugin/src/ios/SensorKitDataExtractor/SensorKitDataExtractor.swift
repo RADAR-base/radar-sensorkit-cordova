@@ -44,16 +44,19 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     var deviceCounter = -1
     var fetchCounter = -1
 
-    var beginDate: Date
+    var beginDate: Double?
     var endDate: Date = (Calendar.current as NSCalendar).date(byAdding: .day, value: -1, to: Date(), options: [])! //Date()
     var numberOfFetches: Int = 0
     
     init(periodMili: Double, topicName: String, chunkSize: Int) {
-          beginDate = PersistentContainer.shared.lastFetched!
+        
+          //beginDate = PersistentContainer.shared.lastFetched!
 
         super.init()
+        beginDate = getBeginDate()
         let fetchIntrevalInSeconds: Double = Double(fetchIntervalInHours * 60 * 60)
-        numberOfFetches = Int(ceil((endDate.timeIntervalSince1970 - beginDate.timeIntervalSince1970)/fetchIntrevalInSeconds))
+//        numberOfFetches = Int(ceil((endDate.timeIntervalSince1970 - beginDate.timeIntervalSince1970)/fetchIntrevalInSeconds))
+        numberOfFetches = Int(ceil((endDate.timeIntervalSince1970 - beginDate!)/fetchIntrevalInSeconds))
 
         self.topicName = topicName
         self.periodMili = periodMili
@@ -61,6 +64,10 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         self.reader = SRSensorReader(sensor: sensor!)
         self.reader = .init(sensor: sensor!)
         self.reader!.delegate = self
+    }
+    
+    func getBeginDate() -> Double? {
+        return nil
     }
     
     var storedTime: Double = 0
@@ -167,8 +174,9 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     func doNextFetch() {
         fetchCounter = fetchCounter + 1
         
-        let fromDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: fetchCounter * fetchIntervalInHours, to: beginDate, options: [])!
-        let toDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: (fetchCounter + 1) * fetchIntervalInHours, to: beginDate, options: [])!
+        let _beginDate = Date(timeIntervalSince1970: TimeInterval(beginDate!))
+        let fromDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: fetchCounter * fetchIntervalInHours, to: _beginDate, options: [])!
+        let toDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: (fetchCounter + 1) * fetchIntervalInHours, to: _beginDate, options: [])!
         
         fetch(from: fromDate as NSDate, to: toDate as NSDate, device: selectedDevice)
     }
@@ -251,7 +259,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
             return
         }
         let compressedData = getCompressedData(data: data)
-        await writeToFile(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_\(iterationCounter)")
+        await writeToFile(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_\(iterationCounter)", endTime: endTime)
     }
    
     func getBody(payload: [[String: Any]], keySchemaId: Int, valueSchemaId: Int) -> [String: Any] {
@@ -325,17 +333,22 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
             processNextFetch()
         }
     }
+    
+    func _updateLastFetch(date: Double) {
+        //PersistentContainer.shared.lastFetched = date
+    }
 }
 
 
 @available(iOS 14.0, *)
 extension SensorKitDataExtractor {
     // UTIL
-    func writeToFile(data: Data, fileName: String) async {
+    func writeToFile(data: Data, fileName: String, endTime: Double) async {
         let tempDir = FileManager.default.temporaryDirectory
         let localURL = tempDir.appendingPathComponent(fileName + ".txt.gz")
         do {
             try data.write(to: localURL)
+            _updateLastFetch(date: endTime)
             await self.doNextPost()
         } catch {
             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding

@@ -33,7 +33,11 @@ class PedometerDataExtractor: SensorKitDataExtractor {
         ])
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedPedometer = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedPedometer
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedPedometer = date
+    }
 }

@@ -35,9 +35,13 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
         ])
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedOnWrist = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedOnWrist
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedOnWrist = date
+    }
 }
 
 @available(iOS 14.0, *)

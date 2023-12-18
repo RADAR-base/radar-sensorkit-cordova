@@ -27,7 +27,11 @@ class MessageUsageReportDataExtractor: SensorKitDataExtractor {
         ])
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedMessageUsage = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedMessageUsage
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedMessageUsage = date
+    }
 }

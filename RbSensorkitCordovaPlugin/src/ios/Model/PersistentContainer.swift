@@ -9,28 +9,26 @@ import Foundation
 import CoreData
 
 class PersistentContainer: NSPersistentContainer {
-//    private static let lastRefreshKey = "lastRefresh"
-    
-    private static let lastFetchKey = "lastFetchKey"
+    private static let firstLoad = "firstLoad"
 
-//    private static let lastFetchAccelerometerKey = "lastFetchAccelerometerKey"
-//    private static let lastFetcAmbientLighthKey = "lastFetcAmbientLighthKey"
-//    private static let lastFetchAmbientPressureKey = "lastFetchAmbientPressureKey"
-//    private static let lastFetchDeviceUsageKey = "lastFetchDeviceUsageKey"
-//    private static let lastFetchKeyboardMetricsKey = "lastFetchKeyboardMetricsKey"
-//    private static let lastFetchMedaiEventsKey = "lastFetchMedaiEventsKey"
-//    private static let lastFetchMessageUsageKey = "lastFetchMessageUsageKey"
-//    private static let lastFetchOnWristKey = "lastFetchOnWristKey"
-//    private static let lastFetchPedometerKey = "lastFetchPedometerKey"
-//    private static let lastFetchPhoneUsageKey = "lastFetchPhoneUsageKey"
-//    private static let lastFetchRotationRateKey = "lastFetchRotationRateKey"
-//    private static let lastFetchTelephonySpeechMetricsKey = "lastFetchTelephonySpeechMetricsKey"
-//    private static let lastFetchVisitKey = "lastFetchVisitKey"
-//    private static let lastFetchSiriSpeechMetricsKey = "lastFetchSiriSpeechMetricsKey"
-//    private static let lastFetchFaceMetricsKey = "lastFetchFaceMetricsKey"
-//    private static let lastFetchHeartRateKey = "lastFetchHeartRateKey"
-//    private static let lastFetchWristTemperatureKey = "lastFetchWristTemperatureKey"
-//    private static let lastFetchOdometerKey = "lastFetchOdometerKey"
+    private static let lastFetchAccelerometerKey = "lastFetchAccelerometerKey"
+    private static let lastFetcAmbientLighthKey = "lastFetcAmbientLighthKey"
+    private static let lastFetchAmbientPressureKey = "lastFetchAmbientPressureKey"
+    private static let lastFetchDeviceUsageKey = "lastFetchDeviceUsageKey"
+    private static let lastFetchKeyboardMetricsKey = "lastFetchKeyboardMetricsKey"
+    private static let lastFetchMedaiEventsKey = "lastFetchMedaiEventsKey"
+    private static let lastFetchMessageUsageKey = "lastFetchMessageUsageKey"
+    private static let lastFetchOnWristKey = "lastFetchOnWristKey"
+    private static let lastFetchPedometerKey = "lastFetchPedometerKey"
+    private static let lastFetchPhoneUsageKey = "lastFetchPhoneUsageKey"
+    private static let lastFetchRotationRateKey = "lastFetchRotationRateKey"
+    private static let lastFetchTelephonySpeechMetricsKey = "lastFetchTelephonySpeechMetricsKey"
+    private static let lastFetchVisitKey = "lastFetchVisitKey"
+    private static let lastFetchSiriSpeechMetricsKey = "lastFetchSiriSpeechMetricsKey"
+    private static let lastFetchFaceMetricsKey = "lastFetchFaceMetricsKey"
+    private static let lastFetchHeartRateKey = "lastFetchHeartRateKey"
+    private static let lastFetchWristTemperatureKey = "lastFetchWristTemperatureKey"
+    private static let lastFetchOdometerKey = "lastFetchOdometerKey"
 
     
     static let shared: PersistentContainer = {
@@ -60,176 +58,185 @@ class PersistentContainer: NSPersistentContainer {
 //        }
 //    }
     
-    var lastFetched: Date? {
+//    var lastFetched: Date? {
+//        get {
+//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchKey) as? Date
+//        }
+//        set {
+//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchKey)
+//        }
+//    }
+    
+    var firstLoad: Bool? {
         get {
-            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchKey) as? Date
+            return UserDefaults.standard.object(forKey: PersistentContainer.firstLoad) as? Bool
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchKey)
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.firstLoad)
         }
     }
     
-//    var lastFetchedAccelerometer: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchAccelerometerKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchAccelerometerKey)
-//        }
-//    }
-//    
-//    var lastFetchedAmbientLighth: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetcAmbientLighthKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetcAmbientLighthKey)
-//        }
-//    }
-//    
-//    var lastFetchedAmbientPressure: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchAmbientPressureKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchAmbientPressureKey)
-//        }
-//    }
-//    
-//    var lastFetchedDeviceUsage: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchDeviceUsageKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchDeviceUsageKey)
-//        }
-//    }
-//    
-//    var lastFetchedMessageUsage: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchMessageUsageKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchMessageUsageKey)
-//        }
-//    }
-//    
-//    var lastFetchedKeyboardMetrics: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchKeyboardMetricsKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchKeyboardMetricsKey)
-//        }
-//    }
-//    
-//    var lastFetchedMedaiEvents: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchMedaiEventsKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchMedaiEventsKey)
-//        }
-//    }
-//    
-//    var lastFetchedOnWrist: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchOnWristKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchOnWristKey)
-//        }
-//    }
-//    
-//    var lastFetchedPedometer: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchPedometerKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchPedometerKey)
-//        }
-//    }
-//    
-//    var lastFetchedPhoneUsage: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchPhoneUsageKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchPhoneUsageKey)
-//        }
-//    }
-//    
-//    var lastFetchedRotationRate: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchRotationRateKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchRotationRateKey)
-//        }
-//    }
-//    
-//    var lastFetchedTelephonySpeechMetrics: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchTelephonySpeechMetricsKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchTelephonySpeechMetricsKey)
-//        }
-//    }
-//    
-//    var lastFetchedVisit: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchVisitKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchVisitKey)
-//        }
-//    }
-//    
-//    var lastFetchedSiriSpeechMetrics: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchSiriSpeechMetricsKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchSiriSpeechMetricsKey)
-//        }
-//    }
-//    
-//    var lastFetchedFaceMetrics: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchFaceMetricsKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchFaceMetricsKey)
-//        }
-//    }
-//    
-//    var lastFetchedHeartRate: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchHeartRateKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchHeartRateKey)
-//        }
-//    }
-//    
-//    var lastFetchedWristTemperature: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchWristTemperatureKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchWristTemperatureKey)
-//        }
-//    }
-//    
-//    var lastFetchedOdometer: Date? {
-//        get {
-//            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchOdometerKey) as? Date
-//        }
-//        set {
-//            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchOdometerKey)
-//        }
-//    }
+    var lastFetchedAccelerometer: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchAccelerometerKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchAccelerometerKey)
+        }
+    }
+    
+    var lastFetchedAmbientLighth: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetcAmbientLighthKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetcAmbientLighthKey)
+        }
+    }
+    
+    var lastFetchedAmbientPressure: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchAmbientPressureKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchAmbientPressureKey)
+        }
+    }
+    
+    var lastFetchedDeviceUsage: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchDeviceUsageKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchDeviceUsageKey)
+        }
+    }
+    
+    var lastFetchedMessageUsage: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchMessageUsageKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchMessageUsageKey)
+        }
+    }
+    
+    var lastFetchedKeyboardMetrics: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchKeyboardMetricsKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchKeyboardMetricsKey)
+        }
+    }
+    
+    var lastFetchedMedaiEvents: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchMedaiEventsKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchMedaiEventsKey)
+        }
+    }
+    
+    var lastFetchedOnWrist: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchOnWristKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchOnWristKey)
+        }
+    }
+    
+    var lastFetchedPedometer: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchPedometerKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchPedometerKey)
+        }
+    }
+    
+    var lastFetchedPhoneUsage: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchPhoneUsageKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchPhoneUsageKey)
+        }
+    }
+    
+    var lastFetchedRotationRate: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchRotationRateKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchRotationRateKey)
+        }
+    }
+    
+    var lastFetchedTelephonySpeechMetrics: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchTelephonySpeechMetricsKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchTelephonySpeechMetricsKey)
+        }
+    }
+    
+    var lastFetchedVisit: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchVisitKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchVisitKey)
+        }
+    }
+    
+    var lastFetchedSiriSpeechMetrics: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchSiriSpeechMetricsKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchSiriSpeechMetricsKey)
+        }
+    }
+    
+    var lastFetchedFaceMetrics: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchFaceMetricsKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchFaceMetricsKey)
+        }
+    }
+    
+    var lastFetchedHeartRate: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchHeartRateKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchHeartRateKey)
+        }
+    }
+    
+    var lastFetchedWristTemperature: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchWristTemperatureKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchWristTemperatureKey)
+        }
+    }
+    
+    var lastFetchedOdometer: Double? {
+        get {
+            return UserDefaults.standard.object(forKey: PersistentContainer.lastFetchOdometerKey) as? Double
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: PersistentContainer.lastFetchOdometerKey)
+        }
+    }
 //    
 //    override func newBackgroundContext() -> NSManagedObjectContext {
 //        let backgroundContext = super.newBackgroundContext()
@@ -264,25 +271,25 @@ extension PersistentContainer {
 //                    try context.save()
                 let initDate = (Calendar.current as NSCalendar).date(byAdding: .hour, value: -48, to: Date(), options: [])!
 
-                self.lastFetched = initDate
-//                self.lastFetchedAccelerometer = daysAgo
-//                self.lastFetchedAmbientLighth = daysAgo
-//                self.lastFetchedAmbientPressure = daysAgo
-//                self.lastFetchedDeviceUsage = daysAgo
-//                self.lastFetchedMessageUsage = daysAgo
-//                self.lastFetchedFaceMetrics = daysAgo
-//                self.lastFetchedHeartRate = daysAgo
-//                self.lastFetchedKeyboardMetrics = daysAgo
-//                self.lastFetchedMedaiEvents = daysAgo
-//                self.lastFetchedOdometer = daysAgo
-//                self.lastFetchedOnWrist = daysAgo
-//                self.lastFetchedPedometer = daysAgo
-//                self.lastFetchedPhoneUsage = daysAgo
-//                self.lastFetchedRotationRate = daysAgo
-//                self.lastFetchedSiriSpeechMetrics = daysAgo
-//                self.lastFetchedTelephonySpeechMetrics = daysAgo
-//                self.lastFetchedVisit = daysAgo
-//                self.lastFetchedWristTemperature = daysAgo
+//                self.lastFetched = initDate
+                self.lastFetchedAccelerometer = initDate.timeIntervalSince1970
+                self.lastFetchedAmbientLighth = initDate.timeIntervalSince1970
+                self.lastFetchedAmbientPressure = initDate.timeIntervalSince1970
+                self.lastFetchedDeviceUsage = initDate.timeIntervalSince1970
+                self.lastFetchedMessageUsage = initDate.timeIntervalSince1970
+                self.lastFetchedFaceMetrics = initDate.timeIntervalSince1970
+                self.lastFetchedHeartRate = initDate.timeIntervalSince1970
+                self.lastFetchedKeyboardMetrics = initDate.timeIntervalSince1970
+                self.lastFetchedMedaiEvents = initDate.timeIntervalSince1970
+                self.lastFetchedOdometer = initDate.timeIntervalSince1970
+                self.lastFetchedOnWrist = initDate.timeIntervalSince1970
+                self.lastFetchedPedometer = initDate.timeIntervalSince1970
+                self.lastFetchedPhoneUsage = initDate.timeIntervalSince1970
+                self.lastFetchedRotationRate = initDate.timeIntervalSince1970
+                self.lastFetchedSiriSpeechMetrics = initDate.timeIntervalSince1970
+                self.lastFetchedTelephonySpeechMetrics = initDate.timeIntervalSince1970
+                self.lastFetchedVisit = initDate.timeIntervalSince1970
+                self.lastFetchedWristTemperature = initDate.timeIntervalSince1970
 //                self.lastRefreshed = nil
 //                }
             } catch {

@@ -34,4 +34,12 @@ class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
             "totalTypingEpisodes": totalTypingEpisodes
         ])
     }
+    
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedKeyboardMetrics
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedKeyboardMetrics = date
+    }
 }

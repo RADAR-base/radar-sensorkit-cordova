@@ -35,4 +35,12 @@ class AmbientPressureDataExtractor: SensorKitDataExtractor {
         convertSensorData(result: result)
         return true
     }
+    
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedAmbientPressure
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedAmbientPressure = date
+    }
 }

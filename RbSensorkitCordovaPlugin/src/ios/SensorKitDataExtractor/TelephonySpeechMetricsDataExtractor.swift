@@ -49,7 +49,11 @@ class TelephonySpeechMetricsDataExtractor: SensorKitDataExtractor {
         }
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedTelephonySpeechMetrics = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedTelephonySpeechMetrics
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedTelephonySpeechMetrics = date
+    }
 }

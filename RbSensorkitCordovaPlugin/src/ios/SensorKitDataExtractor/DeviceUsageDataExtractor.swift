@@ -34,4 +34,12 @@ class DeviceUsageDataExtractor: SensorKitDataExtractor {
             "version": version,
         ])
     }
+    
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedDeviceUsage
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedDeviceUsage = date
+    }
 }

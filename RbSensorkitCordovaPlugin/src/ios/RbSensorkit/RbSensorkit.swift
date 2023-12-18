@@ -72,9 +72,9 @@ extension RbSensorkitCordovaPlugin {
         }
     }
     
-    func _updateLastFetch(date: Date) {
-        PersistentContainer.shared.lastFetched = date
-    }
+//    func _updateLastFetch(date: Date) {
+//        PersistentContainer.shared.lastFetched = date
+//    }
     
     func _getSensorString(sensor: SRSensor) -> String? {
         var sensorString: String? = nil
@@ -399,7 +399,7 @@ extension RbSensorkitCordovaPlugin {
     }
     
     func _postLogToKafka(dataGroupingType: String?) async {
-        print("_postLogToKafka")
+//        print("_postLogToKafka")
         let data = [["time": Date().timeIntervalSince1970, "dataGroupingType": dataGroupingType ?? "PASSIVE_SENSOR_KIT"] as [String : Any]]
         guard let userId = UserConfig.userId, let logTopicKeyId = RadarbaseConfig.logTopicKeyId, let logTopicValueId = RadarbaseConfig.logTopicValueId  else {
             return
@@ -585,7 +585,7 @@ extension RbSensorkitCordovaPlugin: SensorKitDelegate {
             _changeSensor()
         } else {
             self.callbackHelper?.sendString(startFetchingAllCommand!, "Data fetched completed.", true)
-            _updateLastFetch(date: date)
+            //_updateLastFetch(date: date)
             lockStartFetchingAll = false
             uploadCacheCommand = startFetchingAllCommand
             _uploadAllFiles()

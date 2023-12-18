@@ -33,9 +33,13 @@ class VisitsDataExtractor: SensorKitDataExtractor {
         ])
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedVisit = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedVisit
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedVisit = date
+    }
 }
 
 @available(iOS 14.0, *)

@@ -60,12 +60,12 @@ async function onDeviceReady() {
         console.log("[JS] Cache Status Error", e);
     }
 
-    try {
-        const res = await clearCache()
-        console.log("[JS] Clear Cache", res);
-    } catch (e) {
-        console.log("[JS] Clear Cache Error", e);
-    }
+    // try {
+    //     const res = await clearCache()
+    //     console.log("[JS] Clear Cache", res);
+    // } catch (e) {
+    //     console.log("[JS] Clear Cache Error", e);
+    // }
     // try {
     //     const res = await uploadCache()
     //     console.log("[JS] Upload Cache", res);
@@ -103,9 +103,9 @@ async function onDeviceReady() {
 
     try {
         const sensorArray = [
-            {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
-            // {sensor: "accelerometer", period: 20, chunkSize: 10000},
-            {sensor: "rotationRate", period: 1000, chunkSize: 10000},
+            // {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
+            {sensor: "accelerometer", period: 20, chunkSize: 10000},
+            // {sensor: "rotationRate", period: 1000, chunkSize: 10000},
             // {sensor: "deviceUsageReport"},
             // {sensor: "keyboardMetrics"},
             // {sensor: "messagesUsageReport"},

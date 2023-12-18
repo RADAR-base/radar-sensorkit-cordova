@@ -28,7 +28,11 @@ class PhoneUsageReportDataExtractor: SensorKitDataExtractor {
         ])
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedPedometer = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedPhoneUsage
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedPhoneUsage = date
+    }
 }

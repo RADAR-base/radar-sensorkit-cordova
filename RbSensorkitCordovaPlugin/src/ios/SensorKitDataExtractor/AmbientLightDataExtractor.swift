@@ -20,9 +20,13 @@ class AmbientLightDataExtractor: SensorKitDataExtractor {
          ])
     }
     
-//    override func updateLastFetched(date: Date) {
-//        PersistentContainer.shared.lastFetchedAmbientLighth = date
-//    }
+    override func getBeginDate() -> Double? {
+        return PersistentContainer.shared.lastFetchedAmbientLighth
+    }
+    
+    override func _updateLastFetch(date: Double) {
+        PersistentContainer.shared.lastFetchedAmbientLighth = date
+    }
 }
 
 @available(iOS 14.0, *)
