@@ -39,14 +39,27 @@ func writeToFile(data: Data, fileName: String){
     }
 }
 
-func getDocumentsDirectory() -> URL {
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    return paths[0]
-}
-
 func showFirstNResult(n: Int, array: [[String : Any]]) {
     for i in 0...n {
         log("--- \(array[i])")
     }
+}
+
+func getDocumentsDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    let documentsDirectory = paths[0]
+
+    // Check if the directory exists
+    if !FileManager.default.fileExists(atPath: documentsDirectory.path) {
+        do {
+            // If not, create the directory
+            try FileManager.default.createDirectory(at: documentsDirectory, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            // Handle the error appropriately
+            print("Error creating Documents directory: \(error)")
+        }
+    }
+
+    return documentsDirectory
 }
 

@@ -229,9 +229,12 @@ extension RbSensorkitCordovaPlugin {
         var counter: Int = 0
         do {
             let fileManager = FileManager.default
-            let tempPath = fileManager.temporaryDirectory.path
+            let tempPath = getDocumentsDirectory().path
+
             let fileNames = try fileManager.contentsOfDirectory(atPath: "\(tempPath)")
+            
             for fileName in fileNames {
+                
                 if (fileName.hasSuffix(".txt.gz")) {
                     counter = counter + 1
                 }
@@ -250,20 +253,15 @@ extension RbSensorkitCordovaPlugin {
         } catch {}
         do {
             let fileManager = FileManager.default
-            let tempPath = fileManager.temporaryDirectory.path
+            let tempPath = getDocumentsDirectory().path
             let fileNames = try fileManager.contentsOfDirectory(atPath: "\(tempPath)")
             for fileName in fileNames {
                 if (fileName.hasSuffix(".txt.gz")) {
-                    //let filePathName = "\(tempPath)/\(fileName)"
-//                    print("\(Date().timeIntervalSince1970) File: \(fileName)")
                     _uploadFile(fileName: fileName)
                 }
             }
-            
-
         } catch {
             callbackHelper?.sendError(uploadCacheCommand!, "Could not upload all files: \(error)")
-//            print("Could not clear temp folder: \(error)")
         }
     }
     
@@ -299,10 +297,10 @@ extension RbSensorkitCordovaPlugin {
             let backgroundSession = BackgroundSession.shared
             backgroundSession.delegate = self
             let fileManager = FileManager.default
-            let path = fileManager.temporaryDirectory.path + "/" + fileName
+            let path = getDocumentsDirectory().path + "/" + fileName
+
             let fileExists = fileManager.fileExists(atPath: path)
             if fileExists {
-//                print("fileExists : \(fileExists)")
                 _ = try backgroundSession.startUploadFile(for: request, fromFile: fileName, identifier: identifierSuffix)
                 // Save the completion handler for later use (if needed)
                 backgroundSession.savedCompletionHandler = {
@@ -318,7 +316,7 @@ extension RbSensorkitCordovaPlugin {
     func _deleteAllFiles(command: CDVInvokedUrlCommand) {
         do {
             let fileManager = FileManager.default
-            let tempPath = fileManager.temporaryDirectory.path
+            let tempPath = getDocumentsDirectory().path
             let fileNames = try fileManager.contentsOfDirectory(atPath: "\(tempPath)")
             for fileName in fileNames {
                 if (fileName.hasSuffix(".txt.gz")) {
@@ -335,20 +333,19 @@ extension RbSensorkitCordovaPlugin {
         if let resPath = Bundle.main.resourcePath {
             do {
                 let fileManager = FileManager.default
-                let tempPath = fileManager.temporaryDirectory.path
+                let tempPath = getDocumentsDirectory().path
+
                 let dirContents = try FileManager.default.contentsOfDirectory(atPath: tempPath)
-                let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+                let documentsURL = getDocumentsDirectory()
                 let filteredFiles = dirContents.filter{ $0.contains(fileExtension)}
                 
                 for fileName in filteredFiles {
-                    if let documentsURL = documentsURL {
-                        let tempURL = fileManager.temporaryDirectory
+                        let tempURL = getDocumentsDirectory()
                         let sourceURL = tempURL.appendingPathComponent(fileName)
                         let destURL = documentsURL.appendingPathComponent(fileName)
                         do {
                             try fileManager.copyItem(at: sourceURL, to: destURL)
                         }
-                    }
                 }
             } catch { }
         }

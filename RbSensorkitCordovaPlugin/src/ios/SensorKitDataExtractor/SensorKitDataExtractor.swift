@@ -344,7 +344,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 extension SensorKitDataExtractor {
     // UTIL
     func writeToFile(data: Data, fileName: String, endTime: Double) async {
-        let tempDir = FileManager.default.temporaryDirectory
+        let tempDir = getDocumentsDirectory()
         let localURL = tempDir.appendingPathComponent(fileName + ".txt.gz")
         do {
             try data.write(to: localURL)

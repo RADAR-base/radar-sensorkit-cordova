@@ -46,18 +46,43 @@
             </div>
 
             <div class="inner-container">
+                <div><button class="btn" id="clear-cache-button">Clear Cache</button></div>
+                <div><button class="btn" id="upload-cache-button">Upload all</button></div>
+                <div><button class="btn" id="get-cache-status-button">Get Cache status</button></div>
+                <div><button class="btn" id="process-button">Start Fetch</button></div>
+                <div><button class="btn" id="hello-button">Hello</button></div>
                 <div class="sensor-container">
-                    <p>Selected sensor:</p>
-                    <pre id="sensor">-</pre>
+                    <p>Cache Size:</p>
+                    <pre id="cache-status-result">-</pre>
                 </div>
-                <div class="device-container">
-                    <p>Devices:</p>
-                    <pre id="device">-</pre>
+                <div class="sensor-container">
+                    <p>Upload Cache:</p>
+                    <pre id="upload-cache-result">-</pre>
                 </div>
-                <div class="result-container">
-                    <p>Results:</p>
-                    <pre id="result"></pre>
+                <div class="sensor-container">
+                    <p>Set Config:</p>
+                    <pre id="set-config-result">-</pre>
                 </div>
+                <div class="sensor-container">
+                    <p>Available Sensors:</p>
+                    <pre id="available-sensors-result">-</pre>
+                </div>
+                <div class="sensor-container">
+                    <p>Start fetching all:</p>
+                    <pre id="start-fetching-all-result">-</pre>
+                </div>
+<!--                <div class="sensor-container">-->
+<!--                    <p>Selected sensor:</p>-->
+<!--                    <pre id="sensor">-</pre>-->
+<!--                </div>-->
+<!--                <div class="device-container">-->
+<!--                    <p>Devices:</p>-->
+<!--                    <pre id="device">-</pre>-->
+<!--                </div>-->
+<!--                <div class="result-container">-->
+<!--                    <p>Results:</p>-->
+<!--                    <pre id="result"></pre>-->
+<!--                </div>-->
             </div>
         </div>
         <script src="cordova.js"></script>

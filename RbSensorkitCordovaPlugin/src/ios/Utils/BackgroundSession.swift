@@ -56,7 +56,7 @@ extension BackgroundSession {
         let configuration = URLSessionConfiguration.background(withIdentifier: identifier)
 
         session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-        let tempDir = FileManager.default.temporaryDirectory
+        let tempDir = getDocumentsDirectory()
         let fileURL = tempDir.appendingPathComponent(fileName)
 //        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
 //            .appendingPathComponent(UUID().uuidString)

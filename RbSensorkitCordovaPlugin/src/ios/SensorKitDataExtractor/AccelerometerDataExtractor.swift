@@ -39,12 +39,12 @@ class AccelerometerDataExtractor: SensorKitDataExtractor {
     }
     
     override func getBeginDate() -> Double? {
-        print("getBeginDate \(PersistentContainer.shared.lastFetchedAccelerometer)")
+//        print("getBeginDate \(PersistentContainer.shared.lastFetchedAccelerometer)")
         return PersistentContainer.shared.lastFetchedAccelerometer
     }
     
     override func _updateLastFetch(date: Double) {
-        print("_updateLastFetch \(date)")
+//        print("_updateLastFetch \(date)")
         PersistentContainer.shared.lastFetchedAccelerometer = date
     }
 }

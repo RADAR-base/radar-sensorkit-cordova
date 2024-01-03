@@ -37,59 +37,114 @@ async function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 
-    await isSensorkitAvailable();
-
-    try {
-        const res = await getAvailableSensors()
-        console.log("[JS] Available Sensors", JSON.stringify(res));
-    } catch (e) {
-        console.log("[JS] Available Sensors Error", e);
+    document.getElementById('get-cache-status-button').onclick = async function () {
+        try {
+            const res = await getCacheStatus()
+            console.log("[JS] Cache Status - Number of files:", res);
+            document.getElementById('cache-status-result').innerHTML = res.toString();
+        } catch (e) {
+            console.log("[JS] Cache Status Error", e);
+            alert("[JS] Cache Status Error: " + e);
+        }
     }
 
-    try {
-        const res = await setConfig(config)
-        console.log("[JS] Config is set", res);
-    } catch (e) {
-        console.log("[JS] Config is NOT set", e)
+    document.getElementById('clear-cache-button').onclick = async function () {
+        try {
+            const res = await clearCache()
+            console.log("[JS] Clear Cache", res);
+            document.getElementById('cache-status-result').innerHTML = "000";
+        } catch (e) {
+            console.log("[JS] Clear Cache Error", e);
+            alert("[JS] Clear Cache Error: " + e);
+        }
     }
 
-    try {
-        const res = await getCacheStatus()
-        console.log("[JS] Cache Status - Number of files:", res);
-    } catch (e) {
-        console.log("[JS] Cache Status Error", e);
+    document.getElementById('upload-cache-button').onclick = async function () {
+        try {
+            const res = await uploadCache()
+            console.log("[JS] Upload Cache", res);
+            // document.getElementById('upload-cache-result').innerHTML = res.toString();
+        } catch (e) {
+            console.log("[JS] Upload Cache Error", e);
+            // document.getElementById('upload-cache-result').innerHTML = "ERROR Upload Cache:" + e;
+        }
     }
 
-    // try {
-    //     const res = await clearCache()
-    //     console.log("[JS] Clear Cache", res);
-    // } catch (e) {
-    //     console.log("[JS] Clear Cache Error", e);
-    // }
-    // try {
-    //     const res = await uploadCache()
-    //     console.log("[JS] Upload Cache", res);
-    // } catch (e) {
-    //     console.log("[JS] Upload Cache Error", e);
-    // }
+
+    document.getElementById('process-button').onclick = async function () {
+        alert(1);
+        await isSensorkitAvailable();
+
+        try {
+            const res = await setConfig(config)
+            console.log("[JS] Config is set", res);
+            document.getElementById('set-config-result').innerHTML = "Config is set";
+        } catch (e) {
+            console.log("[JS] Config is NOT set", e);
+            document.getElementById('set-config-result').innerHTML = "ERROR in Config set: " + e;
+        }
+
+        try {
+            const res = await getAvailableSensors()
+            console.log("[JS] Available Sensors", JSON.stringify(res));
+            document.getElementById('available-sensors-result').innerHTML = res.toString();
+        } catch (e) {
+            console.log("[JS] Available Sensors Error", e);
+            document.getElementById('available-sensors-result').innerHTML = "ERROR Available Sensors: " + e;
+        }
+
+        try {
+            const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport", "rotationRate", "visits","ambientPressure"]
+            const res = await checkAuthorization(sensorArray)
+            console.log("[JS] checkAuthorization", JSON.stringify(res));
+        } catch (e) {
+            console.log("[JS] checkAuthorization", e);
+        }
+
+        try {
+            const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport", "rotationRate", "visits","ambientPressure"]
+            const res = await authorize(sensorArray)
+            console.log("[JS] Authorize", JSON.stringify(res));
+        } catch (e) {
+            console.log("[JS] Authorize", e);
+        }
+
+        try {
+            const sensorArray = [
+                // {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
+                {sensor: "accelerometer", period: 100, chunkSize: 10000},
+                // {sensor: "rotationRate", period: 1000, chunkSize: 10000},
+                // {sensor: "deviceUsageReport"},
+                // {sensor: "keyboardMetrics"},
+                // {sensor: "messagesUsageReport"},
+                // {sensor: "onWristState"},
+                // {sensor: "pedometerData"},
+                // {sensor: "phoneUsageReport"},
+                // {sensor: "visits"},
+                // {sensor: "ambientPressure"},
+                // {sensor: "telephonySpeechMetrics"}
+            ]
+            const res = await RbSensorkitCordovaPlugin.selectSensors(sensorArray)
+            console.log("[JS] Select Sensor Success");
+
+            await sleep(1000)
+        } catch (e) {
+            // add bugfender
+            console.log("[JS] Error selecting sensors", e);
+        }
+
+        startFetchingAll()
+
+
+    }
+
+
+
     //
     // return;
 
-    try {
-        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport", "rotationRate", "visits","ambientPressure"]
-        const res = await checkAuthorization(sensorArray)
-        console.log("[JS] checkAuthorization", JSON.stringify(res));
-    } catch (e) {
-        console.log("[JS] checkAuthorization", e);
-    }
 
-    try {
-        const sensorArray = ["ambientLightSensor", "accelerometer", "deviceUsageReport","keyboardMetrics","messagesUsageReport","onWristState","pedometerData","phoneUsageReport", "rotationRate", "visits","ambientPressure"]
-        const res = await authorize(sensorArray)
-        console.log("[JS] Authorize", JSON.stringify(res));
-    } catch (e) {
-        console.log("[JS] Authorize", e);
-    }
+
 
     // try {
     //     const sensorArray = ["deviceUsageReport","keyboardMetrics"]
@@ -101,29 +156,7 @@ async function onDeviceReady() {
 
     // return;
 
-    try {
-        const sensorArray = [
-            // {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
-            {sensor: "accelerometer", period: 20, chunkSize: 10000},
-            // {sensor: "rotationRate", period: 1000, chunkSize: 10000},
-            // {sensor: "deviceUsageReport"},
-            // {sensor: "keyboardMetrics"},
-            // {sensor: "messagesUsageReport"},
-            // {sensor: "onWristState"},
-            // {sensor: "pedometerData"},
-            // {sensor: "phoneUsageReport"},
-            // {sensor: "visits"},
-            // {sensor: "ambientPressure"},
-            // {sensor: "telephonySpeechMetrics"}
-        ]
-        const res = await RbSensorkitCordovaPlugin.selectSensors(sensorArray)
-        console.log("[JS] Select Sensor Success");
 
-        await sleep(1000)
-    } catch (e) {
-        // add bugfender
-        console.log("[JS] Error selecting sensors", e);
-    }
     // try {
     //     const sensorArray = [
     //         {sensor: "ambientLightSensor", topic: "sk_amb_light", period: 6000},
@@ -145,7 +178,6 @@ async function onDeviceReady() {
     // }
 
     // return;
-    startFetchingAll()
     // await sleep(30000);
     //
     // startFetchingAll();
@@ -164,33 +196,33 @@ async function onDeviceReady() {
     // await sleep(30000);
     //
     // startFetchingAll();
-    return;
+    //return;
 
-    try {
-        const res = await startFetchingAll()
-        console.log("[JS] startFetchingAll", res);
-    } catch (e) {
-        console.log("[JS] startFetchingAll", e);
-    }
-
-    return;
-
-    try {
-        const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
-        console.log("[JS] Sensor Magnetic Field is selected", res);
-    } catch (e) {
-        console.log("[JS] Sensor Magnetic Field is NOT selected", e);
-    }
-
-    await sleep(1000)
-
-    fetchMagneticFieldData();
-
-    await sleep(60000);
-
-    await stopUpdateMagneticField();
-
-    await sleep(1000)
+    // try {
+    //     const res = await startFetchingAll()
+    //     console.log("[JS] startFetchingAll", res);
+    // } catch (e) {
+    //     console.log("[JS] startFetchingAll", e);
+    // }
+    //
+    // return;
+    //
+    // try {
+    //     const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
+    //     console.log("[JS] Sensor Magnetic Field is selected", res);
+    // } catch (e) {
+    //     console.log("[JS] Sensor Magnetic Field is NOT selected", e);
+    // }
+    //
+    // await sleep(1000)
+    //
+    // fetchMagneticFieldData();
+    //
+    // await sleep(60000);
+    //
+    // await stopUpdateMagneticField();
+    //
+    // await sleep(1000)
 }
 
 function isSensorkitAvailable() {
@@ -240,9 +272,12 @@ function startFetchingAll() {
     RbSensorkitCordovaPlugin.startFetchingAll(
         function(res){
             console.log("[JS] startFetchingAll", JSON.stringify(res));
+            document.getElementById('start-fetching-all-result').innerHTML = document.getElementById('start-fetching-all-result').innerHTML + JSON.stringify(res) + '<br>';
+
         },
         function(e){
             console.log("[JS] startFetchingAll ERROR ", JSON.stringify(e));
+            document.getElementById('start-fetching-all-result').innerHTML = document.getElementById('start-fetching-all-result').innerHTML + JSON.stringify(e) + '<br>';
         }
     )
 }
@@ -267,9 +302,12 @@ function uploadCache() {
     RbSensorkitCordovaPlugin.uploadCache(
         function(res){
             console.log("[JS] uploadCache", JSON.stringify(res));
+            document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
+
         },
         function(e){
             console.log("[JS] uploadCache ERROR ", JSON.stringify(e));
+            document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
         }
     )
 }
@@ -306,5 +344,6 @@ function stopUpdateMagneticField() {
         )
     })
 }
+
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
