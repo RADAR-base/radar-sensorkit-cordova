@@ -23,7 +23,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzAyOTQ4NzA1LCJpYXQiOjE3MDI5MDU1MDUsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.goF_RlhNjyhZphapKR6Er4FITsjcNMXU4Rg-4vJFfyuNuGqvloVrJanX1M5hJvlWNe54RSviTrL7TX6pr-RvsQ",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzA0NDIwNDY3LCJpYXQiOjE3MDQzNzcyNjcsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.gT6wv4MCeTSw4yoRDegA3OOmW_jiGZ74eZ3Tx0uPAUWabur6oP2Nv13QYj8MP9g7Q5G1f0ast9XhLe_FDu8eUw",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
@@ -59,22 +59,7 @@ async function onDeviceReady() {
         }
     }
 
-    document.getElementById('upload-cache-button').onclick = async function () {
-        try {
-            const res = await uploadCache()
-            console.log("[JS] Upload Cache", res);
-            // document.getElementById('upload-cache-result').innerHTML = res.toString();
-        } catch (e) {
-            console.log("[JS] Upload Cache Error", e);
-            // document.getElementById('upload-cache-result').innerHTML = "ERROR Upload Cache:" + e;
-        }
-    }
-
-
-    document.getElementById('process-button').onclick = async function () {
-        alert(1);
-        await isSensorkitAvailable();
-
+    document.getElementById('set-config-button').onclick = async function () {
         try {
             const res = await setConfig(config)
             console.log("[JS] Config is set", res);
@@ -83,6 +68,31 @@ async function onDeviceReady() {
             console.log("[JS] Config is NOT set", e);
             document.getElementById('set-config-result').innerHTML = "ERROR in Config set: " + e;
         }
+    }
+
+    document.getElementById('upload-cache-button').onclick = async function () {
+        try {
+            const res = await uploadCache()
+            console.log("[JS] Upload Cache", res);
+            document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
+        } catch (e) {
+            console.log("[JS] Upload Cache Error", e);
+            document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
+        }
+    }
+
+    document.getElementById('process-button').onclick = async function () {
+        alert(1);
+        await isSensorkitAvailable();
+
+        // try {
+        //     const res = await setConfig(config)
+        //     console.log("[JS] Config is set", res);
+        //     document.getElementById('set-config-result').innerHTML = "Config is set";
+        // } catch (e) {
+        //     console.log("[JS] Config is NOT set", e);
+        //     document.getElementById('set-config-result').innerHTML = "ERROR in Config set: " + e;
+        // }
 
         try {
             const res = await getAvailableSensors()
@@ -295,21 +305,25 @@ function clearCache() {
 }
 
 function uploadCache() {
+    return new Promise((resolve, reject) => {
+        RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
+    })
+
     // return new Promise((resolve, reject) => {
     //     RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
     // })
 
-    RbSensorkitCordovaPlugin.uploadCache(
-        function(res){
-            console.log("[JS] uploadCache", JSON.stringify(res));
-            document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
-
-        },
-        function(e){
-            console.log("[JS] uploadCache ERROR ", JSON.stringify(e));
-            document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
-        }
-    )
+    // RbSensorkitCordovaPlugin.uploadCache(
+    //     function(res){
+    //         console.log("[JS] uploadCache", JSON.stringify(res));
+    //         document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
+    //
+    //     },
+    //     function(e){
+    //         console.log("[JS] uploadCache ERROR ", JSON.stringify(e));
+    //         document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
+    //     }
+    // )
 }
 
 function selectMagneticFieldSensor(sensor) {

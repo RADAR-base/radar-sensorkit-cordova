@@ -240,6 +240,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw PostToKafkaError.runtimeError("Failed")
         }
+        
         var id: Int? = nil
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
@@ -248,6 +249,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         } catch let error {
             print("We couldn't parse the data into JSON. \(error)")
         }
+        
         return id
     }
     

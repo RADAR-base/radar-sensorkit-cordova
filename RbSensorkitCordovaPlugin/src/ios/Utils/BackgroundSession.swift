@@ -166,7 +166,8 @@ extension BackgroundSession: URLSessionDataDelegate {
                             
 
                             let fileManager = FileManager.default
-                            let tempPath = fileManager.temporaryDirectory.path
+                            let tempPath = getDocumentsDirectory().path
+
                             let fileName = fileNamesDictionary[dataTask.taskIdentifier]
                             if (fileName != nil) {
                                 let filePathName = "\(tempPath)/\(fileName!)"

@@ -269,17 +269,14 @@ extension RbSensorkitCordovaPlugin {
         do {
             // get topic name from the file
             let topicName = fileName.components(separatedBy: "___")[0]
-
             guard let baseUrl = RadarbaseConfig.baseUrl else {
                 // send error message to JS and return
                 return
             }
-
             guard let url = URL(string: baseUrl + RadarbaseConfig.kafkaEndpoint + topicName) else {
                 // send error message to JS and return
                 return
             }
-
             var request = URLRequest(url: url)
             request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
             request.httpMethod = "POST"
@@ -289,7 +286,7 @@ extension RbSensorkitCordovaPlugin {
             guard let token = UserConfig.token else {
                 return
             }
-
+            
             request.setValue( "Bearer \(token)", forHTTPHeaderField: "Authorization")
 
             let identifierSuffix = "uniqueId"
