@@ -316,39 +316,42 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
             self.callbackHelper?.sendError(command, "INVALID_TOPIC")
             return
         }
-
+        
         self.fetchMagneticFieldCommand = command
         motionManager = CMMotionManager()
         var mfSensorDataArray: [[String: Any]] = []
-
-        if motionManager.isMagnetometerAvailable {
-            motionManager.magnetometerUpdateInterval = self.magneticFieldPeriodMili / 1000
-            motionManager.startMagnetometerUpdates(to: OperationQueue.main) { (data, error) in
-                let time = Date().timeIntervalSince1970
-                mfSensorDataArray.append([
-                    "time": time,
-                    "timeReceived": time,
-                    "x": data!.magneticField.x as Double,
-                    "y": data!.magneticField.y as Double,
-                    "z": data!.magneticField.z as Double,
-                ])
-                if mfSensorDataArray.count > (self.magneticFieldChunkSize - 1) {
-                    log("Processing Data started at: \(Date().timeIntervalSince1970)")
-                    log("Total number of records: \(mfSensorDataArray.count)")
-                    let body = self.getBody(payload: mfSensorDataArray, keySchemaId: self.magneticFieldTopicKeyId!, valueSchemaId: self.magneticFieldTopicValueId!)
-
-                    mfSensorDataArray = []
-                    guard let data = try? JSONSerialization.data(withJSONObject: body) else {
-                        return
-                    }
-                    let compressedData = self.getCompressedData(data: data)
-                    guard let request = self.getRequest(compressedData: compressedData, topicName: self.magneticFieldTopicName!) else {return}
-                    
-                    Task {
-                        await self.sendMagneticFieldData(request: request)
+        do {
+            if motionManager.isMagnetometerAvailable {
+                motionManager.magnetometerUpdateInterval = self.magneticFieldPeriodMili / 1000
+                motionManager.startMagnetometerUpdates(to: OperationQueue.main) { (data, error) in
+                    let time = Date().timeIntervalSince1970
+                    mfSensorDataArray.append([
+                        "time": time,
+                        "timeReceived": time,
+                        "x": data!.magneticField.x as Double,
+                        "y": data!.magneticField.y as Double,
+                        "z": data!.magneticField.z as Double,
+                    ])
+                    if mfSensorDataArray.count > (self.magneticFieldChunkSize - 1) {
+                        log("Processing Data started at: \(Date().timeIntervalSince1970)")
+                        log("Total number of records: \(mfSensorDataArray.count)")
+                        let body = self.getBody(payload: mfSensorDataArray, keySchemaId: self.magneticFieldTopicKeyId!, valueSchemaId: self.magneticFieldTopicValueId!)
+                        
+                        mfSensorDataArray = []
+                        guard let data = try? JSONSerialization.data(withJSONObject: body) else {
+                            return
+                        }
+                        let compressedData = self.getCompressedData(data: data)
+                        guard let request = self.getRequest(compressedData: compressedData, topicName: self.magneticFieldTopicName!) else {return}
+                        
+                        Task {
+                            await self.sendMagneticFieldData(request: request)
+                        }
                     }
                 }
             }
+        } catch let error {
+            log("Error in get magnetic field: \(error)")
         }
     }
 }
