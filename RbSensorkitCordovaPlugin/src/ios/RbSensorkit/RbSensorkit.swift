@@ -248,6 +248,7 @@ extension RbSensorkitCordovaPlugin {
     func _uploadAllFiles() {
         totalFilesToUpload = 0
         uploadedFileCounter = 0
+        let id = "uniqueId_\(Date().timeIntervalSince1970)"
         do {
             totalFilesToUpload = try _getCacheStatus()
         } catch {}
@@ -257,7 +258,7 @@ extension RbSensorkitCordovaPlugin {
             let fileNames = try fileManager.contentsOfDirectory(atPath: "\(tempPath)")
             for fileName in fileNames {
                 if (fileName.hasSuffix(".txt.gz")) {
-                    _uploadFile(fileName: fileName)
+                    _uploadFile(fileName: fileName, id: id)
                 }
             }
         } catch {
@@ -265,10 +266,11 @@ extension RbSensorkitCordovaPlugin {
         }
     }
     
-    func _uploadFile(fileName: String) {
+    func _uploadFile(fileName: String, id: String) {
         do {
             // get topic name from the file
             let topicName = fileName.components(separatedBy: "___")[0]
+
             guard let baseUrl = RadarbaseConfig.baseUrl else {
                 // send error message to JS and return
                 return
@@ -278,6 +280,7 @@ extension RbSensorkitCordovaPlugin {
                 return
             }
             var request = URLRequest(url: url)
+
             request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
             request.httpMethod = "POST"
 
@@ -289,13 +292,12 @@ extension RbSensorkitCordovaPlugin {
             
             request.setValue( "Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-            let identifierSuffix = "uniqueId"
+            let identifierSuffix = id //"uniqueId_\(Date().timeIntervalSince1970)"
 
             let backgroundSession = BackgroundSession.shared
             backgroundSession.delegate = self
             let fileManager = FileManager.default
             let path = getDocumentsDirectory().path + "/" + fileName
-
             let fileExists = fileManager.fileExists(atPath: path)
             if fileExists {
                 _ = try backgroundSession.startUploadFile(for: request, fromFile: fileName, identifier: identifierSuffix)

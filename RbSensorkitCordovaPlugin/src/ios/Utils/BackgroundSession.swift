@@ -51,10 +51,8 @@ extension BackgroundSession {
 //    @discardableResult
     func startUploadFile(for request: URLRequest, fromFile fileName: String, identifier identifierSuffix: String) throws -> URLSessionUploadTask {
 //        os_log("%{public}@: start", log: log, type: .debug, #function)
-        
         let identifier = Bundle.main.bundleIdentifier! + identifierSuffix //".backgroundSession"
         let configuration = URLSessionConfiguration.background(withIdentifier: identifier)
-
         session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
         let tempDir = getDocumentsDirectory()
         let fileURL = tempDir.appendingPathComponent(fileName)
@@ -65,7 +63,6 @@ extension BackgroundSession {
 //        print("TaskIdentifier: \(task.taskIdentifier)")
         fileNamesDictionary[task.taskIdentifier] = fileName
         task.resume()
-
         return task
     }
 }
@@ -154,7 +151,6 @@ extension BackgroundSession: URLSessionDataDelegate {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
 //                        let time = Date().timeIntervalSince1970 - startTime
 //                        print("Data sent. \(self.iterationCounter)/\(self.totalIterations) in \(time)s")
-//                        print("\(json)")
                         if((json["error"]) != nil){
 //                            print("ERR \(responseText)")
                             let error = UploadError(message: json["error"] as! String) //"Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
@@ -167,7 +163,6 @@ extension BackgroundSession: URLSessionDataDelegate {
 
                             let fileManager = FileManager.default
                             let tempPath = getDocumentsDirectory().path
-
                             let fileName = fileNamesDictionary[dataTask.taskIdentifier]
                             if (fileName != nil) {
                                 let filePathName = "\(tempPath)/\(fileName!)"

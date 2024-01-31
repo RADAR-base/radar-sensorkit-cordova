@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiI5NjliOTkyOS0xMTU5LTQzMjEtOGMzNS0xY2QzNGY5MzRlODciLCJyb2xlcyI6WyJTVEFHSU5HX1BST0pFQ1Q6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzA0NDIwNDY3LCJpYXQiOjE3MDQzNzcyNjcsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.gT6wv4MCeTSw4yoRDegA3OOmW_jiGZ74eZ3Tx0uPAUWabur6oP2Nv13QYj8MP9g7Q5G1f0ast9XhLe_FDu8eUw",
-    baseUrl: "https://radar-dev.connectdigitalstudy.com/",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJkYzgyODM4Ni03MGQ4LTQwYjMtOGRjYy00MjZlZjQwZDBhMmQiLCJzb3VyY2VzIjpbXSwidXNlcl9uYW1lIjoiZGM4MjgzODYtNzBkOC00MGIzLThkY2MtNDI2ZWY0MGQwYTJkIiwicm9sZXMiOlsidGVzdDpST0xFX1BBUlRJQ0lQQU5UIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJhdXRob3JpdGllcyI6WyJST0xFX1BBUlRJQ0lQQU5UIl0sImNsaWVudF9pZCI6ImFSTVQiLCJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJhdGkiOiJjM0ZJYkNrNDQ1TElHdExxY3h1UzhDRzhuajQiLCJleHAiOjE3MTQ1NzY4ODYsImlhdCI6MTcwNjYyODA4NiwianRpIjoiTzFrZXdZQTRMRnl3bmNkQWVTV0EzSVBtTlBZIn0.fHfej6A6D93oXecpsf399EjrG9jQWSXD0LSmpC9DwqyrRocuG4iDE-nycSv55C6I4aTEwZ-XMs-OAk9R8RHOxg",
+    baseUrl: "https://radar.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
-    projectId: "STAGING_PROJECT",
-    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
+    projectId: "test",
+    userId: "dc828386-70d8-40b3-8dcc-426ef40d0a2d",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -76,7 +76,7 @@ async function onDeviceReady() {
             console.log("[JS] Upload Cache", res);
             document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
         } catch (e) {
-            console.log("[JS] Upload Cache Error", e);
+            console.log("[JS] Upload Cache Error", JSON.stringify(e));
             document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
         }
     }
