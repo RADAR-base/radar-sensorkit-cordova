@@ -369,13 +369,9 @@ extension RbSensorkitCordovaPlugin {
     }
     
     func getTopicId(property: TopicKeyValue, topicName: String) async throws -> Int? {
-        guard let baseUrl = RadarbaseConfig.baseUrl else {
+        guard let baseUrl = RadarbaseConfig.baseUrl, let url = URL(string: baseUrl + RadarbaseConfig.schemaEndpoint + topicName + "-" + property.rawValue + "/versions/latest") else {
             return nil
         }
-        guard let url = URL(string: baseUrl + RadarbaseConfig.schemaEndpoint + topicName + "-" + property.rawValue + "/versions/latest") else {
-            return nil
-        }
-        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")

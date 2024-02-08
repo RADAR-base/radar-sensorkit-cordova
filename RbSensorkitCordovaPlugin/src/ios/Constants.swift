@@ -50,7 +50,7 @@ struct ConfigSensor {
         "telephonySpeechMetrics": "sensorkit_telephony_speech_metrics",
         "visits": "sensorkit_visits",
         "wristTemperature": "sensorkit_wrist_temperature",
-        "magneticField": ""
+        "magneticField": "apple_ios_magnetic_field"
     ]
     static var chunkSize: Dictionary<String, Int> = [
         "accelerometer": Constants.DEFAULT_CHUNK_SIZE,

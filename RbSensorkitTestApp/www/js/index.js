@@ -23,12 +23,12 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJkYzgyODM4Ni03MGQ4LTQwYjMtOGRjYy00MjZlZjQwZDBhMmQiLCJzb3VyY2VzIjpbXSwidXNlcl9uYW1lIjoiZGM4MjgzODYtNzBkOC00MGIzLThkY2MtNDI2ZWY0MGQwYTJkIiwicm9sZXMiOlsidGVzdDpST0xFX1BBUlRJQ0lQQU5UIl0sImlzcyI6Ik1hbmFnZW1lbnRQb3J0YWwiLCJhdXRob3JpdGllcyI6WyJST0xFX1BBUlRJQ0lQQU5UIl0sImNsaWVudF9pZCI6ImFSTVQiLCJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJhdGkiOiJjM0ZJYkNrNDQ1TElHdExxY3h1UzhDRzhuajQiLCJleHAiOjE3MTQ1NzY4ODYsImlhdCI6MTcwNjYyODA4NiwianRpIjoiTzFrZXdZQTRMRnl3bmNkQWVTV0EzSVBtTlBZIn0.fHfej6A6D93oXecpsf399EjrG9jQWSXD0LSmpC9DwqyrRocuG4iDE-nycSv55C6I4aTEwZ-XMs-OAk9R8RHOxg",
-    baseUrl: "https://radar.connectdigitalstudy.com/",
+    token: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sInJvbGVzIjpbIlNUQUdJTkdfUFJPSkVDVDpST0xFX1BBUlRJQ0lQQU5UIl0sImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwic2NvcGUiOlsiTUVBU1VSRU1FTlQuQ1JFQVRFIiwiU1VCSkVDVC5SRUFEIiwiU1VCSkVDVC5VUERBVEUiXSwic3ViIjoiOTY5Yjk5MjktMTE1OS00MzIxLThjMzUtMWNkMzRmOTM0ZTg3IiwiaXNzIjoiTWFuYWdlbWVudFBvcnRhbCIsInVzZXJfbmFtZSI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsImNsaWVudF9pZCI6ImFSTVQiLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwiZXhwIjoxNzA3MzY1MzQxLCJpYXQiOjE3MDczMjIxNDF9.4N_i7OhhZnq5GlkyQaOaFAFtuX4Yd1tfYaT1oJgQadYM8r9g0PQtJn68XKlNtRM8ylxZtV9QpC70r-KTdn1T2w",
+    baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
-    projectId: "test",
-    userId: "dc828386-70d8-40b3-8dcc-426ef40d0a2d",
+    projectId: "STAGING_PROJECT",
+    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
     sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
 }
 
@@ -147,6 +147,18 @@ async function onDeviceReady() {
 
 
     }
+
+    document.getElementById('magnetic-field-button').onclick = async function () {
+        try {
+            const res = await selectMagneticFieldSensor({topic: "apple_ios_magnetic_field", period: 100, chunkSize: 100})
+            console.log("[JS] Sensor Magnetic Field is selected", res);
+        } catch (e) {
+            console.log("[JS] Sensor Magnetic Field is NOT selected", e);
+        }
+        await sleep(1000)
+        fetchMagneticFieldData();
+        await sleep(60000);
+    };
 
 
 

@@ -247,10 +247,11 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
             self.checkAuthorizationResponse = []
             self.checkAuthorizationSensors = Array(sensors)
             self.checkAuthorizationSensors.forEach { sensor in
-                let dataExtractor = self._generateDataExtractor(sensor: sensor)
-                let response = self._checkAuthorization(dataExtractor: dataExtractor!)
-                if let sensorString = self._getSensorString(sensor: sensor) {
-                    self.checkAuthorizationResponse.append([sensorString: response])
+                if let dataExtractor = self._generateDataExtractor(sensor: sensor) {
+                    let response = self._checkAuthorization(dataExtractor: dataExtractor)
+                    if let sensorString = self._getSensorString(sensor: sensor) {
+                        self.checkAuthorizationResponse.append([sensorString: response])
+                    }
                 }
             }
             
@@ -281,13 +282,20 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
             self.magneticFieldTopicName = command.arguments[0] as? String ?? ConfigSensor.topics["magneticField"]
             self.magneticFieldPeriodMili = command.arguments[1] as? Double ?? ConfigSensor.periods["magneticField"]!
             self.magneticFieldChunkSize = command.arguments[2] as? Int ?? Constants.DEFAULT_CHUNK_SIZE
+//            print("*** \(self.magneticFieldTopicName) - \(self.magneticFieldPeriodMili) - \(self.magneticFieldChunkSize)")
             
             self.magneticFieldTopicKeyId = nil
             self.magneticFieldTopicValueId = nil
+            guard let magneticFieldTopicName = self.magneticFieldTopicName else {
+                self.callbackHelper?.sendError(command, "INVALID_TOPIC")
+                return
+            }
             Task {
                 do {
-                    self.magneticFieldTopicKeyId = try await self.getTopicId(property: TopicKeyValue.KEY, topicName: self.magneticFieldTopicName!) ?? 0
-                    self.magneticFieldTopicValueId = try await self.getTopicId(property: TopicKeyValue.VALUE, topicName: self.magneticFieldTopicName!) ?? 0
+                    self.magneticFieldTopicKeyId = try await self.getTopicId(property: TopicKeyValue.KEY, topicName: magneticFieldTopicName) ?? 0
+                    self.magneticFieldTopicValueId = try await self.getTopicId(property: TopicKeyValue.VALUE, topicName: magneticFieldTopicName) ?? 0
+//                    print("*** \(self.magneticFieldTopicKeyId) = \(self.magneticFieldTopicValueId)")
+
                     if self.magneticFieldTopicKeyId == nil || self.magneticFieldTopicValueId == nil {
                         self.callbackHelper?.sendError(command, "INVALID_TOPIC")
                         return
@@ -324,25 +332,31 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
             if motionManager.isMagnetometerAvailable {
                 motionManager.magnetometerUpdateInterval = self.magneticFieldPeriodMili / 1000
                 motionManager.startMagnetometerUpdates(to: OperationQueue.main) { (data, error) in
+                    guard let data = data,
+                          let magneticFieldTopicKeyId = self.magneticFieldTopicKeyId,
+                          let magneticFieldTopicValueId = self.magneticFieldTopicValueId,
+                          let magneticFieldTopicName = self.magneticFieldTopicName else {
+                        return
+                    }
                     let time = Date().timeIntervalSince1970
                     mfSensorDataArray.append([
                         "time": time,
                         "timeReceived": time,
-                        "x": data!.magneticField.x as Double,
-                        "y": data!.magneticField.y as Double,
-                        "z": data!.magneticField.z as Double,
+                        "x": data.magneticField.x as Double,
+                        "y": data.magneticField.y as Double,
+                        "z": data.magneticField.z as Double,
                     ])
                     if mfSensorDataArray.count > (self.magneticFieldChunkSize - 1) {
                         log("Processing Data started at: \(Date().timeIntervalSince1970)")
                         log("Total number of records: \(mfSensorDataArray.count)")
-                        let body = self.getBody(payload: mfSensorDataArray, keySchemaId: self.magneticFieldTopicKeyId!, valueSchemaId: self.magneticFieldTopicValueId!)
+                        let body = self.getBody(payload: mfSensorDataArray, keySchemaId: magneticFieldTopicKeyId, valueSchemaId: magneticFieldTopicValueId)
                         
                         mfSensorDataArray = []
                         guard let data = try? JSONSerialization.data(withJSONObject: body) else {
                             return
                         }
                         let compressedData = self.getCompressedData(data: data)
-                        guard let request = self.getRequest(compressedData: compressedData, topicName: self.magneticFieldTopicName!) else {return}
+                        guard let request = self.getRequest(compressedData: compressedData, topicName: magneticFieldTopicName) else {return}
                         
                         Task {
                             await self.sendMagneticFieldData(request: request)
