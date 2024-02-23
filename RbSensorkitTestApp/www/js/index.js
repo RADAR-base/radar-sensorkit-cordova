@@ -23,7 +23,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sInJvbGVzIjpbIlNUQUdJTkdfUFJPSkVDVDpST0xFX1BBUlRJQ0lQQU5UIl0sImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwic2NvcGUiOlsiTUVBU1VSRU1FTlQuQ1JFQVRFIiwiU1VCSkVDVC5SRUFEIiwiU1VCSkVDVC5VUERBVEUiXSwic3ViIjoiOTY5Yjk5MjktMTE1OS00MzIxLThjMzUtMWNkMzRmOTM0ZTg3IiwiaXNzIjoiTWFuYWdlbWVudFBvcnRhbCIsInVzZXJfbmFtZSI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsImNsaWVudF9pZCI6ImFSTVQiLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwiZXhwIjoxNzA3MzY1MzQxLCJpYXQiOjE3MDczMjIxNDF9.4N_i7OhhZnq5GlkyQaOaFAFtuX4Yd1tfYaT1oJgQadYM8r9g0PQtJn68XKlNtRM8ylxZtV9QpC70r-KTdn1T2w",
+    token: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sInJvbGVzIjpbIlNUQUdJTkdfUFJPSkVDVDpST0xFX1BBUlRJQ0lQQU5UIl0sImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwic2NvcGUiOlsiTUVBU1VSRU1FTlQuQ1JFQVRFIiwiU1VCSkVDVC5SRUFEIiwiU1VCSkVDVC5VUERBVEUiXSwic3ViIjoiOTY5Yjk5MjktMTE1OS00MzIxLThjMzUtMWNkMzRmOTM0ZTg3IiwiaXNzIjoiTWFuYWdlbWVudFBvcnRhbCIsInVzZXJfbmFtZSI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsImNsaWVudF9pZCI6ImFSTVQiLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwiZXhwIjoxNzA4NzMxNjMzLCJpYXQiOjE3MDg2ODg0MzN9.J8SOEw4vMxtTWAbxlN3Ot-DnQymPaApMUBHifyr5k1elEQ9oBMzP3s-B4Mn0ywOiglmR-hZlLKDDZYoydd_pgQ",
     baseUrl: "https://radar-dev.connectdigitalstudy.com/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
@@ -71,9 +71,10 @@ async function onDeviceReady() {
     }
 
     document.getElementById('upload-cache-button').onclick = async function () {
+        console.log("Upload all clicked");
         try {
             const res = await uploadCache()
-            console.log("[JS] Upload Cache", res);
+            console.log("[JS] Upload Cache", JSON.stringify(res));
             document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
         } catch (e) {
             console.log("[JS] Upload Cache Error", JSON.stringify(e));
@@ -316,27 +317,42 @@ function clearCache() {
     })
 }
 
+// function uploadCache() {
+//     return new Promise((resolve, reject) => {
+//         RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
+//     })
+//
+//     // return new Promise((resolve, reject) => {
+//     //     RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
+//     // })
+//
+//     // RbSensorkitCordovaPlugin.uploadCache(
+//     //     function(res){
+//     //         console.log("[JS] uploadCache", JSON.stringify(res));
+//     //         document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
+//     //
+//     //     },
+//     //     function(e){
+//     //         console.log("[JS] uploadCache ERROR ", JSON.stringify(e));
+//     //         document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
+//     //     }
+//     // )
+// }
+
 function uploadCache() {
-    return new Promise((resolve, reject) => {
-        RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
-    })
+    RbSensorkitCordovaPlugin.uploadCache(
+        function(res){
+            console.log("[JS] uploadCache", JSON.stringify(res));
+            document.getElementById('start-fetching-all-result').innerHTML = document.getElementById('start-fetching-all-result').innerHTML + JSON.stringify(res) + '<br>';
 
-    // return new Promise((resolve, reject) => {
-    //     RbSensorkitCordovaPlugin.uploadCache(resolve, reject)
-    // })
-
-    // RbSensorkitCordovaPlugin.uploadCache(
-    //     function(res){
-    //         console.log("[JS] uploadCache", JSON.stringify(res));
-    //         document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(res) + '<br>';
-    //
-    //     },
-    //     function(e){
-    //         console.log("[JS] uploadCache ERROR ", JSON.stringify(e));
-    //         document.getElementById('upload-cache-result').innerHTML = document.getElementById('upload-cache-result').innerHTML + JSON.stringify(e) + '<br>';
-    //     }
-    // )
+        },
+        function(e){
+            console.log("[JS] uploadCache ERROR ", JSON.stringify(e));
+            document.getElementById('start-fetching-all-result').innerHTML = document.getElementById('start-fetching-all-result').innerHTML + JSON.stringify(e) + '<br>';
+        }
+    )
 }
+
 
 function selectMagneticFieldSensor(sensor) {
     const sensorArray = [sensor.topic, sensor.period, sensor.chunkSize];
