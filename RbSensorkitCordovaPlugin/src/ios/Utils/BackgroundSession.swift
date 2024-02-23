@@ -124,10 +124,10 @@ extension BackgroundSession: URLSessionDataDelegate {
 
 //     Response received
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: (URLSession.ResponseDisposition) -> Void) {
-        print("response")
-        print("did receive response")
+//        print("response")
+//        print("did receive response")
                     //self.response = response
-                    print(response)
+//                    print(response)
                     completionHandler(URLSession.ResponseDisposition.allow)
                 }  // end func
 //        completionHandler(URLSession.ResponseDisposition.allow)
@@ -142,40 +142,27 @@ extension BackgroundSession: URLSessionDataDelegate {
 //    }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-//      print("didReceive data \(data)")
         if String(data: data, encoding: .utf8) != nil {
-//           print(responseText)
-            
-//            if let data = data {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-//                        let time = Date().timeIntervalSince1970 - startTime
-//                        print("Data sent. \(self.iterationCounter)/\(self.totalIterations) in \(time)s")
-                        if((json["error"]) != nil){
-//                            print("ERR \(responseText)")
-                            let error = UploadError(message: json["error"] as! String) //"Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
-//                            let error = Error()
-//                            errorTemp.description = "Upload failed \(responseText)"
-                            delegate?.__didUploadFileFailed(error: error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
-                        } else {
-//                            print("\(Date().timeIntervalSince1970) OK \(String(describing: fileNamesDictionary[dataTask.taskIdentifier]))")
-                            
-
-                            let fileManager = FileManager.default
-                            let tempPath = getDocumentsDirectory().path
-                            let fileName = fileNamesDictionary[dataTask.taskIdentifier]
-                            if (fileName != nil) {
-                                let filePathName = "\(tempPath)/\(fileName!)"
-                                try fileManager.removeItem(atPath: filePathName)
-                            }
-                            delegate?.__didUploadFileSuccess(fileName: fileName)
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    if((json["error"]) != nil){
+                        let error = UploadError(message: json["error"] as! String) //"Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
+                        delegate?.__didUploadFileFailed(error: error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
+                    } else {
+                        let fileManager = FileManager.default
+                        let tempPath = getDocumentsDirectory().path
+                        let fileName = fileNamesDictionary[dataTask.taskIdentifier]
+                        if (fileName != nil) {
+                            let filePathName = "\(tempPath)/\(fileName!)"
+                            try fileManager.removeItem(atPath: filePathName)
                         }
-                        
+                        delegate?.__didUploadFileSuccess(fileName: fileName)
                     }
-                } catch let error {
-                    let _error = UploadError(message: "Upload failed \(error.localizedDescription)")
-                    delegate?.__didUploadFileFailed(error: _error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
                 }
+            } catch let error {
+                let _error = UploadError(message: "Upload failed \(error.localizedDescription)")
+                delegate?.__didUploadFileFailed(error: _error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
+            }
         }
    }
     

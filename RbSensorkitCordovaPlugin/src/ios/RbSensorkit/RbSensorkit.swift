@@ -2,7 +2,7 @@ import SensorKit
 
 @available(iOS 14.0, *)
 extension RbSensorkitCordovaPlugin {
-    
+
     func _generateDataExtractor(sensor: SRSensor) -> SensorKitDataExtractor? {
         switch sensor {
         case .accelerometer:
@@ -245,20 +245,28 @@ extension RbSensorkitCordovaPlugin {
         }
     }
     
+    
     func _uploadAllFiles() {
         totalFilesToUpload = 0
         uploadedFileCounter = 0
-        let id = "uniqueId_\(Date().timeIntervalSince1970)"
+        uploadAllFilesId = "uniqueId_\(Date().timeIntervalSince1970)"
         do {
             totalFilesToUpload = try _getCacheStatus()
         } catch {}
+        uploadNextFile()
+    }
+    
+    func uploadNextFile(){
         do {
             let fileManager = FileManager.default
             let tempPath = getDocumentsDirectory().path
             let fileNames = try fileManager.contentsOfDirectory(atPath: "\(tempPath)")
             for fileName in fileNames {
                 if (fileName.hasSuffix(".txt.gz")) {
-                    _uploadFile(fileName: fileName, id: id)
+                    _uploadFile(fileName: fileName, id: uploadAllFilesId ?? "default")
+                    return
+                } else {
+                    
                 }
             }
         } catch {
@@ -444,6 +452,7 @@ extension RbSensorkitCordovaPlugin {
             "value_schema_id": valueSchemaId,
             "records": records
         ]
+//        print("B \(body)")
         return body
     }
     
@@ -594,7 +603,9 @@ extension RbSensorkitCordovaPlugin: SensorKitDelegate {
             await _postLogToKafka(dataGroupingType: "PASSIVE_SENSOR_KIT")
         }
         let result: [String: AnyObject] = ["total": totalFilesToUpload, "UploadNumber": uploadedFileCounter, "topic": fileName ?? ""] as [String : AnyObject]
+
         self.callbackHelper?.sendJson(uploadCacheCommand!, result, true)
+        uploadNextFile()
     }
     
     func __didUploadFileFailed(error: UploadError, fileName: String?) {

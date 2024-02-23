@@ -31,6 +31,8 @@ class RbSensorkitCordovaPlugin : CDVPlugin {
     var totalFilesToUpload = 0
     var uploadedFileCounter = 0
 
+    var uploadAllFilesId: String? = nil
+
     var callbackHelper: CallbackHelper?
     
     override func pluginInitialize() {
