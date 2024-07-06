@@ -23,13 +23,13 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 const config = {
-    token: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInNvdXJjZXMiOlsiOWMxMmI5MzItNDI5ZC00OWI2LWE0OTQtNDUzZGFlZjc0NDRmIl0sInJvbGVzIjpbIlNUQUdJTkdfUFJPSkVDVDpST0xFX1BBUlRJQ0lQQU5UIl0sImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwic2NvcGUiOlsiTUVBU1VSRU1FTlQuQ1JFQVRFIiwiU1VCSkVDVC5SRUFEIiwiU1VCSkVDVC5VUERBVEUiXSwic3ViIjoiOTY5Yjk5MjktMTE1OS00MzIxLThjMzUtMWNkMzRmOTM0ZTg3IiwiaXNzIjoiTWFuYWdlbWVudFBvcnRhbCIsInVzZXJfbmFtZSI6Ijk2OWI5OTI5LTExNTktNDMyMS04YzM1LTFjZDM0ZjkzNGU4NyIsImNsaWVudF9pZCI6ImFSTVQiLCJncmFudF90eXBlIjoiYXV0aG9yaXphdGlvbl9jb2RlIiwiZXhwIjoxNzA4NzMxNjMzLCJpYXQiOjE3MDg2ODg0MzN9.J8SOEw4vMxtTWAbxlN3Ot-DnQymPaApMUBHifyr5k1elEQ9oBMzP3s-B4Mn0ywOiglmR-hZlLKDDZYoydd_pgQ",
-    baseUrl: "https://radar-dev.connectdigitalstudy.com/",
+    token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOlsicmVzX2FwcGNvbmZpZyIsInJlc19BcHBTZXJ2ZXIiLCJyZXNfZ2F0ZXdheSIsInJlc19NYW5hZ2VtZW50UG9ydGFsIl0sInN1YiI6IjIyMDQyNGE3LTliYTctNDNlMS1hMzkzLWNkZjVkN2Y3MGJkOSIsInNvdXJjZXMiOlsiZTM5MTUxYTgtMWU5Ny00MmEwLTgwNmUtOTNiMjhkNjM2MWEwIiwiNjg3Y2EzMWQtNWE5Yy00NjYwLTgxZTQtOGJkM2FhMjcxMmVhIl0sImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJ1c2VyX25hbWUiOiIyMjA0MjRhNy05YmE3LTQzZTEtYTM5My1jZGY1ZDdmNzBiZDkiLCJyb2xlcyI6WyJyYWRhci10ZXN0LTE6Uk9MRV9QQVJUSUNJUEFOVCJdLCJzY29wZSI6WyJNRUFTVVJFTUVOVC5DUkVBVEUiLCJTVUJKRUNULlJFQUQiLCJTVUJKRUNULlVQREFURSJdLCJpc3MiOiJNYW5hZ2VtZW50UG9ydGFsIiwiZXhwIjoxNzIwMjMwNzEzLCJpYXQiOjE3MjAxODc1MTMsImF1dGhvcml0aWVzIjpbIlJPTEVfUEFSVElDSVBBTlQiXSwiY2xpZW50X2lkIjoiYVJNVCJ9.qarZiaEVGIz-7Vkvm4Y02nnBFmYkQyxMzPRLJEanWPOp8A5oEx_deCQ05LXI5WwpbWEwaon4gMTgKOW7SVSemg",
+    baseUrl: "https://staging-alpha.radar.thehyve.nl/",
     kafkaEndpoint: "kafka/topics/",
     schemaEndpoint: "schema/subjects/",
-    projectId: "STAGING_PROJECT",
-    userId: "969b9929-1159-4321-8c35-1cd34f934e87",
-    sourceId: "c032209c-b44a-45d5-b5a8-d45fef68a63e",
+    projectId: "radar-test-1",
+    userId: "220424a7-9ba7-43e1-a393-cdf5d7f70bd9",
+    sourceId: "687ca31d-5a9c-4660-81e4-8bd3aa2712ea",
 }
 
 async function onDeviceReady() {
@@ -122,8 +122,8 @@ async function onDeviceReady() {
 
         try {
             const sensorArray = [
-                // {sensor: "ambientLightSensor", period: 60000, chunkSize: 10000},
-                {sensor: "accelerometer", period: 100, chunkSize: 10000},
+                {sensor: "ambientLightSensor", period: 3600000, chunkSize: 10},
+                // {sensor: "accelerometer", period: 100, chunkSize: 10000},
                 // {sensor: "rotationRate", period: 1000, chunkSize: 10000},
                 // {sensor: "deviceUsageReport"},
                 // {sensor: "keyboardMetrics"},

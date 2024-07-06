@@ -62,6 +62,7 @@
                 <pods use-frameworks="true">
                     <!-- Or install using a Git repository -->
                     <pod name="GzipSwift" options=":git => 'https://github.com/1024jp/GzipSwift.git', :tag => '5.2.0'" />
+                    <pod name="SwiftAvroCore" options=":git => 'https://github.com/lynixliu/SwiftAvroCore.git', :tag => '0.4'" />
                 </pods>
             </podspec>
     </platform>

@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 import CoreMotion
+import SwiftAvroCore
 
 @available(iOS 14.0, *)
 class OnWristStateDataExtractor: SensorKitDataExtractor {
@@ -23,16 +24,24 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
             onWristDate = sample.onWristDate?.timeIntervalSince1970 ?? 0
         }
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
-        sensorDataArray.append([
-            "time": time,
-            "timeReceived": time,
-            "device": selectedDevice?.model ?? "UNKNOWN",
-            "crownOrientation": sample.crownOrientation.description,
-            "onWrist": sample.onWrist,
-            "wristLocation": sample.wristLocation.description,
-            "offWristDate": offWristDate,
-            "onWristDate": onWristDate,
-        ])
+        let avro = Avro()
+        do {
+            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            let onWristState = OnWristStateModel(
+                time: time,
+                timeReceived: time,
+                device: selectedDevice?.model ?? "UNKNOWN",
+                crownOrientation: sample.crownOrientation.description,
+                onWrist: sample.onWrist,
+                wristLocation: sample.wristLocation.description,
+                offWristDate: offWristDate,
+                onWristDate: onWristDate
+            )
+            let binaryValue = try avro.encode(onWristState)
+            sensorDataArray.append([UInt8](binaryValue))
+        } catch {
+            print("Failed to encode OnWrist State data: \(error)")
+        }
     }
     
     override func getBeginDate() -> Double? {
@@ -46,13 +55,13 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
 
 @available(iOS 14.0, *)
 extension SRWristDetection.CrownOrientation {
-    var description: String {
+    var description: CrownOrientation {
         get {
             switch self {
                 case .left:
-                  return "LEFT"
+                  return CrownOrientation.LEFT
                 case .right:
-                  return "RIGHT"
+                  return CrownOrientation.RIGHT
             }
         }
     }
@@ -60,14 +69,34 @@ extension SRWristDetection.CrownOrientation {
 
 @available(iOS 14.0, *)
 extension SRWristDetection.WristLocation {
-    var description: String {
+    var description: WristLocation {
         get {
             switch self {
                 case .left:
-                  return "LEFT"
+                return WristLocation.LEFT
                 case .right:
-                  return "RIGHT"
+                return WristLocation.RIGHT
             }
         }
     }
+}
+
+
+struct OnWristStateModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let crownOrientation: CrownOrientation
+    let onWrist: Bool
+    let wristLocation: WristLocation
+    let offWristDate: Double
+    let onWristDate: Double
+}
+
+enum CrownOrientation: String, Codable {
+    case LEFT, RIGHT
+}
+
+enum WristLocation: String, Codable {
+    case LEFT, RIGHT
 }

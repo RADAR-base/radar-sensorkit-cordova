@@ -7,6 +7,7 @@
 
 import Foundation
 import SensorKit
+import SwiftAvroCore
 
 @available(iOS 14.0, *)
 class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
@@ -21,18 +22,26 @@ class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
             totalTypingEpisodes = sample.totalTypingEpisodes
         }
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
-        sensorDataArray.append([
-            "time": time,
-            "timeReceived": time,
-            "device": selectedDevice?.model ?? "UNKNOWN",
-            "totalWords": sample.totalWords,
-            "totalAlteredWords": sample.totalAlteredWords,
-            "totalTaps": sample.totalTaps,
-            "totalEmojis": sample.totalEmojis,
-            "totalTypingDuration": sample.totalTypingDuration,
-            "totalPauses": totalPauses,
-            "totalTypingEpisodes": totalTypingEpisodes
-        ])
+        let avro = Avro()
+        do {
+            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            let keyboardUsageMetrics = KeyboardUsageMetricsModel(
+                time: time,
+                timeReceived: time,
+                device: selectedDevice?.model ?? "UNKNOWN",
+                totalWords: sample.totalWords,
+                totalAlteredWords: sample.totalWords,
+                totalTaps: sample.totalTaps,
+                totalEmojis: sample.totalEmojis,
+                totalTypingDuration: sample.totalTypingDuration,
+                totalPauses: totalPauses,
+                totalTypingEpisodes: totalTypingEpisodes
+            )
+            let binaryValue = try avro.encode(keyboardUsageMetrics)
+            sensorDataArray.append([UInt8](binaryValue))
+        } catch {
+            print("Failed to encode Keyboard Metrics data: \(error)")
+        }
     }
     
     override func getBeginDate() -> Double? {
@@ -42,4 +51,17 @@ class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
     override func _updateLastFetch(date: Double) {
         PersistentContainer.shared.lastFetchedKeyboardMetrics = date
     }
+}
+
+struct KeyboardUsageMetricsModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let totalWords: Int
+    let totalAlteredWords: Int
+    let totalTaps: Int
+    let totalEmojis: Int
+    let totalTypingDuration: Double
+    let totalPauses: Int
+    let totalTypingEpisodes: Int
 }

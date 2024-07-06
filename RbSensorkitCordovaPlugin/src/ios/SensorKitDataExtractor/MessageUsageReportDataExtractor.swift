@@ -7,6 +7,7 @@
 
 import Foundation
 import SensorKit
+import SwiftAvroCore
 
 @available(iOS 14.0, *)
 class MessageUsageReportDataExtractor: SensorKitDataExtractor {
@@ -16,15 +17,22 @@ class MessageUsageReportDataExtractor: SensorKitDataExtractor {
     override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! SRMessagesUsageReport
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
-        sensorDataArray.append([
-            "time": time,
-            "timeReceived": time,
-            "device": selectedDevice?.model ?? "UNKNOWN",
-            "duration": sample.duration,
-            "totalIncomingMessages": sample.totalIncomingMessages,
-            "totalOutgoingMessages": sample.totalOutgoingMessages,
-            "totalUniqueContacts": sample.totalUniqueContacts,
-        ])
+        let avro = Avro()
+        do {
+            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            let messageUsage = MessageUsageModel(
+                time: time,
+                timeReceived: time,
+                device: selectedDevice?.model ?? "UNKNOWN",
+                totalIncomingMessages: sample.totalIncomingMessages,
+                totalOutgoingMessages: sample.totalOutgoingMessages,
+                totalUniqueContacts: sample.totalUniqueContacts
+            )
+            let binaryValue = try avro.encode(messageUsage)
+            sensorDataArray.append([UInt8](binaryValue))
+        } catch {
+            print("Failed to encode Message Usage Report data: \(error)")
+        }
     }
     
     override func getBeginDate() -> Double? {
@@ -34,4 +42,13 @@ class MessageUsageReportDataExtractor: SensorKitDataExtractor {
     override func _updateLastFetch(date: Double) {
         PersistentContainer.shared.lastFetchedMessageUsage = date
     }
+}
+
+struct MessageUsageModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let totalIncomingMessages: Int
+    let totalOutgoingMessages: Int
+    let totalUniqueContacts: Int
 }

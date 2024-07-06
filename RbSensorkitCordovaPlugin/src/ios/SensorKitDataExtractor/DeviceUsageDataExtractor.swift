@@ -7,6 +7,7 @@
 
 import Foundation
 import SensorKit
+import SwiftAvroCore
 
 @available(iOS 14.0, *)
 class DeviceUsageDataExtractor: SensorKitDataExtractor {
@@ -20,19 +21,27 @@ class DeviceUsageDataExtractor: SensorKitDataExtractor {
             version = sample.version
         }
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
-        sensorDataArray.append([
-            "time": time,
-            "timeReceived": time,
-            "device": selectedDevice?.model ?? "UNKNOWN",
-            "duration": sample.duration,
-            "totalScreenWakes": sample.totalScreenWakes,
-            "totalUnlocks": sample.totalUnlocks,
-            "totalUnlockDuration": sample.totalUnlockDuration,
-            "applicationUsageByCategory": "\(sample.applicationUsageByCategory)",
-            "notificationUsageByCategory": "\(sample.notificationUsageByCategory)",
-            "webUsageByCategory": "\(sample.webUsageByCategory)",
-            "version": version,
-        ])
+        let avro = Avro()
+        do {
+            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            let deviceUsage = DeviceUsageModel(
+                time: time,
+                timeReceived: time,
+                device: selectedDevice?.model ?? "UNKNOWN",
+                duration: sample.duration,
+                totalScreenWakes: sample.totalScreenWakes,
+                totalUnlocks: sample.totalUnlocks,
+                totalUnlockDuration: sample.totalUnlockDuration,
+                version: version,
+                applicationUsageByCategory: "\(sample.applicationUsageByCategory)",
+                notificationUsageByCategory: "\(sample.notificationUsageByCategory)",
+                webUsageByCategory: "\(sample.webUsageByCategory)"
+            )
+            let binaryValue = try avro.encode(deviceUsage)
+            sensorDataArray.append([UInt8](binaryValue))
+        } catch {
+            print("Failed to encode Device Usage data: \(error)")
+        }
     }
     
     override func getBeginDate() -> Double? {
@@ -42,4 +51,18 @@ class DeviceUsageDataExtractor: SensorKitDataExtractor {
     override func _updateLastFetch(date: Double) {
         PersistentContainer.shared.lastFetchedDeviceUsage = date
     }
+}
+
+struct DeviceUsageModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let duration: Double
+    let totalScreenWakes: Int
+    let totalUnlocks: Int
+    let totalUnlockDuration: Double
+    let version: String
+    let applicationUsageByCategory: String
+    let notificationUsageByCategory: String
+    let webUsageByCategory: String
 }

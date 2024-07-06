@@ -146,6 +146,7 @@ extension BackgroundSession: URLSessionDataDelegate {
             do {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     if((json["error"]) != nil){
+                        print("0000ERRR \(json["error_description"])")
                         let error = UploadError(message: json["error"] as! String) //"Upload failed \(responseText)") // NSError(domain:"", code:responseText, userInfo:nil)
                         delegate?.__didUploadFileFailed(error: error, fileName: fileNamesDictionary[dataTask.taskIdentifier])
                     } else {

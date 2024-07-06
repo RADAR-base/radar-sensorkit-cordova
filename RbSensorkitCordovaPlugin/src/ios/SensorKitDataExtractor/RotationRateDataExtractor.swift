@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 import CoreMotion
+import SwiftAvroCore
 
 @available(iOS 14.0, *)
 class RotationDataExtractor: SensorKitDataExtractor {
@@ -17,18 +18,26 @@ class RotationDataExtractor: SensorKitDataExtractor {
     
     override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! [CMRecordedRotationRateData]
+        let avro = Avro()
+        _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
         sample.forEach { a in
             let currentRecordTS: Double = a.startDate.timeIntervalSince1970
             if 1000 * (currentRecordTS - lastRecordTS) >= periodMili {
                 lastRecordTS = currentRecordTS
-                sensorDataArray.append([
-                    "time": currentRecordTS,
-                    "timeReceived": currentRecordTS,
-                    "device": selectedDevice?.model ?? "UNKNOWN",
-                    "x": a.rotationRate.x,
-                    "y": a.rotationRate.y,
-                    "z": a.rotationRate.z,
-                ])
+                do {
+                    let rotationRate = RotationRateModel(
+                        time: currentRecordTS,
+                        timeReceived: currentRecordTS,
+                        device: selectedDevice?.model ?? "UNKNOWN",
+                        x: Float(a.rotationRate.x),
+                        y: Float(a.rotationRate.y),
+                        z: Float(a.rotationRate.z)
+                    )
+                    let binaryValue = try avro.encode(rotationRate)
+                    sensorDataArray.append([UInt8](binaryValue))
+                } catch {
+                    print("Failed to encode Rotation data: \(error)")
+                }
             }
         }
     }
@@ -45,4 +54,13 @@ class RotationDataExtractor: SensorKitDataExtractor {
     override func _updateLastFetch(date: Double) {
         PersistentContainer.shared.lastFetchedRotationRate = date
     }
+}
+
+struct RotationRateModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let x: Float
+    let y: Float
+    let z: Float
 }

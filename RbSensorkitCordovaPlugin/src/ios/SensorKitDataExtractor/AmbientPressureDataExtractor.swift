@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 import CoreMotion
+import SwiftAvroCore
 
 @available(iOS 15.4, *)
 class AmbientPressureDataExtractor: SensorKitDataExtractor {
@@ -16,17 +17,25 @@ class AmbientPressureDataExtractor: SensorKitDataExtractor {
     
     override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! [CMRecordedPressureData]
+        let avro = Avro()
+        _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
         sample.forEach { a in
             let currentRecordTS: Double = a.startDate.timeIntervalSince1970
             if 1000 * (currentRecordTS - lastRecordTS) >= periodMili {
                 lastRecordTS = currentRecordTS
-                sensorDataArray.append([
-                    "time": currentRecordTS,
-                    "timeReceived": currentRecordTS,
-                    "device": selectedDevice?.model ?? "UNKNOWN",
-                    "pressure": a.pressure.value,
-                    "temperature": a.temperature.value,
-                ])
+                do {
+                    let ambientPressure = AmbientPressureModel(
+                        time: currentRecordTS,
+                        timeReceived: currentRecordTS,
+                        device: selectedDevice?.model ?? "UNKNOWN",
+                        pressure: a.pressure.value,
+                        temperature: a.temperature.value
+                    )
+                    let binaryValue = try avro.encode(ambientPressure)
+                    sensorDataArray.append([UInt8](binaryValue))
+                } catch {
+                    print("Failed to encode Ambient Pressure data: \(error)")
+                }
             }
         }
     }
@@ -43,4 +52,12 @@ class AmbientPressureDataExtractor: SensorKitDataExtractor {
     override func _updateLastFetch(date: Double) {
         PersistentContainer.shared.lastFetchedAmbientPressure = date
     }
+}
+
+struct AmbientPressureModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let pressure: Double
+    let temperature: Double
 }

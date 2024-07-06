@@ -8,6 +8,7 @@
 import Foundation
 import SensorKit
 import CoreMotion
+import SwiftAvroCore
 
 @available(iOS 14.0, *)
 class AccelerometerDataExtractor: SensorKitDataExtractor {
@@ -17,18 +18,26 @@ class AccelerometerDataExtractor: SensorKitDataExtractor {
     
     override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! [CMRecordedAccelerometerData]
+        let avro = Avro()
+        _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
         sample.forEach { a in
             let currentRecordTS: Double = a.startDate.timeIntervalSince1970
             if 1000 * (currentRecordTS - lastRecordTS) >= periodMili {
                 lastRecordTS = currentRecordTS
-                sensorDataArray.append([
-                    "time": currentRecordTS,
-                    "timeReceived": currentRecordTS,
-                    "device": selectedDevice?.model ?? "UNKNOWN",
-                    "x": a.acceleration.x,
-                    "y": a.acceleration.y,
-                    "z": a.acceleration.z,
-                ])
+                do {
+                    let acceleration = AccelerationModel(
+                        time: currentRecordTS,
+                        timeReceived: currentRecordTS,
+                        device: selectedDevice?.model ?? "UNKNOWN",
+                        x: Float(a.acceleration.x),
+                        y: Float(a.acceleration.y),
+                        z: Float(a.acceleration.z)
+                    )
+                    let binaryValue = try avro.encode(acceleration)
+                    sensorDataArray.append([UInt8](binaryValue))
+                } catch {
+                    print("Failed to encode Accelerometer data: \(error)")
+                }
             }
         }
     }
@@ -47,4 +56,13 @@ class AccelerometerDataExtractor: SensorKitDataExtractor {
 //        print("_updateLastFetch \(date)")
         PersistentContainer.shared.lastFetchedAccelerometer = date
     }
+}
+
+struct AccelerationModel: Encodable, Decodable {
+    let time: Double
+    let timeReceived: Double
+    let device: String
+    let x: Float
+    let y: Float
+    let z: Float
 }
