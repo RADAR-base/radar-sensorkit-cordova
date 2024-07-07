@@ -50,7 +50,7 @@ class TelephonySpeechMetricsDataExtractor: SensorKitDataExtractor {
                     soundClassification: (classificationsString ?? nil) as Any as? String
                 )
                 let binaryValue = try avro.encode(telephoneSpeechMetrics)
-                sensorDataArray.append([UInt8](binaryValue))
+                sensorDataArray.append([time: [UInt8](binaryValue)])
             } catch {
                 print("Failed to encode Telephony Speech Metrics data: \(error)")
             }

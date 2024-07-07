@@ -32,7 +32,7 @@ class AmbientPressureDataExtractor: SensorKitDataExtractor {
                         temperature: a.temperature.value
                     )
                     let binaryValue = try avro.encode(ambientPressure)
-                    sensorDataArray.append([UInt8](binaryValue))
+                    sensorDataArray.append([currentRecordTS: [UInt8](binaryValue)])
                 } catch {
                     print("Failed to encode Ambient Pressure data: \(error)")
                 }

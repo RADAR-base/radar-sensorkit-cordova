@@ -38,7 +38,7 @@ class DeviceUsageDataExtractor: SensorKitDataExtractor {
                 webUsageByCategory: "\(sample.webUsageByCategory)"
             )
             let binaryValue = try avro.encode(deviceUsage)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode Device Usage data: \(error)")
         }

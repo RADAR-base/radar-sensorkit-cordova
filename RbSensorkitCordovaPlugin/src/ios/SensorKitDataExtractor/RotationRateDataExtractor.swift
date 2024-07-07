@@ -34,7 +34,7 @@ class RotationDataExtractor: SensorKitDataExtractor {
                         z: Float(a.rotationRate.z)
                     )
                     let binaryValue = try avro.encode(rotationRate)
-                    sensorDataArray.append([UInt8](binaryValue))
+                    sensorDataArray.append([currentRecordTS: [UInt8](binaryValue)])
                 } catch {
                     print("Failed to encode Rotation data: \(error)")
                 }

@@ -29,7 +29,7 @@ class MessageUsageReportDataExtractor: SensorKitDataExtractor {
                 totalUniqueContacts: sample.totalUniqueContacts
             )
             let binaryValue = try avro.encode(messageUsage)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode Message Usage Report data: \(error)")
         }

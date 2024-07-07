@@ -34,7 +34,7 @@ class AccelerometerDataExtractor: SensorKitDataExtractor {
                         z: Float(a.acceleration.z)
                     )
                     let binaryValue = try avro.encode(acceleration)
-                    sensorDataArray.append([UInt8](binaryValue))
+                    sensorDataArray.append([currentRecordTS: [UInt8](binaryValue)])
                 } catch {
                     print("Failed to encode Accelerometer data: \(error)")
                 }

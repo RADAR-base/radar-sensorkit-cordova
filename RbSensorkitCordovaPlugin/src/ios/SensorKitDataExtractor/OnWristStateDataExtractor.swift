@@ -38,7 +38,7 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
                 onWristDate: onWristDate
             )
             let binaryValue = try avro.encode(onWristState)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode OnWrist State data: \(error)")
         }

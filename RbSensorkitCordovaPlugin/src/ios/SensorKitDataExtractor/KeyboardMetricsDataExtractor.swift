@@ -38,7 +38,7 @@ class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
                 totalTypingEpisodes: totalTypingEpisodes
             )
             let binaryValue = try avro.encode(keyboardUsageMetrics)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode Keyboard Metrics data: \(error)")
         }

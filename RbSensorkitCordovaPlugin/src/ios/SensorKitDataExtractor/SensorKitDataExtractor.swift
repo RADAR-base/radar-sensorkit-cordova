@@ -30,11 +30,11 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     var reader: SRSensorReader?
     
     var counter = 0
-    var sensorDataArray: [[UInt8]] = [] //[[String: Any]] = []
+    var sensorDataArray: [[Double : [UInt8]]] = [] //[[UInt8]] = [] //[[String: Any]] = []
     
     var totalIterations = 0
     var iterationCounter = -1
-    var results: [[[UInt8]]] = [] // [[[String : Any]]] = []
+    var results: [[[Double : [UInt8]]]] = [] //[[[UInt8]]] = [] // [[[String : Any]]] = []
     
     var startTime: Double = 0
     var endTime: Double = 0
@@ -88,34 +88,26 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         }
     }
     
-    func processData(sensorDataArray: [[UInt8]]) async { //}[[String : Any]]) async {
-//        print("***")
+    func processData(sensorDataArray: [[Double : [UInt8]]]) async { //}[[UInt8]]) async { //}[[String : Any]]) async {
         do {
             if sensorDataArray.isEmpty {
                 processNextFetch()
-//                print("*** 1")
                 return
             }
-//            print("*** 2")
             
             if self.topicKeyId == 0 {
                 self.topicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: topicName) ?? 0
             }
-//            print("*** 3")
             
             if self.topicValueId == 0 {
                 self.topicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: topicName) ?? 0
             }
             if self.topicSchemaStr == nil {
-                print("((((((((((((((((((((((()))))))))))))))))))))))")
                 self.topicSchemaStr = try await getTopicSchemaString(topicName: topicName) ?? nil
             }
-//            print("*** 4")
             
             await self.prepareForPost(sensorDataArray: sensorDataArray)
         } catch let error {
-//            print("*** 5")
-            
             delegate?.__failedFetchTopic(topicName: topicName, error: error)
             processNextFetch()
         }
@@ -216,7 +208,6 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
             Task {
                 do {
                     if self.topicSchemaStr == nil {
-                        print("((((((((((((((((((((((()))))))))))))))))))))))")
                         self.topicSchemaStr = try await getTopicSchemaString(topicName: topicName) ?? nil
                         convertSensorData(result: result)
                                 }
@@ -243,14 +234,10 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         return json
     }
     
-    func prepareForPost(sensorDataArray: [[UInt8]]) async { //}[[String : Any]]) async {
-        print("&&&")
+    func prepareForPost(sensorDataArray: [[Double : [UInt8]]]) async {
         totalIterations = sensorDataArray.count / chunkSize
-        print("&&& \(totalIterations)")
         results = sensorDataArray.chunked(into: chunkSize)
-        print("&&& \(results)")
         iterationCounter = -1
-        print("&&& \(iterationCounter)")
         await doNextPost()
     }
     
@@ -275,7 +262,6 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         var id: Int? = nil
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                print("*** TOPICID \(property) \(json)")
                 id = json["id"] as? Int
             }
         } catch let error {
@@ -286,8 +272,6 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     }
     
     func getTopicSchemaString(topicName: String) async throws -> String? {
-        print("000((((((((((((((((((((((()))))))))))))))))))))))")
-                    
         guard let baseUrl = RadarbaseConfig.baseUrl else {
             // send error to JS and return
             return nil
@@ -308,86 +292,36 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         var schemaStr: String? = nil
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-//                print("*** TOPICID \(property) \(json)")
                 schemaStr = json["schema"] as? String
             }
         } catch let error {
             print("We couldn't parse the data into JSON. \(error)")
         }
-        print("001(((((((((((((((((((((())))))))))))))))))))))) \(schemaStr)")
-              
         return schemaStr
     }
     
-    func postDataToKafka(payload: [[UInt8]]) async { //}[[String : Any]]) async {
-//        startTime = payload[0]["time"] as! Double
-//        endTime = payload[payload.count-1]["time"] as! Double
-//        print("***!")
-//        print(payload)
-//        print("***@")
-        // need the schema light
-        
-        // For each item in the payload -> Convert payload to binary
-        // get schema of recordset
-        // create object
-        // convert to binary
-        // write file
-        
-        let body = getBody(payload: payload, keySchemaId: self.topicKeyId, valueSchemaId: self.topicValueId)
-//        guard let data = try? JSONSerialization.data(withJSONObject: body) else {
-//            return
-//        }
-//        let compressedData = getCompressedData(data: data)
-        let compressedData = getCompressedData(data: body)
-
-//        await writeToFile(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_\(iterationCounter)", endTime: endTime)
-        await writeToFile2(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_\(iterationCounter)")
-    }
-    
-    func writeToFile2(data: Data, fileName: String) async{
-        // get path of directory
-//        let tempDir = getDocumentsDirectory()
-//        let localURL = tempDir.appendingPathComponent(fileName + ".txt.gz")
-//        do {
-//            try data.write(to: localURL)
-//            _updateLastFetch(date: endTime)
-//            await self.doNextPost()
-//        } catch {
-//            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-//            print("\(Date().timeIntervalSince1970) Write failed")
-//        }
-        
-        
-        guard let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else {
+    func postDataToKafka(payload: [[Double : [UInt8]]]) async {//}[[UInt8]]) async { //}[[String : Any]]) async {
+        guard let lastDictionary = payload.last else {
             return
         }
-        // create file url
-        let fileurl =  directory.appendingPathComponent("\(fileName).txt.gz")
-    // if file exists then write data
-        if FileManager.default.fileExists(atPath: fileurl.path) {
-            if let fileHandle = FileHandle(forWritingAtPath: fileurl.path) {
-                // seekToEndOfFile, writes data at the last of file(appends not override)
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(data)
-                fileHandle.closeFile()
-            }
-            else {
-                print("Can't open file to write.")
+        
+        guard let lastKey = lastDictionary.keys.sorted().last else {
+            return
+        }
+        
+        var allPayloadValues: [[UInt8]] = []
+        for dictionary in payload {
+            for value in dictionary.values {
+                allPayloadValues.append(value)
             }
         }
-        else {
-            // if file does not exist write data for the first time
-            do{
-                try data.write(to: fileurl, options: .atomic)
-                print("Success.")
-                await self.doNextPost()
-
-            }catch {
-                print("Unable to write in new file.")
-            }
-        }
-
+            
+        let body = getBody(payload: allPayloadValues, keySchemaId: self.topicKeyId, valueSchemaId: self.topicValueId)
+        let compressedData = getCompressedData(data: body)
+        await writeToFile(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_\(iterationCounter)", endTime: lastKey)
     }
+    
+    
     
 //    var ccounter = 0
    
@@ -409,52 +343,17 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
           ]
         }
         """
-        
+
         let avro = Avro()
-//        do {
-//        print("SOURCEID \(UserConfig.sourceId) \(UserConfig.projectId)")
-            _ = avro.decodeSchema(schema: recordSetSchemaStr)!
-            let recordSet = RecordSetModel(
-                keySchemaVersion: 1, valueSchemaVersion: 1,
-                projectId: UserConfig.projectId["string"]!!, userId:UserConfig.userId!, sourceId: UserConfig.sourceId ?? "",
-                data: payload
-            )
-                
-//            let ambientLight = AmbientLightModel(
-//                time: 1719844860.000,
-//                timeReceived: 1719844860.000,
-//                device: "UNKNOWN",
-//                chromaticityX: 0.123,
-//                chromaticityY: 0.124,
-//                lux: 0.125,
-//                placement: SensorPlacement.FRONT_BOTTOM
-//            )
-            let recordSetBinaryValue = try!avro.encode(recordSet)
-//            print("Encoded binary value: \(recordSetBinaryValue)")
-            let hexString = dataToHexString(recordSetBinaryValue)
-            print("hexString: \(hexString)")
-            return recordSetBinaryValue
-//            sensorDataArray.append([UInt8](binaryValue))
-//        } catch {
-//            print("Failed to encode: \(error)")
-//        }
-        
-        
-//        let key: [String : Any] = [
-//            "projectId": UserConfig.projectId,
-//            "userId": UserConfig.userId!,
-//            "sourceId": UserConfig.sourceId ?? ""
-//        ] as [String : Any]
-//        let records = payload.map {
-//            return ["key": key, "value": $0]
-//        }
-//        
-//        let body: [String: Any] = [
-//            "key_schema_id": keySchemaId,
-//            "value_schema_id": valueSchemaId,
-//            "records": records
-//        ]
-//        return body
+        _ = avro.decodeSchema(schema: recordSetSchemaStr)!
+        let recordSet = RecordSetModel(
+            keySchemaVersion: 1, valueSchemaVersion: 1,
+            projectId: UserConfig.projectId["string"]!!, userId:UserConfig.userId!, sourceId: UserConfig.sourceId ?? "",
+            data: payload
+        )
+        let recordSetBinaryValue = try!avro.encode(recordSet)
+        let hexString = dataToHexString(recordSetBinaryValue)
+        return recordSetBinaryValue
     }
     
     func dataToHexString(_ data: Data) -> String {
@@ -525,16 +424,33 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
 extension SensorKitDataExtractor {
     // UTIL
     func writeToFile(data: Data, fileName: String, endTime: Double) async {
-        let tempDir = getDocumentsDirectory()
-        let localURL = tempDir.appendingPathComponent(fileName + ".txt.gz")
-        do {
-            try data.write(to: localURL)
-            _updateLastFetch(date: endTime)
-            await self.doNextPost()
-        } catch {
-            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-            print("\(Date().timeIntervalSince1970) Write failed")
+        guard let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else {
+            return
         }
+        let fileurl =  directory.appendingPathComponent("\(fileName).txt.gz")
+        if FileManager.default.fileExists(atPath: fileurl.path) {
+            if let fileHandle = FileHandle(forWritingAtPath: fileurl.path) {
+                // seekToEndOfFile, writes data at the last of file(appends not override)
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(data)
+                fileHandle.closeFile()
+            }
+            else {
+                print("Can't open file to write.")
+            }
+        }
+        else {
+            // if file does not exist write data for the first time
+            do{
+                try data.write(to: fileurl, options: .atomic)
+                _updateLastFetch(date: endTime)
+                await self.doNextPost()
+
+            }catch {
+                print("Unable to write in new file.")
+            }
+        }
+
     }
 }
 
@@ -544,7 +460,7 @@ struct RecordSetModel: Encodable, Decodable {
     let projectId: String?
     let userId: String?
     let sourceId: String
-    let data: [[UInt8]] //accAvroBuffer] //lightAvroBuffer] // Use Buffer directly
+    let data: [[UInt8]]
 };
 
 

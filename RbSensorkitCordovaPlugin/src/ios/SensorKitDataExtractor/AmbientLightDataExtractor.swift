@@ -23,7 +23,7 @@ class AmbientLightDataExtractor: SensorKitDataExtractor {
                 placement: sample.placement.description
             )
             let binaryValue = try avro.encode(ambientLight)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode AmbientLight data: \(error)")
         }

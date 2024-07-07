@@ -36,7 +36,7 @@ class VisitsDataExtractor: SensorKitDataExtractor {
                 locationCategory: sample.locationCategory.description
             )
             let binaryValue = try avro.encode(visit)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode Visits data: \(error)")
         }

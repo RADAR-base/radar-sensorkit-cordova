@@ -36,7 +36,7 @@ class PedometerDataExtractor: SensorKitDataExtractor {
                 floorsDescended: Int(truncating: sample.floorsDescended ?? 0)
             )
             let binaryValue = try avro.encode(pedometer)
-            sensorDataArray.append([UInt8](binaryValue))
+            sensorDataArray.append([time: [UInt8](binaryValue)])
         } catch {
             print("Failed to encode Pedometer data: \(error)")
         }
