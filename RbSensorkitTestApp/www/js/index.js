@@ -122,9 +122,9 @@ async function onDeviceReady() {
 
         try {
             const sensorArray = [
-                {sensor: "ambientLightSensor", period: 3600000, chunkSize: 10},
+                // {sensor: "ambientLightSensor", period: 3600000, chunkSize: 10},
                 // {sensor: "accelerometer", period: 100, chunkSize: 10000},
-                // {sensor: "rotationRate", period: 1000, chunkSize: 10000},
+                {sensor: "rotationRate", period: 1000, chunkSize: 10000},
                 // {sensor: "deviceUsageReport"},
                 // {sensor: "keyboardMetrics"},
                 // {sensor: "messagesUsageReport"},
@@ -132,7 +132,7 @@ async function onDeviceReady() {
                 // {sensor: "pedometerData"},
                 // {sensor: "phoneUsageReport"},
                 // {sensor: "visits"},
-                // {sensor: "ambientPressure"},
+                // {sensor: "ambientPressure", period: 3600000, chunkSize: 10},
                 // {sensor: "telephonySpeechMetrics"}
             ]
             const res = await RbSensorkitCordovaPlugin.selectSensors(sensorArray)
