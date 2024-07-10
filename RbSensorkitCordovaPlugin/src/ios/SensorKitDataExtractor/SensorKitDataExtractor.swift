@@ -24,7 +24,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
     
     var topicKeyId = 0
     var topicValueId = 0
-    var topicSchemaStr: String? = nil
+//    var topicSchemaStr: String? = nil
     var lastRecordTS: Double = 0
     
     var reader: SRSensorReader?
@@ -95,16 +95,16 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
                 return
             }
             
-            if self.topicKeyId == 0 {
-                self.topicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: topicName) ?? 0
-            }
-            
-            if self.topicValueId == 0 {
-                self.topicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: topicName) ?? 0
-            }
-            if self.topicSchemaStr == nil {
-                self.topicSchemaStr = try await getTopicSchemaString(topicName: topicName) ?? nil
-            }
+//            if self.topicKeyId == 0 {
+//                self.topicKeyId = try await getTopicId(property: TopicKeyValue.KEY, topicName: topicName) ?? 0
+//            }
+//            
+//            if self.topicValueId == 0 {
+//                self.topicValueId = try await getTopicId(property: TopicKeyValue.VALUE, topicName: topicName) ?? 0
+//            }
+//            if self.topicSchemaStr == nil {
+//                self.topicSchemaStr = try await getTopicSchemaString(topicName: topicName) ?? nil
+//            }
             
             await self.prepareForPost(sensorDataArray: sensorDataArray)
         } catch let error {
@@ -205,16 +205,16 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
         let currentRecordTS: Double = result.timestamp.rawValue * 1000
         if currentRecordTS - lastRecordTS >= periodMili {
             lastRecordTS = currentRecordTS
-            Task {
-                do {
-                    if self.topicSchemaStr == nil {
-                        self.topicSchemaStr = try await getTopicSchemaString(topicName: topicName) ?? nil
+//            Task {
+//                do {
+//                    if self.topicSchemaStr == nil {
+//                        self.topicSchemaStr = try await getTopicSchemaString(topicName: topicName) ?? nil
                         convertSensorData(result: result)
-                                }
-                } catch let error {
-                    delegate?.__failedFetchTopic(topicName: topicName, error: error)
-                }
-            }
+//                                }
+//                } catch let error {
+//                    delegate?.__failedFetchTopic(topicName: topicName, error: error)
+//                }
+//            }
         }
         return true
     }

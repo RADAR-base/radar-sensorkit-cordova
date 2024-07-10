@@ -24,7 +24,7 @@ class KeyboardMetricsDataExtractor: SensorKitDataExtractor {
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
         let avro = Avro()
         do {
-            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            _ = avro.decodeSchema(schema: ConfigSensor.schemaStr["keyboardMetrics"]!)
             let keyboardUsageMetrics = KeyboardUsageMetricsModel(
                 time: time,
                 timeReceived: time,

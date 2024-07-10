@@ -20,7 +20,7 @@ class PedometerDataExtractor: SensorKitDataExtractor {
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
         let avro = Avro()
         do {
-            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            _ = avro.decodeSchema(schema: ConfigSensor.schemaStr["pedometerData"]!)
             let pedometer = PedometerModel(
                 time: time,
                 timeReceived: time,

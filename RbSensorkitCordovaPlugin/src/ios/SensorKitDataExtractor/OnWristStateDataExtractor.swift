@@ -26,7 +26,7 @@ class OnWristStateDataExtractor: SensorKitDataExtractor {
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
         let avro = Avro()
         do {
-            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            _ = avro.decodeSchema(schema: ConfigSensor.schemaStr["onWristState"]!)
             let onWristState = OnWristStateModel(
                 time: time,
                 timeReceived: time,

@@ -19,7 +19,7 @@ class AccelerometerDataExtractor: SensorKitDataExtractor {
     override func convertSensorData(result: SRFetchResult<AnyObject>){
         let sample = result.sample as! [CMRecordedAccelerometerData]
         let avro = Avro()
-        _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+        _ = avro.decodeSchema(schema: ConfigSensor.schemaStr["accelerometer"]!)
         sample.forEach { a in
             let currentRecordTS: Double = a.startDate.timeIntervalSince1970
             if 1000 * (currentRecordTS - lastRecordTS) >= periodMili {

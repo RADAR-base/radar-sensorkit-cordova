@@ -27,7 +27,7 @@ class TelephonySpeechMetricsDataExtractor: SensorKitDataExtractor {
             let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
             let avro = Avro()
             do {
-                _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+                _ = avro.decodeSchema(schema: ConfigSensor.schemaStr["telephonySpeechMetrics"]!)
                 let telephoneSpeechMetrics = TelephonySpeechMetricsModel(
                     time: time,
                     timeReceived: time,

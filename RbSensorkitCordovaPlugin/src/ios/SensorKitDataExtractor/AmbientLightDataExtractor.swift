@@ -12,7 +12,7 @@ class AmbientLightDataExtractor: SensorKitDataExtractor {
         let time = result.timestamp.toCFAbsoluteTime() + kCFAbsoluteTimeIntervalSince1970
         let avro = Avro()
         do {
-            _ = avro.decodeSchema(schema: self.topicSchemaStr!)!
+            _ = avro.decodeSchema(schema: ConfigSensor.schemaStr["ambientLightSensor"]!)
             let ambientLight = AmbientLightModel(
                 time: time,
                 timeReceived: time,
