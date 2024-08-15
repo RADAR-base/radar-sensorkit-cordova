@@ -318,7 +318,7 @@ class SensorKitDataExtractor : NSObject, SRSensorReaderDelegate, URLSessionTaskD
             
         let body = getBody(payload: allPayloadValues, keySchemaId: self.topicKeyId, valueSchemaId: self.topicValueId)
         let compressedData = getCompressedData(data: body)
-        await writeToFile(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_\(iterationCounter)", endTime: lastKey)
+        await writeToFile(data: compressedData, fileName: "\(topicName)___\(Date().timeIntervalSince1970)_binary_\(iterationCounter)", endTime: lastKey)
     }
     
     

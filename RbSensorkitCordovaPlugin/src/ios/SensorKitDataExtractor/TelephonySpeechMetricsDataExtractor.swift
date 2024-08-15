@@ -32,22 +32,21 @@ class TelephonySpeechMetricsDataExtractor: SensorKitDataExtractor {
                     time: time,
                     timeReceived: time,
                     device: selectedDevice?.model ?? "UNKNOWN",
-                    audioLevelLoudness: sample.audioLevel?.loudness as Any as? Double,
                     audioLevelStart: sample.audioLevel?.timeRange.start.seconds as Any as? Double,
                     audioLevelDuration: sample.audioLevel?.timeRange.duration.seconds as Any as? Double,
-                    
-                    speechExpressionStart: sample.speechExpression?.timeRange.start.seconds as Any as? Double,
-                    speechExpressionDuration: sample.speechExpression?.timeRange.duration.seconds as Any as? Double,
-//                    speechExpressionVersion: sample.speechExpression?.version as Any,
-                    speechExpressionConfidence: sample.speechExpression?.confidence as Any as? Double,
-                    speechExpressionMood: sample.speechExpression?.mood as Any as? Double,
-                    speechExpressionValence: sample.speechExpression?.valence as Any as? Double,
-                    speechExpressionActivation: sample.speechExpression?.activation as Any as? Double,
-                    speechExpressionDominance: sample.speechExpression?.dominance as Any as? Double,
+                    audioLevelLoudness: sample.audioLevel?.loudness as Any as? Double,
                     
                     soundClassificationStart: sample.soundClassification?.timeRange.start.seconds as Any as? Double,
                     soundClassificationDuration: sample.soundClassification?.timeRange.duration.seconds as Any as? Double,
-                    soundClassification: (classificationsString ?? nil) as Any as? String
+                    soundClassification: (classificationsString ?? nil) as Any as? String,
+                    
+                    speechExpressionStart: sample.speechExpression?.timeRange.start.seconds as Any as? Double,
+                    speechExpressionDuration: sample.speechExpression?.timeRange.duration.seconds as Any as? Double,
+                    speechExpressionActivation: sample.speechExpression?.activation as Any as? Double,
+                    speechExpressionConfidence: sample.speechExpression?.confidence as Any as? Double,
+                    speechExpressionDominance: sample.speechExpression?.dominance as Any as? Double,
+                    speechExpressionMood: sample.speechExpression?.mood as Any as? Double,
+                    speechExpressionValence: sample.speechExpression?.valence as Any as? Double
                 )
                 let binaryValue = try avro.encode(telephoneSpeechMetrics)
                 sensorDataArray.append([time: [UInt8](binaryValue)])
@@ -73,20 +72,17 @@ struct TelephonySpeechMetricsModel: Encodable, Decodable {
     let time: Double
     let timeReceived: Double
     let device: String
-    let audioLevelLoudness: Double?
     let audioLevelStart: Double?
     let audioLevelDuration: Double?
-    
-    let speechExpressionStart: Double?
-    let speechExpressionDuration: Double?
-//    let speechExpressionVersion: sample.speechExpression?.version as Any,
-    let speechExpressionConfidence: Double?
-    let speechExpressionMood: Double?
-    let speechExpressionValence: Double?
-    let speechExpressionActivation: Double?
-    let speechExpressionDominance: Double?
-    
+    let audioLevelLoudness: Double?
     let soundClassificationStart: Double?
     let soundClassificationDuration: Double?
     let soundClassification: String?
+    let speechExpressionStart: Double?
+    let speechExpressionDuration: Double?
+    let speechExpressionActivation: Double?
+    let speechExpressionConfidence: Double?
+    let speechExpressionDominance: Double?
+    let speechExpressionMood: Double?
+    let speechExpressionValence: Double?
 }

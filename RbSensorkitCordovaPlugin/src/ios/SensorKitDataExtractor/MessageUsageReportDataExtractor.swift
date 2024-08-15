@@ -24,6 +24,7 @@ class MessageUsageReportDataExtractor: SensorKitDataExtractor {
                 time: time,
                 timeReceived: time,
                 device: selectedDevice?.model ?? "UNKNOWN",
+                duration: sample.duration,
                 totalIncomingMessages: sample.totalIncomingMessages,
                 totalOutgoingMessages: sample.totalOutgoingMessages,
                 totalUniqueContacts: sample.totalUniqueContacts
@@ -48,6 +49,7 @@ struct MessageUsageModel: Encodable, Decodable {
     let time: Double
     let timeReceived: Double
     let device: String
+    let duration: Double
     let totalIncomingMessages: Int
     let totalOutgoingMessages: Int
     let totalUniqueContacts: Int

@@ -292,7 +292,12 @@ extension RbSensorkitCordovaPlugin {
             request.addValue("gzip", forHTTPHeaderField: "Content-Encoding")
             request.httpMethod = "POST"
 
-            request.setValue("application/vnd.radarbase.avro.v1+binary", forHTTPHeaderField: "Content-Type")
+            if(fileName.contains("binary")) {
+                request.setValue("application/vnd.radarbase.avro.v1+binary", forHTTPHeaderField: "Content-Type")
+            } else {
+                request.setValue("application/vnd.kafka.avro.v2+json", forHTTPHeaderField: "Content-Type")
+            }
+
 //            request.setValue("application/vnd.kafka.avro.v2+json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/vnd.kafka.v2+json, application/vnd.kafka+json; q=0.9, application/json; q=0.8", forHTTPHeaderField: "Accept")
             guard let token = UserConfig.token else {
